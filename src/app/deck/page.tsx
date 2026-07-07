@@ -183,8 +183,8 @@ function DeckDetail() {
             className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900"
           >
             <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{card.frontText}</p>
-              <p className="truncate text-sm text-neutral-500">{card.backText}</p>
+              <p className="truncate font-medium">{card.sideAText}</p>
+              <p className="truncate text-sm text-neutral-500">{card.sideBText}</p>
               {card.attempts > 0 && (
                 <p className="mt-0.5 text-xs text-neutral-400">
                   시도 {card.attempts}회 · 오답률 {Math.round(card.errorRate * 100)}%

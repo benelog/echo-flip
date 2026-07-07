@@ -29,8 +29,8 @@ type SharedDeckSummary struct {
 // SharedCard is the card payload exposed to non-owners: content only, no ids
 // or SRS state.
 type SharedCard struct {
-	FrontText string   `json:"frontText"`
-	BackText  string   `json:"backText"`
+	SideAText string   `json:"sideAText"`
+	SideBText string   `json:"sideBText"`
 	CardType  string   `json:"cardType"`
 	Tags      []string `json:"tags"`
 	Phonetic  *string  `json:"phonetic"`
@@ -116,7 +116,7 @@ func (s *Store) GetSharedDeck(ctx context.Context, viewerID uuid.UUID, slug stri
 
 func (s *Store) GetSharedDeckCards(ctx context.Context, slug string) ([]SharedCard, error) {
 	rows, err := s.pool.Query(ctx,
-		`select c.front_text, c.back_text, c.card_type, c.tags, c.phonetic, c.example, c.notes
+		`select c.side_a_text, c.side_b_text, c.card_type, c.tags, c.phonetic, c.example, c.notes
 		 from cards c
 		 join decks d on d.id = c.deck_id
 		 where d.share_slug = $1
@@ -128,7 +128,7 @@ func (s *Store) GetSharedDeckCards(ctx context.Context, slug string) ([]SharedCa
 	cards := []SharedCard{}
 	for rows.Next() {
 		var c SharedCard
-		if err := rows.Scan(&c.FrontText, &c.BackText, &c.CardType, &c.Tags,
+		if err := rows.Scan(&c.SideAText, &c.SideBText, &c.CardType, &c.Tags,
 			&c.Phonetic, &c.Example, &c.Notes); err != nil {
 			return nil, err
 		}
@@ -169,9 +169,9 @@ func (s *Store) ImportSharedDeck(ctx context.Context, viewerID uuid.UUID, slug s
 
 	if _, err := tx.Exec(ctx,
 		`with copied as (
-		   insert into cards (user_id, deck_id, front_text, back_text, card_type,
+		   insert into cards (user_id, deck_id, side_a_text, side_b_text, card_type,
 		                      tags, phonetic, example, notes)
-		   select $1, $2, front_text, back_text, card_type, tags, phonetic, example, notes
+		   select $1, $2, side_a_text, side_b_text, card_type, tags, phonetic, example, notes
 		   from cards where deck_id = $3
 		   returning id
 		 )

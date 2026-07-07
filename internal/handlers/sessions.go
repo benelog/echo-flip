@@ -18,6 +18,7 @@ import (
 func (h *Handlers) CreateSession(c *gin.Context) {
 	var body struct {
 		Mode      string          `json:"mode"`
+		Direction string          `json:"direction"`
 		DeckID    *uuid.UUID      `json:"deckId"`
 		Rule      json.RawMessage `json:"rule"`
 		DueBefore *time.Time      `json:"dueBefore"`
@@ -29,6 +30,13 @@ func (h *Handlers) CreateSession(c *gin.Context) {
 	}
 	if body.Limit <= 0 || body.Limit > 200 {
 		body.Limit = 50
+	}
+	if body.Direction == "" {
+		body.Direction = "a_to_b"
+	}
+	if body.Direction != "a_to_b" && body.Direction != "b_to_a" {
+		badRequest(c, "direction must be a_to_b or b_to_a")
+		return
 	}
 	userID := auth.UserID(c)
 	ctx := c.Request.Context()
@@ -74,7 +82,7 @@ func (h *Handlers) CreateSession(c *gin.Context) {
 		return
 	}
 
-	sess, err := h.Store.CreateSession(ctx, userID, body.Mode, body.DeckID, ruleJSON, len(cards))
+	sess, err := h.Store.CreateSession(ctx, userID, body.Mode, body.Direction, body.DeckID, ruleJSON, len(cards))
 	if err != nil {
 		fail(c, err)
 		return

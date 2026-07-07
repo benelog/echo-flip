@@ -1,26 +1,37 @@
 "use client";
 
-import type { Card } from "@/lib/types";
+import type { Card, StudyDirection } from "@/lib/types";
 import { TtsButton } from "./TtsButton";
 
 const TYPE_LABEL: Record<Card["cardType"], string> = {
   word: "단어",
   sentence: "문장",
   idiom: "숙어",
+  concept: "개념",
 };
 
-/** 3D flip card: front (English) → back (meaning). */
+/**
+ * 3D flip card: question side → answer side, following the study direction.
+ * TTS and phonetics belong to side A (the English/term side), so they render
+ * only on whichever face shows side A — never as a hint for the hidden answer.
+ */
 export function Flashcard({
   card,
+  direction,
   revealed,
   onReveal,
   ttsRate,
 }: {
   card: Card;
+  direction: StudyDirection;
   revealed: boolean;
   onReveal: () => void;
   ttsRate?: number;
 }) {
+  const aFirst = direction === "a_to_b";
+  const questionText = aFirst ? card.sideAText : card.sideBText;
+  const answerText = aFirst ? card.sideBText : card.sideAText;
+
   return (
     <div
       className="flip-scene min-h-72 w-full cursor-pointer select-none"
@@ -32,13 +43,13 @@ export function Flashcard({
             <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
               {TYPE_LABEL[card.cardType]}
             </span>
-            <TtsButton text={card.frontText} rate={ttsRate} />
+            {aFirst && <TtsButton text={card.sideAText} rate={ttsRate} />}
           </div>
           <div className="flex flex-1 flex-col items-center justify-center gap-2 py-6">
             <p className="text-center text-2xl font-semibold leading-snug">
-              {card.frontText}
+              {questionText}
             </p>
-            {card.phonetic && (
+            {aFirst && card.phonetic && (
               <p className="text-sm text-neutral-500">{card.phonetic}</p>
             )}
           </div>
@@ -52,14 +63,17 @@ export function Flashcard({
           <div className="flex items-center justify-between">
             <span className="text-xs text-blue-600 dark:text-blue-300">정답</span>
             <TtsButton
-              text={card.example ? `${card.frontText}. ${card.example}` : card.frontText}
+              text={card.example ? `${card.sideAText}. ${card.example}` : card.sideAText}
               rate={ttsRate}
             />
           </div>
           <div className="flex flex-1 flex-col justify-center gap-3 py-4">
             <p className="whitespace-pre-line text-center text-lg font-medium leading-relaxed">
-              {card.backText}
+              {answerText}
             </p>
+            {!aFirst && card.phonetic && (
+              <p className="text-center text-sm text-neutral-500">{card.phonetic}</p>
+            )}
             {card.example && (
               <p className="whitespace-pre-line text-center text-sm italic text-neutral-600 dark:text-neutral-300">
                 {card.example}

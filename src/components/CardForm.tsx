@@ -11,6 +11,7 @@ const TYPES: { value: CardType; label: string }[] = [
   { value: "word", label: "단어" },
   { value: "sentence", label: "문장" },
   { value: "idiom", label: "숙어" },
+  { value: "concept", label: "개념" },
 ];
 
 const inputCls =
@@ -26,8 +27,8 @@ export function CardForm({
   submitting: boolean;
 }) {
   const toast = useToast();
-  const [front, setFront] = useState(initial?.frontText ?? "");
-  const [back, setBack] = useState(initial?.backText ?? "");
+  const [sideA, setSideA] = useState(initial?.sideAText ?? "");
+  const [sideB, setSideB] = useState(initial?.sideBText ?? "");
   const [cardType, setCardType] = useState<CardType>(initial?.cardType ?? "word");
   const [tags, setTags] = useState(initial?.tags.join(", ") ?? "");
   const [phonetic, setPhonetic] = useState(initial?.phonetic ?? "");
@@ -35,15 +36,15 @@ export function CardForm({
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [looking, setLooking] = useState(false);
 
-  const canLookup = cardType === "word" && front.trim().split(/\s+/).length === 1;
+  const canLookup = cardType === "word" && sideA.trim().split(/\s+/).length === 1;
 
   const fillFromDictionary = async () => {
     setLooking(true);
     try {
-      const entry = await lookupWord(front);
+      const entry = await lookupWord(sideA);
       // Fill only fields the user hasn't typed yet.
       if (entry.phonetic && !phonetic) setPhonetic(entry.phonetic);
-      if (entry.definition && !back) setBack(entry.definition);
+      if (entry.definition && !sideB) setSideB(entry.definition);
       if (entry.example && !example) setExample(entry.example);
       toast("사전에서 채웠어요");
     } catch (e) {
@@ -60,13 +61,13 @@ export function CardForm({
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!front.trim() || !back.trim()) {
-      toast("앞면과 뒷면을 입력해주세요", "error");
+    if (!sideA.trim() || !sideB.trim()) {
+      toast("A면과 B면을 모두 입력해주세요", "error");
       return;
     }
     onSubmit({
-      frontText: front.trim(),
-      backText: back.trim(),
+      sideAText: sideA.trim(),
+      sideBText: sideB.trim(),
       cardType,
       tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
       phonetic: phonetic.trim() || null,
@@ -96,9 +97,9 @@ export function CardForm({
 
       <label className="flex flex-col gap-1.5">
         <span className="flex items-center justify-between text-sm font-medium">
-          앞면 (영어)
+          A면 (영어 · 용어)
           <span className="flex items-center gap-1">
-            {front.trim() && <TtsButton text={front} />}
+            {sideA.trim() && <TtsButton text={sideA} />}
             {canLookup && (
               <button
                 type="button"
@@ -113,19 +114,19 @@ export function CardForm({
           </span>
         </span>
         <textarea
-          value={front}
-          onChange={(e) => setFront(e.target.value)}
+          value={sideA}
+          onChange={(e) => setSideA(e.target.value)}
           rows={2}
-          placeholder="serendipity / Break a leg! / hit the sack"
+          placeholder="serendipity / hit the sack / idempotency"
           className={inputCls}
         />
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">뒷면 (뜻/설명)</span>
+        <span className="text-sm font-medium">B면 (뜻 · 설명)</span>
         <textarea
-          value={back}
-          onChange={(e) => setBack(e.target.value)}
+          value={sideB}
+          onChange={(e) => setSideB(e.target.value)}
           rows={3}
           placeholder="우연한 행운, 뜻밖의 발견"
           className={inputCls}

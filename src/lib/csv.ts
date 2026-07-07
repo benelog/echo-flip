@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import type { CardInput, CardType } from "./types";
 
-const TYPES: CardType[] = ["word", "sentence", "idiom"];
+const TYPES: CardType[] = ["word", "sentence", "idiom", "concept"];
 
 export interface CsvParseResult {
   cards: CardInput[];
@@ -9,6 +9,9 @@ export interface CsvParseResult {
 }
 
 interface CsvRow {
+  side_a?: string;
+  side_b?: string;
+  // Legacy headers from decks exported before the side A/B rename.
   front?: string;
   back?: string;
   type?: string;
@@ -19,13 +22,13 @@ interface CsvRow {
 
 /** Maps one parsed CSV row to a card; null when required fields are missing. */
 export function rowToCard(row: CsvRow): CardInput | null {
-  const front = row.front?.trim();
-  const back = row.back?.trim();
-  if (!front || !back) return null;
+  const sideA = (row.side_a ?? row.front)?.trim();
+  const sideB = (row.side_b ?? row.back)?.trim();
+  if (!sideA || !sideB) return null;
   const type = row.type?.trim().toLowerCase() as CardType;
   return {
-    frontText: front,
-    backText: back,
+    sideAText: sideA,
+    sideBText: sideB,
     cardType: TYPES.includes(type) ? type : "word",
     tags:
       row.tags

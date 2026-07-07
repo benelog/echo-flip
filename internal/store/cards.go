@@ -15,8 +15,8 @@ import (
 type Card struct {
 	ID        uuid.UUID `json:"id"`
 	DeckID    uuid.UUID `json:"deckId"`
-	FrontText string    `json:"frontText"`
-	BackText  string    `json:"backText"`
+	SideAText string    `json:"sideAText"`
+	SideBText string    `json:"sideBText"`
 	CardType  string    `json:"cardType"`
 	Tags      []string  `json:"tags"`
 	Phonetic  *string   `json:"phonetic"`
@@ -34,8 +34,8 @@ type Card struct {
 
 type CardInput struct {
 	DeckID    uuid.UUID `json:"deckId"`
-	FrontText string    `json:"frontText"`
-	BackText  string    `json:"backText"`
+	SideAText string    `json:"sideAText"`
+	SideBText string    `json:"sideBText"`
 	CardType  string    `json:"cardType"`
 	Tags      []string  `json:"tags"`
 	Phonetic  *string   `json:"phonetic"`
@@ -44,13 +44,13 @@ type CardInput struct {
 }
 
 const cardSelect = `
-	select id, deck_id, front_text, back_text, card_type, tags, phonetic, example,
+	select id, deck_id, side_a_text, side_b_text, card_type, tags, phonetic, example,
 	       notes, created_at, attempts, error_rate, interval_days, due_at, last_reviewed_at
 	from cards_with_stats`
 
 func scanCard(row pgx.Row) (Card, error) {
 	var c Card
-	err := row.Scan(&c.ID, &c.DeckID, &c.FrontText, &c.BackText, &c.CardType, &c.Tags,
+	err := row.Scan(&c.ID, &c.DeckID, &c.SideAText, &c.SideBText, &c.CardType, &c.Tags,
 		&c.Phonetic, &c.Example, &c.Notes, &c.CreatedAt,
 		&c.Attempts, &c.ErrorRate, &c.IntervalDays, &c.DueAt, &c.LastReviewed)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -99,9 +99,9 @@ func (s *Store) CreateCard(ctx context.Context, userID uuid.UUID, in CardInput) 
 
 	var cardID uuid.UUID
 	err = tx.QueryRow(ctx,
-		`insert into cards (user_id, deck_id, front_text, back_text, card_type, tags, phonetic, example, notes)
+		`insert into cards (user_id, deck_id, side_a_text, side_b_text, card_type, tags, phonetic, example, notes)
 		 values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`,
-		userID, in.DeckID, in.FrontText, in.BackText, in.CardType, in.Tags, in.Phonetic, in.Example, in.Notes).
+		userID, in.DeckID, in.SideAText, in.SideBText, in.CardType, in.Tags, in.Phonetic, in.Example, in.Notes).
 		Scan(&cardID)
 	if err != nil {
 		return Card{}, err
@@ -119,10 +119,10 @@ func (s *Store) CreateCard(ctx context.Context, userID uuid.UUID, in CardInput) 
 func (s *Store) UpdateCard(ctx context.Context, userID, cardID uuid.UUID, in CardInput) (Card, error) {
 	tag, err := s.pool.Exec(ctx,
 		`update cards set
-		   front_text = $3, back_text = $4, card_type = $5, tags = $6,
+		   side_a_text = $3, side_b_text = $4, card_type = $5, tags = $6,
 		   phonetic = $7, example = $8, notes = $9, updated_at = now()
 		 where user_id = $1 and id = $2`,
-		userID, cardID, in.FrontText, in.BackText, in.CardType, in.Tags, in.Phonetic, in.Example, in.Notes)
+		userID, cardID, in.SideAText, in.SideBText, in.CardType, in.Tags, in.Phonetic, in.Example, in.Notes)
 	if err != nil {
 		return Card{}, err
 	}
@@ -148,8 +148,8 @@ type BulkResult struct {
 	Skipped int `json:"skipped"`
 }
 
-// BulkCreateCards inserts many cards, skipping fronts that already exist in
-// the deck (or repeat within the batch), compared case- and space-insensitively.
+// BulkCreateCards inserts many cards, skipping side-A texts that already exist
+// in the deck (or repeat within the batch), compared case- and space-insensitively.
 func (s *Store) BulkCreateCards(ctx context.Context, userID, deckID uuid.UUID, inputs []CardInput) (BulkResult, error) {
 	var res BulkResult
 	if _, err := s.GetDeck(ctx, userID, deckID); err != nil {
@@ -157,7 +157,7 @@ func (s *Store) BulkCreateCards(ctx context.Context, userID, deckID uuid.UUID, i
 	}
 	seen := map[string]bool{}
 	rows, err := s.pool.Query(ctx,
-		`select lower(trim(front_text)) from cards where user_id = $1 and deck_id = $2`, userID, deckID)
+		`select lower(trim(side_a_text)) from cards where user_id = $1 and deck_id = $2`, userID, deckID)
 	if err != nil {
 		return res, err
 	}
@@ -180,7 +180,7 @@ func (s *Store) BulkCreateCards(ctx context.Context, userID, deckID uuid.UUID, i
 	}
 	defer tx.Rollback(ctx)
 	for _, in := range inputs {
-		key := strings.ToLower(strings.TrimSpace(in.FrontText))
+		key := strings.ToLower(strings.TrimSpace(in.SideAText))
 		if key == "" || seen[key] {
 			res.Skipped++
 			continue
@@ -188,9 +188,9 @@ func (s *Store) BulkCreateCards(ctx context.Context, userID, deckID uuid.UUID, i
 		seen[key] = true
 		var cardID uuid.UUID
 		err := tx.QueryRow(ctx,
-			`insert into cards (user_id, deck_id, front_text, back_text, card_type, tags, phonetic, example, notes)
+			`insert into cards (user_id, deck_id, side_a_text, side_b_text, card_type, tags, phonetic, example, notes)
 			 values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`,
-			userID, deckID, strings.TrimSpace(in.FrontText), in.BackText, in.CardType, in.Tags,
+			userID, deckID, strings.TrimSpace(in.SideAText), in.SideBText, in.CardType, in.Tags,
 			in.Phonetic, in.Example, in.Notes).Scan(&cardID)
 		if err != nil {
 			return res, err

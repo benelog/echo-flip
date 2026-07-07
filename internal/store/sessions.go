@@ -15,20 +15,21 @@ import (
 type Session struct {
 	ID         uuid.UUID       `json:"id"`
 	Mode       string          `json:"mode"`
+	Direction  string          `json:"direction"`
 	DeckID     *uuid.UUID      `json:"deckId"`
 	SmartRule  json.RawMessage `json:"smartRule"`
 	TotalCards int             `json:"totalCards"`
 	StartedAt  time.Time       `json:"startedAt"`
 }
 
-func (s *Store) CreateSession(ctx context.Context, userID uuid.UUID, mode string, deckID *uuid.UUID, rule json.RawMessage, totalCards int) (Session, error) {
+func (s *Store) CreateSession(ctx context.Context, userID uuid.UUID, mode, direction string, deckID *uuid.UUID, rule json.RawMessage, totalCards int) (Session, error) {
 	var sess Session
 	err := s.pool.QueryRow(ctx,
-		`insert into study_sessions (user_id, mode, deck_id, smart_rule, total_cards)
-		 values ($1, $2, $3, $4, $5)
-		 returning id, mode, deck_id, smart_rule, total_cards, started_at`,
-		userID, mode, deckID, rule, totalCards).
-		Scan(&sess.ID, &sess.Mode, &sess.DeckID, &sess.SmartRule, &sess.TotalCards, &sess.StartedAt)
+		`insert into study_sessions (user_id, mode, direction, deck_id, smart_rule, total_cards)
+		 values ($1, $2, $3, $4, $5, $6)
+		 returning id, mode, direction, deck_id, smart_rule, total_cards, started_at`,
+		userID, mode, direction, deckID, rule, totalCards).
+		Scan(&sess.ID, &sess.Mode, &sess.Direction, &sess.DeckID, &sess.SmartRule, &sess.TotalCards, &sess.StartedAt)
 	return sess, err
 }
 

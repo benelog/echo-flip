@@ -3,18 +3,20 @@
 import { useRouter } from "next/navigation";
 import { Check, RotateCcw, X } from "lucide-react";
 import { useStudySession } from "@/hooks/useStudySession";
-import type { Card } from "@/lib/types";
+import type { Card, StudyDirection } from "@/lib/types";
 import { Flashcard } from "./Flashcard";
 
 export function StudyView({
   sessionId,
   cards,
   title,
+  direction,
   ttsRate,
 }: {
   sessionId: string;
   cards: Card[];
   title: string;
+  direction: StudyDirection;
   ttsRate?: number;
 }) {
   const router = useRouter();
@@ -114,6 +116,7 @@ export function StudyView({
       {current && (
         <Flashcard
           card={current}
+          direction={direction}
           revealed={state.revealed}
           onReveal={reveal}
           ttsRate={ttsRate}

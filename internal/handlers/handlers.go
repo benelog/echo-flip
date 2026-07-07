@@ -67,5 +67,5 @@ func pathUUID(c *gin.Context, name string) (uuid.UUID, bool) {
 }
 
 func validCardType(t string) bool {
-	return t == "word" || t == "sentence" || t == "idiom"
+	return t == "word" || t == "sentence" || t == "idiom" || t == "concept"
 }

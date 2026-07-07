@@ -88,8 +88,8 @@ function SharedDeckPreview() {
             key={i}
             className="rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900"
           >
-            <p className="font-medium">{card.frontText}</p>
-            <p className="text-sm text-neutral-500">{card.backText}</p>
+            <p className="font-medium">{card.sideAText}</p>
+            <p className="text-sm text-neutral-500">{card.sideBText}</p>
           </li>
         ))}
       </ul>
