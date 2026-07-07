@@ -1,6 +1,9 @@
 // Package handler is the Vercel serverless entrypoint. vercel.json rewrites
 // every /api/* request here; the original path is preserved, so the Gin
 // router dispatches normally.
+//
+// Vercel compiles this file outside the module, so it must not import
+// internal/ packages (directly); shared code it needs lives in pkg/.
 package handler
 
 import (
