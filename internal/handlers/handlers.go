@@ -4,10 +4,12 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/benelog/echo-flip/internal/auth"
 	"github.com/benelog/echo-flip/internal/store"
 )
 
@@ -21,6 +23,25 @@ func New(s *store.Store) *Handlers {
 
 func (h *Handlers) Healthz(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
+}
+
+// EnsureProfile lazily creates the caller's profile row so that any first
+// write (deck create, import, …) satisfies the profiles(id) foreign keys.
+// Runs once per user per warm instance.
+func (h *Handlers) EnsureProfile() gin.HandlerFunc {
+	var seen sync.Map
+	return func(c *gin.Context) {
+		userID := auth.UserID(c)
+		if _, ok := seen.Load(userID); !ok {
+			if _, err := h.Store.GetOrCreateProfile(c.Request.Context(), userID, ""); err != nil {
+				fail(c, err)
+				c.Abort()
+				return
+			}
+			seen.Store(userID, struct{}{})
+		}
+		c.Next()
+	}
 }
 
 func fail(c *gin.Context, err error) {

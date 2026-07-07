@@ -58,7 +58,7 @@ func build() (*gin.Engine, error) {
 
 	r.GET("/api/healthz", h.Healthz)
 
-	api := r.Group("/api", auth.Middleware(cfg.JWKSURL, cfg.JWTSecret))
+	api := r.Group("/api", auth.Middleware(cfg.JWKSURL, cfg.JWTSecret), h.EnsureProfile())
 	{
 		api.GET("/me", h.GetMe)
 		api.PATCH("/me", h.UpdateMe)
