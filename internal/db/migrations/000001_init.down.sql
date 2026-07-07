@@ -1,0 +1,10 @@
+drop view if exists cards_with_stats;
+drop table if exists smart_decks;
+drop table if exists review_logs;
+drop table if exists study_sessions;
+drop table if exists card_srs;
+drop table if exists cards;
+drop table if exists decks;
+drop table if exists profiles;
+drop type if exists session_mode;
+drop type if exists card_type;
