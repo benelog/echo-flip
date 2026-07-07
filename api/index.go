@@ -6,7 +6,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/benelog/echo-flip/internal/app"
+	"github.com/benelog/echo-flip/pkg/app"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

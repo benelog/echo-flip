@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/benelog/echo-flip/internal/app"
+	"github.com/benelog/echo-flip/pkg/app"
 )
 
 func main() {
