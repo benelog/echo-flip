@@ -17,8 +17,40 @@ export interface Deck {
   name: string;
   description: string | null;
   cardCount: number;
+  shareSlug: string | null;
+  sharedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ShareInfo {
+  shareSlug: string;
+  sharedAt: string;
+}
+
+export interface SharedDeckSummary {
+  shareSlug: string;
+  name: string;
+  description: string | null;
+  cardCount: number;
+  ownerName: string | null;
+  sharedAt: string;
+  isMine: boolean;
+}
+
+export interface SharedCard {
+  frontText: string;
+  backText: string;
+  cardType: CardType;
+  tags: string[];
+  phonetic: string | null;
+  example: string | null;
+  notes: string | null;
+}
+
+export interface SharedDeckDetail {
+  deck: SharedDeckSummary;
+  cards: SharedCard[];
 }
 
 export interface Card {

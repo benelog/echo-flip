@@ -8,8 +8,11 @@ import {
   ChevronLeft,
   Download,
   GraduationCap,
+  Link2,
+  Link2Off,
   Pencil,
   Plus,
+  Share2,
   Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -17,7 +20,7 @@ import { CsvImportButton } from "@/components/CsvImportDialog";
 import { useToast } from "@/components/Toast";
 import { api, apiBlob } from "@/lib/api";
 import { downloadBlob } from "@/lib/csv";
-import type { Card, Deck } from "@/lib/types";
+import type { Card, Deck, ShareInfo } from "@/lib/types";
 
 function DeckDetail() {
   const params = useSearchParams();
@@ -64,6 +67,38 @@ function DeckDetail() {
     }
   };
 
+  const copyShareLink = async (slug: string) => {
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/shared-deck?slug=${slug}`,
+      );
+      toast("공유 링크를 복사했어요");
+    } catch {
+      toast("클립보드 복사에 실패했어요", "error");
+    }
+  };
+
+  const share = useMutation({
+    mutationFn: () =>
+      api<ShareInfo>(`/api/decks/${deckId}/share`, { method: "POST" }),
+    onSuccess: (info) => {
+      queryClient.invalidateQueries({ queryKey: ["deck", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["shared-decks"] });
+      void copyShareLink(info.shareSlug);
+    },
+    onError: (e) => toast(e.message, "error"),
+  });
+
+  const unshare = useMutation({
+    mutationFn: () => api(`/api/decks/${deckId}/share`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["deck", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["shared-decks"] });
+      toast("공유를 해제했어요");
+    },
+    onError: (e) => toast(e.message, "error"),
+  });
+
   if (!deckId) return <p className="text-neutral-500">덱을 찾을 수 없어요.</p>;
 
   return (
@@ -108,7 +143,38 @@ function DeckDetail() {
         >
           <Download size={16} /> CSV 내보내기
         </button>
+        {deck?.shareSlug ? (
+          <>
+            <button
+              onClick={() => copyShareLink(deck.shareSlug!)}
+              className="flex items-center gap-1.5 rounded-lg border border-green-300 px-3 py-2 text-sm text-green-700 dark:border-green-800 dark:text-green-400"
+            >
+              <Link2 size={16} /> 공유 링크 복사
+            </button>
+            <button
+              onClick={() => unshare.mutate()}
+              disabled={unshare.isPending}
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-500 disabled:opacity-50 dark:border-neutral-700"
+            >
+              <Link2Off size={16} /> 공유 해제
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => share.mutate()}
+            disabled={share.isPending || (cards?.length ?? 0) === 0}
+            className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-neutral-700"
+          >
+            <Share2 size={16} /> 덱 공유하기
+          </button>
+        )}
       </div>
+      {deck?.shareSlug && (
+        <p className="text-xs text-neutral-400">
+          이 덱은 공유 중이에요. 링크가 있거나 공유 덱 목록을 보는 누구나
+          미리보고 자기 덱으로 가져갈 수 있어요.
+        </p>
+      )}
 
       <ul className="flex flex-col gap-2">
         {cards?.map((card) => (

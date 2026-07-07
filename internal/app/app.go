@@ -71,6 +71,12 @@ func build() (*gin.Engine, error) {
 		api.GET("/decks/:id/cards", h.ListDeckCards)
 		api.POST("/decks/:id/cards/bulk", h.BulkCreateCards)
 		api.GET("/decks/:id/export", h.ExportDeck)
+		api.POST("/decks/:id/share", h.ShareDeck)
+		api.DELETE("/decks/:id/share", h.UnshareDeck)
+
+		api.GET("/shared-decks", h.ListSharedDecks)
+		api.GET("/shared-decks/:slug", h.GetSharedDeck)
+		api.POST("/shared-decks/:slug/import", h.ImportSharedDeck)
 
 		api.POST("/cards", h.CreateCard)
 		api.GET("/cards/:id", h.GetCard)

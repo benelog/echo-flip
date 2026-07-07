@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Sparkles, Trash2 } from "lucide-react";
+import { ChevronRight, Globe2, Plus, Sparkles, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useToast } from "@/components/Toast";
 import { api } from "@/lib/api";
@@ -82,6 +82,16 @@ function DeckList() {
           </button>
         </form>
       )}
+
+      <Link
+        href="/shared"
+        className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-3.5 dark:border-blue-900 dark:bg-blue-950/30"
+      >
+        <span className="flex items-center gap-2 font-medium">
+          <Globe2 size={18} className="text-blue-500" /> 공유 덱 둘러보기
+        </span>
+        <ChevronRight size={18} className="text-neutral-400" />
+      </Link>
 
       <section className="flex flex-col gap-2">
         {decks?.map((deck) => (

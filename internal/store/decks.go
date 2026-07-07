@@ -10,23 +10,26 @@ import (
 )
 
 type Deck struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name"`
-	Description *string   `json:"description"`
-	CardCount   int       `json:"cardCount"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          uuid.UUID  `json:"id"`
+	Name        string     `json:"name"`
+	Description *string    `json:"description"`
+	CardCount   int        `json:"cardCount"`
+	ShareSlug   *string    `json:"shareSlug"`
+	SharedAt    *time.Time `json:"sharedAt"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
 }
 
 const deckSelect = `
 	select d.id, d.name, d.description,
 	       (select count(*) from cards c where c.deck_id = d.id) as card_count,
-	       d.created_at, d.updated_at
+	       d.share_slug, d.shared_at, d.created_at, d.updated_at
 	from decks d`
 
 func scanDeck(row pgx.Row) (Deck, error) {
 	var d Deck
-	err := row.Scan(&d.ID, &d.Name, &d.Description, &d.CardCount, &d.CreatedAt, &d.UpdatedAt)
+	err := row.Scan(&d.ID, &d.Name, &d.Description, &d.CardCount,
+		&d.ShareSlug, &d.SharedAt, &d.CreatedAt, &d.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return d, ErrNotFound
 	}
@@ -60,7 +63,7 @@ func (s *Store) CreateDeck(ctx context.Context, userID uuid.UUID, name string, d
 		   insert into decks (user_id, name, description) values ($1, $2, $3)
 		   returning id, name, description, created_at, updated_at
 		 )
-		 select id, name, description, 0, created_at, updated_at from ins`,
+		 select id, name, description, 0, null::text, null::timestamptz, created_at, updated_at from ins`,
 		userID, name, description))
 }
 
