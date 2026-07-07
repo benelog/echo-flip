@@ -14,17 +14,17 @@ import type { Profile, SessionStart, StudyDirection } from "@/lib/types";
 const DIRECTION_KEY = "echo-flip:study-direction";
 
 function lastDirection(): StudyDirection {
-  if (typeof window !== "undefined" && localStorage.getItem(DIRECTION_KEY) === "b_to_a")
-    return "b_to_a";
-  return "a_to_b";
+  if (typeof window !== "undefined" && localStorage.getItem(DIRECTION_KEY) === "meaning_to_text")
+    return "meaning_to_text";
+  return "text_to_meaning";
 }
 
 /** Pre-study screen: pick which side is the question. */
 function DirectionChooser({ onPick }: { onPick: (d: StudyDirection) => void }) {
   const last = lastDirection();
   const options: { value: StudyDirection; title: string; desc: string }[] = [
-    { value: "a_to_b", title: "A면 → B면", desc: "영어·용어를 보고 뜻을 떠올려요" },
-    { value: "b_to_a", title: "B면 → A면", desc: "뜻·설명을 보고 영어·용어를 떠올려요" },
+    { value: "text_to_meaning", title: "원문 → 뜻", desc: "영어·용어를 보고 뜻을 떠올려요" },
+    { value: "meaning_to_text", title: "뜻 → 원문", desc: "뜻·설명을 보고 영어·용어를 떠올려요" },
   ];
   return (
     <div className="flex flex-col gap-4 py-8">

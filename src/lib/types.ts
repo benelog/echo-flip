@@ -1,7 +1,7 @@
 export type CardType = "word" | "sentence" | "idiom" | "concept";
 
-/** Which side is shown as the question: A→B or B→A. */
-export type StudyDirection = "a_to_b" | "b_to_a";
+/** Which side is shown as the question: text→meaning or meaning→text. */
+export type StudyDirection = "text_to_meaning" | "meaning_to_text";
 
 export interface Profile {
   id: string;
@@ -42,8 +42,8 @@ export interface SharedDeckSummary {
 }
 
 export interface SharedCard {
-  sideAText: string;
-  sideBText: string;
+  text: string;
+  meaning: string;
   cardType: CardType;
   tags: string[];
   phonetic: string | null;
@@ -59,8 +59,8 @@ export interface SharedDeckDetail {
 export interface Card {
   id: string;
   deckId: string;
-  sideAText: string;
-  sideBText: string;
+  text: string;
+  meaning: string;
   cardType: CardType;
   tags: string[];
   phonetic: string | null;
@@ -76,8 +76,8 @@ export interface Card {
 
 export interface CardInput {
   deckId?: string;
-  sideAText: string;
-  sideBText: string;
+  text: string;
+  meaning: string;
   cardType: CardType;
   tags: string[];
   phonetic?: string | null;

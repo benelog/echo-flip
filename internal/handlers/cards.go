@@ -15,8 +15,8 @@ import (
 
 type cardBody struct {
 	DeckID    uuid.UUID `json:"deckId"`
-	SideAText string    `json:"sideAText"`
-	SideBText string    `json:"sideBText"`
+	Text      string    `json:"text"`
+	Meaning   string    `json:"meaning"`
 	CardType  string    `json:"cardType"`
 	Tags      []string  `json:"tags"`
 	Phonetic  *string   `json:"phonetic"`
@@ -25,10 +25,10 @@ type cardBody struct {
 }
 
 func (b *cardBody) toInput() (store.CardInput, string) {
-	b.SideAText = strings.TrimSpace(b.SideAText)
-	b.SideBText = strings.TrimSpace(b.SideBText)
-	if b.SideAText == "" || b.SideBText == "" {
-		return store.CardInput{}, "sideAText and sideBText are required"
+	b.Text = strings.TrimSpace(b.Text)
+	b.Meaning = strings.TrimSpace(b.Meaning)
+	if b.Text == "" || b.Meaning == "" {
+		return store.CardInput{}, "text and meaning are required"
 	}
 	if b.CardType == "" {
 		b.CardType = "word"
@@ -40,7 +40,7 @@ func (b *cardBody) toInput() (store.CardInput, string) {
 		b.Tags = []string{}
 	}
 	return store.CardInput{
-		DeckID: b.DeckID, SideAText: b.SideAText, SideBText: b.SideBText,
+		DeckID: b.DeckID, Text: b.Text, Meaning: b.Meaning,
 		CardType: b.CardType, Tags: b.Tags,
 		Phonetic: b.Phonetic, Example: b.Example, Notes: b.Notes,
 	}, ""
@@ -188,7 +188,7 @@ func (h *Handlers) ExportDeck(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%q", "deck-"+deck.ID.String()+".csv"))
 	c.Writer.Write([]byte{0xEF, 0xBB, 0xBF}) // UTF-8 BOM
 	w := csv.NewWriter(c.Writer)
-	w.Write([]string{"side_a", "side_b", "type", "tags", "phonetic", "example"})
+	w.Write([]string{"text", "meaning", "type", "tags", "phonetic", "example"})
 	deref := func(s *string) string {
 		if s == nil {
 			return ""
@@ -197,7 +197,7 @@ func (h *Handlers) ExportDeck(c *gin.Context) {
 	}
 	for _, card := range cards {
 		w.Write([]string{
-			card.SideAText, card.SideBText, card.CardType,
+			card.Text, card.Meaning, card.CardType,
 			strings.Join(card.Tags, "|"), deref(card.Phonetic), deref(card.Example),
 		})
 	}

@@ -1,21 +1,22 @@
--- Cards are bidirectional: rename front/back to neutral side A / side B,
--- add the 'concept' card type, and record the study direction per session.
+-- Cards are bidirectional: rename front/back to text (the expression/term
+-- being learned) and meaning (its definition), add the 'concept' card type,
+-- and record the study direction per session.
 
 alter type card_type add value if not exists 'concept';
 
-create type study_direction as enum ('a_to_b', 'b_to_a');
+create type study_direction as enum ('text_to_meaning', 'meaning_to_text');
 
 alter table study_sessions
-  add column direction study_direction not null default 'a_to_b';
+  add column direction study_direction not null default 'text_to_meaning';
 
 drop view cards_with_stats;
 
-alter table cards rename column front_text to side_a_text;
-alter table cards rename column back_text to side_b_text;
+alter table cards rename column front_text to text;
+alter table cards rename column back_text to meaning;
 
 create view cards_with_stats with (security_invoker = true) as
 select
-  c.id, c.user_id, c.deck_id, c.side_a_text, c.side_b_text, c.card_type,
+  c.id, c.user_id, c.deck_id, c.text, c.meaning, c.card_type,
   c.tags, c.phonetic, c.example, c.notes, c.created_at,
   s.ease_factor, s.interval_days, s.repetitions, s.lapses, s.due_at,
   s.last_reviewed_at, s.correct_count, s.incorrect_count,

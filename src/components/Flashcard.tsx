@@ -12,8 +12,8 @@ const TYPE_LABEL: Record<Card["cardType"], string> = {
 
 /**
  * 3D flip card: question side → answer side, following the study direction.
- * TTS and phonetics belong to side A (the English/term side), so they render
- * only on whichever face shows side A — never as a hint for the hidden answer.
+ * TTS and phonetics belong to the text side (the English/term side), so they
+ * render only on whichever face shows it — never as a hint for the hidden answer.
  */
 export function Flashcard({
   card,
@@ -28,9 +28,9 @@ export function Flashcard({
   onReveal: () => void;
   ttsRate?: number;
 }) {
-  const aFirst = direction === "a_to_b";
-  const questionText = aFirst ? card.sideAText : card.sideBText;
-  const answerText = aFirst ? card.sideBText : card.sideAText;
+  const textFirst = direction === "text_to_meaning";
+  const questionText = textFirst ? card.text : card.meaning;
+  const answerText = textFirst ? card.meaning : card.text;
 
   return (
     <div
@@ -43,13 +43,13 @@ export function Flashcard({
             <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
               {TYPE_LABEL[card.cardType]}
             </span>
-            {aFirst && <TtsButton text={card.sideAText} rate={ttsRate} />}
+            {textFirst && <TtsButton text={card.text} rate={ttsRate} />}
           </div>
           <div className="flex flex-1 flex-col items-center justify-center gap-2 py-6">
             <p className="text-center text-2xl font-semibold leading-snug">
               {questionText}
             </p>
-            {aFirst && card.phonetic && (
+            {textFirst && card.phonetic && (
               <p className="text-sm text-neutral-500">{card.phonetic}</p>
             )}
           </div>
@@ -63,7 +63,7 @@ export function Flashcard({
           <div className="flex items-center justify-between">
             <span className="text-xs text-blue-600 dark:text-blue-300">정답</span>
             <TtsButton
-              text={card.example ? `${card.sideAText}. ${card.example}` : card.sideAText}
+              text={card.example ? `${card.text}. ${card.example}` : card.text}
               rate={ttsRate}
             />
           </div>
@@ -71,7 +71,7 @@ export function Flashcard({
             <p className="whitespace-pre-line text-center text-lg font-medium leading-relaxed">
               {answerText}
             </p>
-            {!aFirst && card.phonetic && (
+            {!textFirst && card.phonetic && (
               <p className="text-center text-sm text-neutral-500">{card.phonetic}</p>
             )}
             {card.example && (

@@ -32,10 +32,10 @@ func (h *Handlers) CreateSession(c *gin.Context) {
 		body.Limit = 50
 	}
 	if body.Direction == "" {
-		body.Direction = "a_to_b"
+		body.Direction = "text_to_meaning"
 	}
-	if body.Direction != "a_to_b" && body.Direction != "b_to_a" {
-		badRequest(c, "direction must be a_to_b or b_to_a")
+	if body.Direction != "text_to_meaning" && body.Direction != "meaning_to_text" {
+		badRequest(c, "direction must be text_to_meaning or meaning_to_text")
 		return
 	}
 	userID := auth.UserID(c)

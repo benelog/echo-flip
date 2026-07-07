@@ -38,7 +38,7 @@ export function CsvImportButton({ deckId }: { deckId: string }) {
       const { cards, invalid } = await parseCsv(file);
       if (cards.length === 0) {
         toast(
-          `가져올 카드가 없어요. side_a,side_b (또는 front,back) 헤더가 있는 CSV인지 확인해주세요` +
+          `가져올 카드가 없어요. text,meaning (또는 front,back) 헤더가 있는 CSV인지 확인해주세요` +
             (invalid ? ` (${invalid}행 오류)` : ""),
           "error",
         );

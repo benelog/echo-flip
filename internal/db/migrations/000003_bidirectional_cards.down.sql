@@ -3,8 +3,8 @@
 
 drop view cards_with_stats;
 
-alter table cards rename column side_a_text to front_text;
-alter table cards rename column side_b_text to back_text;
+alter table cards rename column text to front_text;
+alter table cards rename column meaning to back_text;
 
 alter table study_sessions drop column direction;
 drop type study_direction;
