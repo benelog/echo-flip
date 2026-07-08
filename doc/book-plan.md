@@ -6,7 +6,8 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 ## 책 개요
 
-- 제목: **Echo Flip으로 배우는 풀스택 개발**
+- 제목: **월 0원으로 운영하는 나의 웹 앱** — 부제: 혼자 만들고, 무료로 배포하고, AI와 함께 개발한다
+  - 2026-07-09 변경. 이전 제목 "Echo Flip으로 배우는 풀스택 개발"은 폐기(독자가 Echo Flip을 모르고 '풀스택'이 진부하다는 피드백). 제목에 Echo Flip·풀스택 단어를 쓰지 않는다.
 - 목적: 이 앱의 모든 코드를 해설하는 책이 아니다. 비슷한 앱을 직접 만들 수 있도록 언어·프레임워크·배포 인프라 지식을 이 앱의 실제 코드 예제로 전달한다.
 - 각 기술의 **선택 이유(트레이드오프)** 를 반드시 다룬다: 왜 Go인가, 왜 TypeScript·React인가, 왜 Vercel·Supabase인가.
 - 배포: GitHub Pages (https://benelog.github.io/echo-flip/), `.github/workflows/book.yml`이 `doc/**` 변경 push 시 자동 배포.
@@ -82,6 +83,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - [x] GitHub Actions 워크플로 (`.github/workflows/book.yml`)
 - [x] 전체 10개 장 초안 작성 (2026-07-09, 총 약 5,800줄)
 - [x] 1부 재구성 (2026-07-09): 각 장에 흩어져 있던 기술 선택 이유를 새 1장(`part1/tech-choices.md`)으로 통합, 이후 장 번호 한 칸씩 밀림(총 11개 장). 상호 참조 정합성 수동 검토 완료.
+- [x] 제목 변경 + 무료 티어 보강 (2026-07-09): 새 제목에 맞춰 9장·10장에 "무료 티어로 어디까지 갈 수 있는가" 절 추가(2026년 7월 기준 공식 요금 페이지 수치, 변동 가능성 명시). 수치는 개정 시 재확인 필요.
 - [ ] 전체 통독 검토: 장 간 중복 제거, 상호 참조("N장에서 다룬다") 정합성 확인
 - [x] `npm run build` 통과 확인 후 커밋·push
 - [x] GitHub Pages Source = GitHub Actions 설정 (gh api로 완료)

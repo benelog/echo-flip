@@ -2,9 +2,9 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   lang: 'ko-KR',
-  title: 'Echo Flip으로 배우는 풀스택 개발',
+  title: '월 0원으로 운영하는 나의 웹 앱',
   description:
-    '작은 암기 카드 앱 하나로 Go, Gin, TypeScript, React, PostgreSQL과 Vercel·Supabase 배포, 그리고 Claude Code를 활용한 개발까지 배운다.',
+    '혼자 만들고, 무료로 배포하고, AI와 함께 개발한다 — 작은 웹 앱의 실제 코드로 Go, Gin, TypeScript, React, PostgreSQL을 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
   base: '/echo-flip/',
   srcExclude: ['book-plan.md'],
   cleanUrls: true,

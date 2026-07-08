@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: "Echo Flip으로 배우는 풀스택 개발"
-  text: "작은 앱 하나로 언어부터 배포까지"
-  tagline: 영어 암기 카드 앱 Echo Flip의 실제 코드로 Go, Gin, TypeScript, React, PostgreSQL을 익히고, Claude Code와 Vercel·Supabase로 만들고 배포하는 과정을 배운다.
+  name: "월 0원으로 운영하는 나의 웹 앱"
+  text: "혼자 만들고, 무료로 배포하고, AI와 함께 개발한다"
+  tagline: 영어 암기 카드 앱의 실제 코드로 Go, Gin, TypeScript, React, PostgreSQL을 익히고, Claude Code와 함께 개발해 Vercel·Supabase 무료 티어로 서버 비용 없이 배포·운영하는 과정을 배운다.
   actions:
     - theme: brand
       text: 읽기 시작
