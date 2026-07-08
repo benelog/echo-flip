@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { AUTH_NEXT_KEY, safeNext } from "@/lib/authNext";
 import { supabase } from "@/lib/supabase";
 
 function GoogleIcon() {
@@ -36,15 +37,18 @@ function GitHubIcon() {
   );
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const { session, loading } = useAuth();
   const router = useRouter();
+  const next = safeNext(useSearchParams().get("next"));
 
   useEffect(() => {
-    if (!loading && session) router.replace("/");
-  }, [loading, session, router]);
+    if (!loading && session) router.replace(next);
+  }, [loading, session, router, next]);
 
   const signIn = (provider: "google" | "github") => {
+    if (next === "/") sessionStorage.removeItem(AUTH_NEXT_KEY);
+    else sessionStorage.setItem(AUTH_NEXT_KEY, next);
     void supabase().auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -77,5 +81,13 @@ export default function LoginPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   );
 }

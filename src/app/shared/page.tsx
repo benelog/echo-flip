@@ -4,21 +4,25 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, Globe2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { api } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
+import { apiPublic } from "@/lib/api";
 import type { SharedDeckSummary } from "@/lib/types";
 
 function SharedGallery() {
-  const { data: decks, isLoading } = useQuery({
+  const { session } = useAuth();
+  const { data: decks, error, isLoading } = useQuery({
     queryKey: ["shared-decks"],
-    queryFn: () => api<SharedDeckSummary[]>("/api/shared-decks"),
+    queryFn: () => apiPublic<SharedDeckSummary[]>("/api/shared-decks"),
   });
 
   return (
     <div className="flex flex-col gap-5">
       <header className="flex items-center gap-2">
-        <Link href="/decks" aria-label="뒤로" className="p-1 text-neutral-500">
-          <ChevronLeft size={22} />
-        </Link>
+        {session && (
+          <Link href="/decks" aria-label="뒤로" className="p-1 text-neutral-500">
+            <ChevronLeft size={22} />
+          </Link>
+        )}
         <h1 className="text-lg font-bold">공유 덱 둘러보기</h1>
       </header>
 
@@ -57,8 +61,22 @@ function SharedGallery() {
         {decks?.length === 0 && (
           <p className="py-12 text-center text-sm text-neutral-500">
             아직 공유된 덱이 없어요.
-            <br />내 덱 상세 화면에서 "덱 공유하기"를 눌러 첫 공유 덱을
-            만들어보세요.
+            {session ? (
+              <>
+                <br />내 덱 상세 화면에서 "덱 공유하기"를 눌러 첫 공유 덱을
+                만들어보세요.
+              </>
+            ) : (
+              <>
+                <br />
+                로그인하면 내 덱을 공유해 첫 공유 덱을 만들 수 있어요.
+              </>
+            )}
+          </p>
+        )}
+        {error && (
+          <p className="py-12 text-center text-sm text-neutral-500">
+            불러오지 못했어요: {error.message}
           </p>
         )}
         {isLoading && (
@@ -73,7 +91,7 @@ function SharedGallery() {
 
 export default function SharedPage() {
   return (
-    <AppShell>
+    <AppShell requireAuth={false}>
       <SharedGallery />
     </AppShell>
   );

@@ -38,11 +38,33 @@ func keyfuncFor(jwksURL, secret string) (jwt.Keyfunc, error) {
 	return jwks.Keyfunc, nil
 }
 
+func bearerToken(c *gin.Context) string {
+	token, ok := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer ")
+	if !ok {
+		return ""
+	}
+	return token
+}
+
+// parseUserID validates a Supabase access token and returns its subject.
+func parseUserID(raw string, kf jwt.Keyfunc) (uuid.UUID, error) {
+	claims := jwt.MapClaims{}
+	if _, err := jwt.ParseWithClaims(raw, claims, kf,
+		jwt.WithValidMethods([]string{"HS256", "RS256", "ES256"}),
+		jwt.WithAudience("authenticated"),
+		jwt.WithExpirationRequired(),
+	); err != nil {
+		return uuid.Nil, err
+	}
+	sub, _ := claims["sub"].(string)
+	return uuid.Parse(sub)
+}
+
 // Middleware validates the Supabase access token and stores the user id.
 func Middleware(jwksURL, secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		raw := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
-		if raw == "" || raw == c.GetHeader("Authorization") {
+		raw := bearerToken(c)
+		if raw == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing bearer token"})
 			return
 		}
@@ -51,20 +73,9 @@ func Middleware(jwksURL, secret string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "jwks unavailable"})
 			return
 		}
-		claims := jwt.MapClaims{}
-		_, err = jwt.ParseWithClaims(raw, claims, kf,
-			jwt.WithValidMethods([]string{"HS256", "RS256", "ES256"}),
-			jwt.WithAudience("authenticated"),
-			jwt.WithExpirationRequired(),
-		)
+		userID, err := parseUserID(raw, kf)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-			return
-		}
-		sub, _ := claims["sub"].(string)
-		userID, err := uuid.Parse(sub)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid subject"})
 			return
 		}
 		c.Set(userIDKey, userID)
@@ -72,6 +83,30 @@ func Middleware(jwksURL, secret string) gin.HandlerFunc {
 	}
 }
 
+// OptionalMiddleware attaches the user id when a valid token is present but
+// never rejects the request, so public endpoints can still personalize their
+// response (e.g. an "is mine" flag) for signed-in callers.
+func OptionalMiddleware(jwksURL, secret string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if raw := bearerToken(c); raw != "" {
+			if kf, err := keyfuncFor(jwksURL, secret); err == nil {
+				if userID, err := parseUserID(raw, kf); err == nil {
+					c.Set(userIDKey, userID)
+				}
+			}
+		}
+		c.Next()
+	}
+}
+
 func UserID(c *gin.Context) uuid.UUID {
 	return c.MustGet(userIDKey).(uuid.UUID)
+}
+
+// OptionalUserID returns the caller's id, or uuid.Nil when unauthenticated.
+func OptionalUserID(c *gin.Context) uuid.UUID {
+	if v, ok := c.Get(userIDKey); ok {
+		return v.(uuid.UUID)
+	}
+	return uuid.Nil
 }

@@ -58,6 +58,18 @@ func build() (*gin.Engine, error) {
 
 	r.GET("/api/healthz", h.Healthz)
 
+	// Public: browsing shared decks needs no login. Optional auth only lets a
+	// signed-in caller see the "is mine" flag on their own shared decks.
+	// Responses vary by Authorization, so keep shared caches from reusing a
+	// signed-in caller's personalized body for anonymous visitors.
+	pub := r.Group("/api", auth.OptionalMiddleware(cfg.JWKSURL, cfg.JWTSecret), func(c *gin.Context) {
+		c.Header("Cache-Control", "no-store")
+	})
+	{
+		pub.GET("/shared-decks", h.ListSharedDecks)
+		pub.GET("/shared-decks/:slug", h.GetSharedDeck)
+	}
+
 	api := r.Group("/api", auth.Middleware(cfg.JWKSURL, cfg.JWTSecret), h.EnsureProfile())
 	{
 		api.GET("/me", h.GetMe)
@@ -74,8 +86,6 @@ func build() (*gin.Engine, error) {
 		api.POST("/decks/:id/share", h.ShareDeck)
 		api.DELETE("/decks/:id/share", h.UnshareDeck)
 
-		api.GET("/shared-decks", h.ListSharedDecks)
-		api.GET("/shared-decks/:slug", h.GetSharedDeck)
 		api.POST("/shared-decks/:slug/import", h.ImportSharedDeck)
 
 		api.POST("/cards", h.CreateCard)

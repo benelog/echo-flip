@@ -4,11 +4,15 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Download } from "lucide-react";
+import { ChevronLeft, Download, LogIn } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
-import { api, ApiError } from "@/lib/api";
+import { api, apiPublic, ApiError } from "@/lib/api";
 import type { Deck, SharedDeckDetail } from "@/lib/types";
+
+const ctaClass =
+  "flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white";
 
 function SharedDeckPreview() {
   const params = useSearchParams();
@@ -16,10 +20,11 @@ function SharedDeckPreview() {
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { session } = useAuth();
 
   const { data, error, isLoading } = useQuery<SharedDeckDetail>({
     queryKey: ["shared-deck", slug],
-    queryFn: () => api<SharedDeckDetail>(`/api/shared-decks/${slug}`),
+    queryFn: () => apiPublic<SharedDeckDetail>(`/api/shared-decks/${slug}`),
     enabled: !!slug,
     retry: 0,
   });
@@ -70,16 +75,28 @@ function SharedDeckPreview() {
         </p>
       )}
 
-      <button
-        onClick={() => importDeck.mutate()}
-        disabled={importDeck.isPending}
-        className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white disabled:opacity-50"
-      >
-        <Download size={20} />
-        {importDeck.isPending ? "가져오는 중…" : "내 덱으로 가져오기"}
-      </button>
+      {session ? (
+        <button
+          onClick={() => importDeck.mutate()}
+          disabled={importDeck.isPending}
+          className={`${ctaClass} disabled:opacity-50`}
+        >
+          <Download size={20} />
+          {importDeck.isPending ? "가져오는 중…" : "내 덱으로 가져오기"}
+        </button>
+      ) : (
+        <Link
+          href={`/login?next=${encodeURIComponent(`/shared-deck?slug=${slug}`)}`}
+          className={ctaClass}
+        >
+          <LogIn size={20} />
+          로그인하고 내 덱으로 가져오기
+        </Link>
+      )}
       <p className="-mt-2 text-center text-xs text-neutral-400">
-        카드 전체가 내 계정으로 복사되고, 학습 기록은 새로 시작해요.
+        {session
+          ? "카드 전체가 내 계정으로 복사되고, 학습 기록은 새로 시작해요."
+          : "로그인하면 이 덱을 내 계정으로 복사해 학습할 수 있어요."}
       </p>
 
       <ul className="flex flex-col gap-2">
@@ -99,7 +116,7 @@ function SharedDeckPreview() {
 
 export default function SharedDeckPage() {
   return (
-    <AppShell>
+    <AppShell requireAuth={false}>
       <Suspense>
         <SharedDeckPreview />
       </Suspense>

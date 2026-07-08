@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { BarChart3, Home, Layers, Settings } from "lucide-react";
-import { RequireAuth } from "./AuthProvider";
+import { RequireAuth, useAuth } from "./AuthProvider";
+import { TopBar } from "./TopBar";
 
 const TABS = [
   { href: "/", label: "홈", icon: Home },
@@ -34,37 +35,58 @@ function OfflineBanner() {
   );
 }
 
-/** Authenticated app frame: offline banner + content + bottom tab bar. */
-export function AppShell({ children }: { children: ReactNode }) {
+function BottomNav() {
   const pathname = usePathname();
   return (
-    <RequireAuth>
-      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
-        <OfflineBanner />
-        <main className="flex-1 px-4 pb-24 pt-6">{children}</main>
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
-          <div className="mx-auto flex max-w-lg justify-around">
-            {TABS.map(({ href, label, icon: Icon }) => {
-              const active =
-                href === "/" ? pathname === "/" : pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`flex flex-col items-center gap-0.5 px-4 py-2.5 text-xs ${
-                    active
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-neutral-500"
-                  }`}
-                >
-                  <Icon size={20} />
-                  {label}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+      <div className="mx-auto flex max-w-lg justify-around">
+        {TABS.map(({ href, label, icon: Icon }) => {
+          const active =
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex flex-col items-center gap-0.5 px-4 py-2.5 text-xs ${
+                active
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-neutral-500"
+              }`}
+            >
+              <Icon size={20} />
+              {label}
+            </Link>
+          );
+        })}
       </div>
-    </RequireAuth>
+    </nav>
   );
+}
+
+/**
+ * App frame: top login-status bar, offline banner, content, and the bottom tab
+ * bar. `requireAuth` (default) gates the content behind sign-in; pass
+ * `requireAuth={false}` for public pages such as shared-deck browsing. The
+ * bottom nav only appears when the visitor is signed in.
+ */
+export function AppShell({
+  children,
+  requireAuth = true,
+}: {
+  children: ReactNode;
+  requireAuth?: boolean;
+}) {
+  const { session } = useAuth();
+  const showNav = !!session;
+  const frame = (
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
+      <TopBar />
+      <OfflineBanner />
+      <main className={`flex-1 px-4 pt-6 ${showNav ? "pb-24" : "pb-10"}`}>
+        {children}
+      </main>
+      {showNav && <BottomNav />}
+    </div>
+  );
+  return requireAuth ? <RequireAuth>{frame}</RequireAuth> : frame;
 }

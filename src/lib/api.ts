@@ -15,18 +15,38 @@ export class ApiError extends Error {
   }
 }
 
-async function authHeader(): Promise<Record<string, string>> {
+// Sends the bearer token only when signed in — for endpoints that work
+// anonymously but personalize the response for logged-in callers.
+async function optionalAuthHeader(): Promise<Record<string, string>> {
   const { data } = await supabase().auth.getSession();
   const token = data.session?.access_token;
-  if (!token) throw new ApiError(401, "로그인이 필요합니다");
-  return { Authorization: `Bearer ${token}` };
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function authHeader(): Promise<Record<string, string>> {
+  const header = await optionalAuthHeader();
+  if (!header.Authorization) throw new ApiError(401, "로그인이 필요합니다");
+  return header;
 }
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  return request(path, await authHeader(), init);
+}
+
+/** Like `api`, but does not require a session (public endpoints). */
+export async function apiPublic<T>(path: string, init?: RequestInit): Promise<T> {
+  return request(path, await optionalAuthHeader(), init);
+}
+
+async function request<T>(
+  path: string,
+  auth: Record<string, string>,
+  init?: RequestInit,
+): Promise<T> {
   const res = await fetch(BASE + path, {
     ...init,
     headers: {
-      ...(await authHeader()),
+      ...auth,
       ...(init?.body ? { "Content-Type": "application/json" } : {}),
       ...init?.headers,
     },

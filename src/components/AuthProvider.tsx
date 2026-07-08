@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthState>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const client = supabase();
@@ -33,15 +35,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setLoading(false);
     });
-    const { data: sub } = client.auth.onAuthStateChange((_event, next) => {
+    const { data: sub } = client.auth.onAuthStateChange((event, next) => {
       setSession(next);
       setLoading(false);
+      // Cached responses may be personalized for the previous identity
+      // (e.g. the isMine flag on public shared-deck endpoints).
+      if (event === "SIGNED_OUT") queryClient.clear();
     });
     return () => sub.subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const signOut = async () => {
-    await supabase().auth.signOut();
+    // The server revocation can fail (offline, 5xx) without clearing the
+    // local session; fall back so the UI always ends up signed out.
+    const { error } = await supabase().auth.signOut();
+    if (error) await supabase().auth.signOut({ scope: "local" });
   };
 
   return (

@@ -46,7 +46,7 @@ func (h *Handlers) UnshareDeck(c *gin.Context) {
 }
 
 func (h *Handlers) ListSharedDecks(c *gin.Context) {
-	decks, err := h.Store.ListSharedDecks(c.Request.Context(), auth.UserID(c))
+	decks, err := h.Store.ListSharedDecks(c.Request.Context(), auth.OptionalUserID(c))
 	if err != nil {
 		fail(c, err)
 		return
@@ -62,7 +62,7 @@ func (h *Handlers) GetSharedDeck(c *gin.Context) {
 		return
 	}
 	ctx := c.Request.Context()
-	deck, err := h.Store.GetSharedDeck(ctx, auth.UserID(c), slug)
+	deck, err := h.Store.GetSharedDeck(ctx, auth.OptionalUserID(c), slug)
 	if err != nil {
 		fail(c, err)
 		return
