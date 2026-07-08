@@ -77,7 +77,7 @@ func build() (*gin.Engine, error) {
 
 		api.GET("/decks", h.ListDecks)
 		api.POST("/decks", h.CreateDeck)
-		// Decks are addressed by their short Base62 slug, not the UUID.
+		// Decks are addressed by their short Base36 slug, not the UUID.
 		api.GET("/decks/:slug", h.GetDeck)
 		api.PATCH("/decks/:slug", h.UpdateDeck)
 		api.DELETE("/decks/:slug", h.DeleteDeck)
