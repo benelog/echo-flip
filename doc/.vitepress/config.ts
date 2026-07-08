@@ -8,10 +8,22 @@ export default defineConfig({
   base: '/echo-flip/',
   srcExclude: ['book-plan.md'],
   cleanUrls: true,
+  head: [
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap',
+      },
+    ],
+  ],
   themeConfig: {
     nav: [
       { text: '홈', link: '/' },
       { text: '읽기 시작', link: '/intro' },
+      { text: 'PDF 다운로드', link: 'https://benelog.github.io/echo-flip/echo-flip-book.pdf' },
     ],
     sidebar: [
       {

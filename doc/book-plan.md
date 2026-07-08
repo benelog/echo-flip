@@ -18,6 +18,8 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - SSG: **VitePress** (선택 이유: 앱과 동일한 npm 스택이라 도구 추가 부담 없음, 마크다운 기반, 한국어 로컬 검색 내장, GitHub Pages 배포 단순)
 - 소스 위치: `doc/` (독립 `package.json`, 앱 의존성과 분리)
 - 로컬 확인: `cd doc && npm install && npm run dev` / 빌드 검증: `npm run build`
+- 책 테마 (2026-07-09): `.vitepress/theme/custom.css` — 본문 명조(Noto Serif KR)·제목 고딕의 한국어 종이책 관례, 행간 2.05·양쪽 정렬, 인쇄용 CSS 포함
+- PDF (2026-07-09): `npm run pdf`(`scripts/export-pdf.mjs`)가 빌드 결과를 장 순서대로 인쇄해 `dist/echo-flip-book.pdf` 한 권으로 병합(시스템 Chrome + puppeteer-core + pdf-lib, 연속 쪽 번호). CI(book.yml)가 매 배포마다 재생성. 다운로드 링크는 홈 hero와 상단 nav에 있음
 
 ## 목차와 파일 매핑
 

@@ -1,0 +1,139 @@
+/* ──────────────────────────────────────────────────────────────
+   책 타이포그래피
+   한국어 종이책 관례를 따른다: 본문은 명조(세리프), 제목·UI는 고딕.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  --ef-font-serif: 'Noto Serif KR', 'KoPubWorld Batang', 'Nanum Myeongjo',
+    Georgia, 'Times New Roman', serif;
+}
+
+/* 본문 텍스트를 명조체로 */
+.vp-doc p,
+.vp-doc li,
+.vp-doc blockquote,
+.vp-doc td,
+.vp-doc th {
+  font-family: var(--ef-font-serif);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 종이책에 가까운 글자 크기와 행간 */
+.vp-doc p,
+.vp-doc li {
+  font-size: 1.0625rem; /* 17px */
+  line-height: 2.05;
+}
+
+.vp-doc p {
+  text-align: justify;
+  margin: 1.15em 0;
+}
+
+.vp-doc li + li {
+  margin-top: 0.35em;
+}
+
+/* 장 제목 */
+.vp-doc h1 {
+  font-size: 1.9rem;
+  line-height: 1.45;
+  word-break: keep-all;
+  padding-bottom: 0.55em;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4 {
+  word-break: keep-all;
+}
+
+/* 인용문 — 문체 가이드의 참고 원문 발췌 등에 쓰인다 */
+.vp-doc blockquote {
+  border-left: 3px solid var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+  padding: 12px 20px;
+  border-radius: 0 6px 6px 0;
+}
+
+.vp-doc blockquote > p {
+  color: var(--vp-c-text-2);
+}
+
+/* 표는 본문보다 살짝 작게 */
+.vp-doc td,
+.vp-doc th {
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* 세리프 본문 안에서 인라인 코드가 튀지 않게 */
+.vp-doc :not(pre) > code {
+  font-size: 0.85em;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   인쇄·PDF
+   내비게이션·사이드바를 걷어내고 본문만 종이에 얹는다.
+   ────────────────────────────────────────────────────────────── */
+
+@media print {
+  .VPNav,
+  .VPLocalNav,
+  .VPSidebar,
+  .VPSkipLink,
+  .VPBackdrop,
+  .VPFooter,
+  .VPDocAside,
+  .VPDoc .aside,
+  .VPDocFooter,
+  .vp-doc button.copy,
+  .vp-doc span.lang {
+    display: none !important;
+  }
+
+  .VPContent {
+    padding-top: 0 !important;
+  }
+
+  .VPContent.has-sidebar {
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .VPDoc {
+    padding: 0 !important;
+  }
+
+  .VPDoc .container {
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  .VPDoc .content {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* 코드가 가로 스크롤로 잘리지 않게 줄 안에서 개행 */
+  .vp-doc [class*='language-'] {
+    overflow: visible !important;
+  }
+
+  .vp-doc [class*='language-'] pre,
+  .vp-doc [class*='language-'] code {
+    white-space: pre-wrap !important;
+    word-break: break-all;
+    overflow: visible !important;
+  }
+
+  /* 제목 직후에서 페이지가 갈라지지 않게 */
+  .vp-doc h1,
+  .vp-doc h2,
+  .vp-doc h3 {
+    break-after: avoid;
+  }
+}

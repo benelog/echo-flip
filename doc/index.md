@@ -10,6 +10,9 @@ hero:
       text: 읽기 시작
       link: /intro
     - theme: alt
+      text: PDF 다운로드
+      link: https://benelog.github.io/echo-flip/echo-flip-book.pdf
+    - theme: alt
       text: GitHub 저장소
       link: https://github.com/benelog/echo-flip
 
