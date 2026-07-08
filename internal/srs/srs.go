@@ -11,7 +11,7 @@ const (
 	MinEase     = 1.3
 	InitialEase = 2.5
 	// SM-2 ease deltas for q=5 and q=2.
-	easeGainCorrect  = 0.1
+	easeGainCorrect   = 0.1
 	easeLossIncorrect = 0.32
 )
 

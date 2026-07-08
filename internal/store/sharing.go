@@ -29,13 +29,13 @@ type SharedDeckSummary struct {
 // SharedCard is the card payload exposed to non-owners: content only, no ids
 // or SRS state.
 type SharedCard struct {
-	Text      string   `json:"text"`
-	Meaning   string   `json:"meaning"`
-	CardType  string   `json:"cardType"`
-	Tags      []string `json:"tags"`
-	Phonetic  *string  `json:"phonetic"`
-	Example   *string  `json:"example"`
-	Notes     *string  `json:"notes"`
+	Text     string   `json:"text"`
+	Meaning  string   `json:"meaning"`
+	CardType string   `json:"cardType"`
+	Tags     []string `json:"tags"`
+	Phonetic *string  `json:"phonetic"`
+	Example  *string  `json:"example"`
+	Notes    *string  `json:"notes"`
 }
 
 func newShareSlug() string {
