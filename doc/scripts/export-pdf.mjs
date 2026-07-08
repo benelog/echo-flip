@@ -1,5 +1,6 @@
-// 빌드된 사이트(.vitepress/dist)를 로컬로 서빙하고, 장 순서대로 인쇄해
-// 한 권의 PDF(echo-flip-book.pdf)로 합친다. 시스템 Chrome을 사용한다.
+// 빌드된 사이트(.vitepress/dist)를 로컬로 서빙하고, 표지·차례와 함께
+// 장 순서대로 인쇄해 한 권의 PDF(echo-flip-book.pdf)로 합친다.
+// 북마크(PDF 아웃라인)와 연속 쪽 번호를 넣는다. 시스템 Chrome을 사용한다.
 // 사용: vitepress build 후 `npm run pdf`
 import { createServer } from 'node:http'
 import { readFile, writeFile, stat } from 'node:fs/promises'
@@ -7,27 +8,95 @@ import { existsSync } from 'node:fs'
 import { extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import puppeteer from 'puppeteer-core'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import { PDFDocument, PDFHexString, PDFName, PDFNumber, StandardFonts, rgb } from 'pdf-lib'
 
 const docRoot = fileURLToPath(new URL('..', import.meta.url))
 const dist = join(docRoot, '.vitepress/dist')
 const BASE = '/echo-flip/'
 
-// 책 읽기 순서
-const routes = [
-  'intro',
-  'part1/tech-choices',
-  'part1/go',
-  'part1/gin',
-  'part1/typescript',
-  'part1/react',
-  'part1/database',
-  'part2/claude-code',
-  'part2/agents-hooks',
-  'part2/vercel',
-  'part2/supabase',
+const TITLE = '월 0원으로 운영하는 나의 웹 앱'
+const SUBTITLE = '혼자 만들고, 무료로 배포하고, AI와 함께 개발한다'
+const AUTHOR = 'benelog'
+const SITE = 'benelog.github.io/echo-flip'
+
+// 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.
+const chapters = [
+  { route: 'intro', title: '도입 — 무엇을 만드는가: Echo Flip의 요구사항' },
+  { route: 'part1/tech-choices', title: '1장 기술 선택 — 왜 이 조합인가', part: '1부 언어와 프레임워크로 코드 이해하기' },
+  { route: 'part1/go', title: '2장 Go — 작은 서버를 위한 백엔드 언어' },
+  { route: 'part1/gin', title: '3장 Gin으로 만드는 HTTP API' },
+  { route: 'part1/typescript', title: '4장 TypeScript — 타입으로 지키는 프런트엔드' },
+  { route: 'part1/react', title: '5장 React와 Next.js로 만드는 화면' },
+  { route: 'part1/database', title: '6장 PostgreSQL 데이터베이스 설계' },
+  { route: 'part2/claude-code', title: '7장 Claude Code — AI 에이전트와 개발하기', part: '2부 앱을 만드는 도구와 인프라' },
+  { route: 'part2/agents-hooks', title: '8장 서브에이전트와 훅으로 만드는 품질 게이트' },
+  { route: 'part2/vercel', title: '9장 Vercel — 한 플랫폼에 모두 배포하기' },
+  { route: 'part2/supabase', title: '10장 Supabase — 인증과 데이터베이스' },
 ]
 
+const FONT_LINKS = `
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">`
+
+function coverHtml() {
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8">${FONT_LINKS}
+  <style>
+    @page { size: A4; margin: 0; }
+    html, body { margin: 0; padding: 0; }
+    .cover {
+      position: relative; box-sizing: border-box; width: 210mm; height: 296mm;
+      padding: 34mm 26mm 26mm; overflow: hidden;
+      background: linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+      color: #fff; font-family: 'Noto Serif KR', serif;
+      display: flex; flex-direction: column;
+    }
+    .rule { width: 34mm; border-top: 1.2mm solid #8ea2d8; margin-bottom: 14mm; }
+    h1 { font-size: 34pt; line-height: 1.45; font-weight: 700; margin: 0 0 10mm; word-break: keep-all; }
+    .subtitle { font-family: 'Noto Sans KR', sans-serif; font-size: 13.5pt; font-weight: 400; color: rgba(255,255,255,.82); margin: 0; line-height: 1.8; word-break: keep-all; }
+    .bottom { margin-top: auto; font-family: 'Noto Sans KR', sans-serif; }
+    .author { font-size: 13pt; font-weight: 500; margin: 0 0 2.5mm; }
+    .site { font-size: 9.5pt; color: rgba(255,255,255,.55); margin: 0; }
+    .zero { position: absolute; right: -6mm; bottom: -14mm; font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 340pt; line-height: 1; color: rgba(255,255,255,.05); letter-spacing: -0.04em; }
+  </style></head><body>
+  <div class="cover">
+    <div class="rule"></div>
+    <h1>월 0원으로 운영하는<br>나의 웹 앱</h1>
+    <p class="subtitle">${SUBTITLE}</p>
+    <div class="bottom">
+      <p class="author">${AUTHOR} 지음</p>
+      <p class="site">${SITE}</p>
+    </div>
+    <div class="zero">&#8361;0</div>
+  </div></body></html>`
+}
+
+function tocHtml(startPages) {
+  const rows = chapters
+    .map((c, i) => {
+      const part = c.part
+        ? `<div class="part">${c.part}</div>`
+        : ''
+      return `${part}<div class="row"><span class="t">${c.title}</span><span class="dots"></span><span class="p">${startPages[i]}</span></div>`
+    })
+    .join('\n')
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8">${FONT_LINKS}
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { font-family: 'Noto Serif KR', serif; color: #1c1c1e; }
+    h1 { font-family: 'Noto Sans KR', sans-serif; font-size: 21pt; font-weight: 700; margin: 6mm 0 12mm; }
+    .part { font-family: 'Noto Sans KR', sans-serif; font-size: 11.5pt; font-weight: 700; color: #33436e; margin: 9mm 0 2.5mm; }
+    .row { display: flex; align-items: baseline; font-size: 11pt; line-height: 2.2; word-break: keep-all; }
+    .row .t { padding-right: 3mm; }
+    .row .dots { flex: 1; border-bottom: 1px dotted #b3b3b8; transform: translateY(-1.5mm); }
+    .row .p { padding-left: 3mm; font-variant-numeric: tabular-nums; color: #444; }
+  </style></head><body>
+  <h1>차례</h1>
+  ${rows}
+  </body></html>`
+}
+
+// ── dist 정적 서버 (cleanUrls 대응) ─────────────────────────────
 const mime = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript',
@@ -38,8 +107,6 @@ const mime = {
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
 }
-
-// dist를 base 경로 아래에 서빙하는 최소 정적 서버 (cleanUrls 대응)
 const server = createServer(async (req, res) => {
   const path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
   if (!path.startsWith(BASE)) {
@@ -61,6 +128,7 @@ const server = createServer(async (req, res) => {
 await new Promise((resolve) => server.listen(0, resolve))
 const port = server.address().port
 
+// ── Chrome으로 인쇄 ─────────────────────────────────────────────
 const chrome =
   process.env.PUPPETEER_EXECUTABLE_PATH ??
   [
@@ -72,45 +140,78 @@ const chrome =
   ].find(existsSync)
 if (!chrome) throw new Error('Chrome 실행 파일을 찾지 못했다 (PUPPETEER_EXECUTABLE_PATH로 지정 가능)')
 
+const CONTENT_MARGIN = { top: '18mm', bottom: '18mm', left: '15mm', right: '15mm' }
 const browser = await puppeteer.launch({
   executablePath: chrome,
   args: ['--no-sandbox', '--font-render-hinting=none'],
 })
 
-const chapterPdfs = []
+let coverBuf, tocBuf
+const chapterDocs = []
 try {
   const page = await browser.newPage()
-  for (const route of routes) {
-    const url = `http://127.0.0.1:${port}${BASE}${route}`
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 90_000 })
+
+  // 본문 장들
+  for (const { route } of chapters) {
+    await page.goto(`http://127.0.0.1:${port}${BASE}${route}`, {
+      waitUntil: 'networkidle0',
+      timeout: 90_000,
+    })
     await page.evaluateHandle('document.fonts.ready')
-    chapterPdfs.push(
-      await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '18mm', bottom: '18mm', left: '15mm', right: '15mm' },
-      }),
-    )
+    const buf = await page.pdf({ format: 'A4', printBackground: true, margin: CONTENT_MARGIN })
+    chapterDocs.push(await PDFDocument.load(buf))
     console.log(`printed: ${route}`)
   }
+
+  // 장별 시작 쪽 번호(본문 기준 1부터)를 계산해 차례를 만든다
+  const startPages = []
+  let cursor = 1
+  for (const doc of chapterDocs) {
+    startPages.push(cursor)
+    cursor += doc.getPageCount()
+  }
+
+  await page.setContent(tocHtml(startPages), { waitUntil: 'load', timeout: 60_000 })
+  await page.evaluate(() => document.fonts.ready)
+  tocBuf = await page.pdf({ format: 'A4', printBackground: true, margin: CONTENT_MARGIN })
+
+  await page.setContent(coverHtml(), { waitUntil: 'load', timeout: 60_000 })
+  await page.evaluate(() => document.fonts.ready)
+  coverBuf = await page.pdf({ format: 'A4', printBackground: true, margin: 0, pageRanges: '1' })
 } finally {
   await browser.close()
   server.close()
 }
 
-// 장별 PDF를 한 권으로 병합하고 연속 페이지 번호를 매긴다
+// ── 병합: 표지 + 차례 + 본문 ────────────────────────────────────
 const book = await PDFDocument.create()
-book.setTitle('월 0원으로 운영하는 나의 웹 앱')
-book.setAuthor('benelog')
+book.setTitle(TITLE)
+book.setAuthor(AUTHOR)
+book.setSubject(SUBTITLE)
 book.setLanguage('ko-KR')
-for (const buf of chapterPdfs) {
-  const doc = await PDFDocument.load(buf)
-  for (const p of await book.copyPages(doc, doc.getPageIndices())) book.addPage(p)
+
+async function append(src) {
+  const pages = await book.copyPages(src, src.getPageIndices())
+  pages.forEach((p) => book.addPage(p))
+  return pages.length
 }
+
+const coverPages = await append(await PDFDocument.load(coverBuf))
+const tocPages = await append(await PDFDocument.load(tocBuf))
+const frontPages = coverPages + tocPages
+
+const chapterStartIndex = [] // 병합본에서 각 장의 0-기준 페이지 인덱스
+for (const doc of chapterDocs) {
+  chapterStartIndex.push(book.getPageCount())
+  await append(doc)
+}
+
+// 본문에만 연속 쪽 번호를 찍는다 (표지·차례 제외)
 const font = await book.embedFont(StandardFonts.Helvetica)
-const total = book.getPageCount()
+const contentTotal = book.getPageCount() - frontPages
 book.getPages().forEach((p, i) => {
-  const label = `${i + 1} / ${total}`
+  if (i < frontPages) return
+  const label = `${i - frontPages + 1} / ${contentTotal}`
   const width = font.widthOfTextAtSize(label, 9)
   p.drawText(label, {
     x: (p.getSize().width - width) / 2,
@@ -121,6 +222,33 @@ book.getPages().forEach((p, i) => {
   })
 })
 
+// ── 북마크(PDF 아웃라인) ────────────────────────────────────────
+const outlineItems = [
+  { title: '차례', pageIndex: coverPages },
+  ...chapters.map((c, i) => ({ title: c.title, pageIndex: chapterStartIndex[i] })),
+]
+{
+  const ctx = book.context
+  const rootRef = ctx.nextRef()
+  const itemRefs = outlineItems.map(() => ctx.nextRef())
+  outlineItems.forEach((item, i) => {
+    const dict = ctx.obj({})
+    dict.set(PDFName.of('Title'), PDFHexString.fromText(item.title))
+    dict.set(PDFName.of('Parent'), rootRef)
+    dict.set(PDFName.of('Dest'), ctx.obj([book.getPage(item.pageIndex).ref, PDFName.of('Fit')]))
+    if (i > 0) dict.set(PDFName.of('Prev'), itemRefs[i - 1])
+    if (i < itemRefs.length - 1) dict.set(PDFName.of('Next'), itemRefs[i + 1])
+    ctx.assign(itemRefs[i], dict)
+  })
+  const root = ctx.obj({})
+  root.set(PDFName.of('Type'), PDFName.of('Outlines'))
+  root.set(PDFName.of('First'), itemRefs[0])
+  root.set(PDFName.of('Last'), itemRefs[itemRefs.length - 1])
+  root.set(PDFName.of('Count'), PDFNumber.of(outlineItems.length))
+  ctx.assign(rootRef, root)
+  book.catalog.set(PDFName.of('Outlines'), rootRef)
+}
+
 const out = join(dist, 'echo-flip-book.pdf')
 await writeFile(out, await book.save())
-console.log(`PDF 생성 완료: ${out} (${total}쪽)`)
+console.log(`PDF 생성 완료: ${out} (표지 ${coverPages} + 차례 ${tocPages} + 본문 ${contentTotal}쪽)`)

@@ -75,6 +75,115 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
+   이북 뷰어 레이아웃
+   목차는 왼쪽 하나만 남기고(오른쪽 아웃라인 제거), 본문은
+   종이 페이지처럼 가운데 카드로 띄운다.
+   ────────────────────────────────────────────────────────────── */
+
+/* 오른쪽 페이지 아웃라인 영역 제거 */
+.VPDoc .aside {
+  display: none !important;
+}
+
+/* 본문 뒤 배경을 살짝 가라앉혀 종이가 떠 있는 느낌으로 */
+.VPDoc {
+  background: var(--vp-c-bg-alt);
+}
+
+.VPDoc .content {
+  max-width: 880px !important;
+  margin: 0 auto;
+  padding: 0 !important;
+}
+
+.VPDoc .content-container {
+  max-width: none !important;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 56px 72px 48px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 767px) {
+  .VPDoc .content-container {
+    padding: 32px 24px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+/* 상단 바의 목차 접기/펼치기 버튼 (데스크톱 전용) */
+.ef-toc-toggle {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .ef-toc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: var(--vp-nav-height);
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--vp-c-text-2);
+    transition: color 0.25s;
+  }
+
+  .ef-toc-toggle:hover {
+    color: var(--vp-c-text-1);
+  }
+}
+
+/* 목차를 접은 몰입 모드 */
+.ef-toc-hidden .VPSidebar {
+  display: none !important;
+}
+
+.ef-toc-hidden .VPContent.has-sidebar {
+  padding-left: 0 !important;
+}
+
+@media (min-width: 960px) {
+  .ef-toc-hidden .VPNavBar .divider {
+    padding-left: 0 !important;
+  }
+
+  .ef-toc-hidden .VPNavBar.has-sidebar .title {
+    background-color: transparent;
+    border-bottom-color: transparent;
+  }
+}
+
+/* 읽기 진행 바 */
+.ef-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--vp-c-brand-1);
+  z-index: 100;
+  pointer-events: none;
+  transition: width 0.1s ease-out;
+}
+
+/* 이전 장/다음 장 — 책장을 넘기는 버튼처럼 도드라지게 */
+.vp-doc + .prev-next,
+.prev-next {
+  margin-top: 40px;
+}
+
+.prev-next .pager-link {
+  border-radius: 10px;
+}
+
+.prev-next .pager-link .title {
+  font-family: var(--vp-font-family-base);
+}
+
+/* ──────────────────────────────────────────────────────────────
    인쇄·PDF
    내비게이션·사이드바를 걷어내고 본문만 종이에 얹는다.
    ────────────────────────────────────────────────────────────── */
@@ -116,6 +225,25 @@
   .VPDoc .content {
     max-width: 100% !important;
     padding: 0 !important;
+  }
+
+  /* 화면용 페이지 카드 장식은 종이에서 제거 */
+  .VPDoc {
+    background: none !important;
+  }
+
+  .VPDoc .content-container {
+    max-width: 100% !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .ef-progress,
+  .ef-toc-toggle {
+    display: none !important;
   }
 
   /* 코드가 가로 스크롤로 잘리지 않게 줄 안에서 개행 */

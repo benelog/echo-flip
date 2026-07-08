@@ -51,7 +51,7 @@ export default defineConfig({
         ],
       },
     ],
-    outline: { level: [2, 3], label: '이 페이지에서' },
+    outline: false,
     docFooter: { prev: '이전 장', next: '다음 장' },
     lastUpdated: { text: '마지막 수정' },
     darkModeSwitchLabel: '다크 모드',
