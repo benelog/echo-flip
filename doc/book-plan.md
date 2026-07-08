@@ -44,7 +44,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - **2장 Go**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조, 구조체·다중 반환·에러 처리, 테이블 주도 테스트(`internal/srs/srs_test.go`), 품질 도구(gofmt, go vet, go build, staticcheck). 예제: `internal/srs/`, `internal/smartrules/`.
 - **3장 Gin**: 라우터 조립(`pkg/app/app.go`), 로컬 서버와 Vercel 함수가 같은 앱을 공유하는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS, JWT 인증 `internal/auth/jwt.go`), handlers→store 계층 분리.
 - **4장 TypeScript**: 타입 기초(`src/lib/types.ts`), 유니온·제네릭, zod 런타임 검증, 순수 로직 모듈(`csv.ts`, `dictionary.ts`), 품질 도구(tsc strict, vitest).
-- **5장 React/Next.js**: 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), Tailwind 간단히.
+- **5장 React/Next.js**: 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), PWA 매니페스트(`src/app/manifest.ts`), Tailwind 간단히.
 - **6장 DBMS 설계**: 요구사항→테이블 도출, 스키마(`internal/db/migrations/*.sql`), 키·제약·인덱스, 마이그레이션 관리(`cmd/migrate`), SRS 데이터 모델, RLS 전략(정책 0개 enable로 PostgREST 차단, Go API 전용 접근).
 - **7장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
 - **8장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
@@ -63,6 +63,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 6. 기술 용어는 처음 등장할 때 한글(영문) 병기. 예: 간격 반복(Spaced Repetition).
 7. 코드 예제는 반드시 이 저장소의 실제 코드에서 발췌하고, 코드 블록 앞 본문이나 캡션에 파일 경로를 명시한다. 설명에 불필요한 부분은 `// ...` 로 생략한다.
 8. 독자를 가르치려 들기보다 경험을 나누는 어조. "~해 보자", "~를 짚어 보겠다" 같은 표현 활용.
+9. 도입 장에는 코드 블록을 싣지 않는다(아키텍처 텍스트 다이어그램은 예외). 코드는 그것을 해설하는 장에 두고, 도입에서는 말로 풀어 설명한 뒤 해당 장을 가리킨다. (2026-07-09 지시)
 
 문체 예시(참고 원문 발췌):
 

@@ -237,7 +237,25 @@ Go에서 `go build`와 `go vet`이 하던 역할을 프런트엔드에서는 `ts
 ### React 생태계의 사실상 표준
 
 React 생태계에서 TypeScript는 사실상 표준(de facto standard)이 됐다.
-Echo Flip이 쓰는 라이브러리를 보면 Next.js는 프로젝트 생성 시 TypeScript가 기본값이고, TanStack Query는 타입 추론을 전제로 API를 설계했다.
+Echo Flip의 `package.json` 의존성 목록으로 확인해 보자.
+
+```json
+{
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.1",
+    "@tanstack/react-query": "^5.101.2",
+    "lucide-react": "^1.23.0",
+    "next": "16.2.10",
+    "papaparse": "^5.5.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  }
+}
+```
+
+Next.js는 프로젝트 생성 시 TypeScript가 기본값이고, TanStack Query는 타입 추론을 전제로 API를 설계했다.
 zod처럼 타입 시스템과의 연동이 존재 이유인 라이브러리도 이 생태계의 산물이다.
 papaparse처럼 자바스크립트로 작성된 라이브러리도 `@types/papaparse` 같은 타입 선언 패키지가 별도로 제공된다.
 생태계가 타입을 전제로 움직이므로, TypeScript를 쓰지 않으면 라이브러리가 제공하는 안전망의 절반을 포기하는 셈이다.

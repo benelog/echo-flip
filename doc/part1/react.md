@@ -490,6 +490,31 @@ export default function RootLayout({
 `<body>` 바로 안쪽에서 `Providers`가 전체 트리를 감싸므로, 어떤 페이지에서든 쿼리 캐시와 인증 Context를 쓸 수 있다.
 생략한 `export const metadata`는 Next.js가 빌드 시점에 `<head>`의 title, meta 태그로 변환해 주는 관례다.
 
+### manifest.ts — 파일 하나로 PWA
+
+App Router의 파일 관례는 화면에만 적용되는 것이 아니다.
+`src/app/manifest.ts`를 두면 Next.js가 웹 앱 매니페스트(Web App Manifest)를 만들어 모든 페이지의 `<head>`에 연결해 준다.
+
+```ts
+export const dynamic = "force-static";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Echo Flip — 영어 암기 카드",
+    short_name: "Echo Flip",
+    lang: "ko",
+    start_url: "/",
+    display: "standalone",
+    // ...색상·아이콘 생략...
+  };
+}
+```
+
+도입에서 소개한 PWA 요구사항이 이 파일 하나로 충족된다.
+`display: "standalone"` 덕분에 Android Chrome에서 "홈 화면에 추가"를 누르면 주소창 없는 독립 실행형 앱처럼 동작하고, iOS Safari에서도 같은 방식으로 설치할 수 있다.
+반환 타입이 `MetadataRoute.Manifest`로 고정되어 있어 매니페스트 필드의 오타나 잘못된 값은 컴파일 시점에 걸린다.
+맨 위의 `export const dynamic = "force-static"`은 이 파일을 빌드 시점에 정적 생성하라는 선언으로, 바로 이어서 볼 정적 export 구성과 한 몸이다.
+
 ### output: 'export' — 서버 없는 Next.js
 
 Echo Flip은 Next.js를 흔한 서버 렌더링 구성이 아니라 정적 export(static export)로 쓴다.
