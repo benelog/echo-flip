@@ -449,9 +449,9 @@ func Migrate(databaseURL string) error {
 }
 ```
 
-`//go:embed`로 SQL 파일을 바이너리에 내장하므로 마이그레이션 실행에 별도 파일 배포가 필요 없다(2장에서 본 Go의 embed 기능이다).
+`//go:embed`는 SQL 파일을 컴파일 시점에 바이너리 안에 넣는 Go 기능으로, 덕분에 마이그레이션 실행에 별도 파일 배포가 필요 없다.
 golang-migrate는 `schema_migrations` 테이블에 현재 버전을 기록해 두고 미적용분만 실행하며, 적용 중에는 PostgreSQL 자문 잠금(advisory lock)을 잡아 동시 실행을 막는다.
-주석의 "direct connection"은 Supabase 특유의 제약인데, 트랜잭션 풀링 포트를 거치면 세션에 귀속되는 자문 잠금이 제대로 동작하지 않아 마이그레이션만은 직결 포트로 실행해야 한다(10장에서 다룬다).
+주석의 "direct connection"은 이 자문 잠금 때문에 생기는 Supabase 특유의 제약으로, 왜 트랜잭션 풀링 포트를 거치면 안 되는지는 10장에서 다룬다.
 
 진입점인 `cmd/migrate/main.go`는 `MIGRATE_DATABASE_URL`(없으면 `DATABASE_URL`)에서 접속 문자열을 읽어 `db.Migrate`를 호출하는 짧은 CLI로, `MIGRATE_DATABASE_URL=postgres://... go run ./cmd/migrate`처럼 실행한다.
 접속 문자열 환경 변수를 둘로 나눈 것도 위의 직결 연결 요구 때문으로, API 서버는 풀링 포트를, 마이그레이션은 직결 포트를 쓴다.

@@ -339,7 +339,7 @@ async function authHeader(): Promise<Record<string, string>> {
 그러나 서버리스에서는 함수 인스턴스가 수시로 생기고 사라지므로 인스턴스 메모리에 세션을 둘 수 없고, Redis를 붙이면 관리 플랫폼이 하나 늘어난다.
 
 JWT 방식은 서명된 토큰 자체가 신원 증명이라서, 어떤 인스턴스가 요청을 받아도 공개키만 있으면 외부 저장소 조회 없이 사용자를 식별한다.
-무상태(stateless)라서 수평 확장에 제약이 없고, 콜드 스타트 때 세션 저장소 연결을 기다릴 필요도 없다.
+무상태(stateless)라서 수평 확장에 제약이 없고, 콜드스타트 때 세션 저장소 연결을 기다릴 필요도 없다.
 
 대가도 정직하게 짚어야 하는데, 발급된 토큰은 만료 전까지 유효해서 즉시 강제 폐기가 어렵다.
 Supabase는 액세스 토큰 수명을 1시간으로 짧게 잡고 리프레시 토큰 폐기로 갱신을 끊는 방식으로 이 약점을 완화한다.
@@ -451,23 +451,8 @@ func parseUserID(raw string, kf jwt.Keyfunc) (uuid.UUID, error) {
 
 이 파일은 두 가지 미들웨어를 내보낸다.
 `Middleware`는 토큰이 없거나 무효하면 401로 요청을 끊고, `OptionalMiddleware`는 유효한 토큰이 있을 때만 사용자 ID를 붙이되 없어도 통과시킨다.
-`pkg/app/app.go`의 라우터 조립에서 두 미들웨어가 갈라지는 지점을 보자.
-
-```go
-// Public: browsing shared decks needs no login. Optional auth only lets a
-// signed-in caller see the "is mine" flag on their own shared decks.
-pub := r.Group("/api", auth.OptionalMiddleware(cfg.JWKSURL, cfg.JWTSecret), /* ... */)
-{
-	pub.GET("/shared-decks", h.ListSharedDecks)
-	pub.GET("/shared-decks/:slug", h.GetSharedDeck)
-}
-
-api := r.Group("/api", auth.Middleware(cfg.JWKSURL, cfg.JWTSecret), h.EnsureProfile())
-```
-
-공유 덱 열람은 로그인 없이 가능해야 하지만, 로그인한 사용자에게는 "내 덱" 표시를 보여 주고 싶다.
-선택 인증은 이런 "익명 허용 + 개인화" 요구를 위한 장치다.
-응답이 `Authorization` 헤더에 따라 달라지므로 `Cache-Control: no-store`로 공유 캐시 오염을 막는 것까지가 한 세트다.
+둘 다 방금 본 검증 경로를 그대로 거치며, 차이는 검증에 실패한 요청을 어떻게 처리하느냐뿐이다.
+두 미들웨어가 라우터 조립에서 갈라지는 지점과 그 이유 — 공유 덱의 "익명 허용 + 로그인 시 개인화" 요구, 그리고 `Cache-Control: no-store`가 한 세트인 사연 — 는 3장에서 다뤘다.
 
 ## DB 연결 — 서버리스와 커넥션 풀
 
@@ -609,7 +594,7 @@ Vercel 무료 티어의 함수 리전 선택지가 제한적이어서 함수를 
 쓰는 플랫폼이 서울 리전 함수를 지원한다면 함수와 DB를 모두 서울에 두는 것이 정답이다.
 콜로케이션(colocation)의 원칙은 "함수를 어디에 두든, DB는 반드시 그 옆에"이다.
 
-## RLS 전략 — 정책 0개로 잠근다
+## RLS 전략 복기 — 인증 구조와의 접점
 
 6장에서 설계한 RLS 전략이 이 장의 인증 구조와 어떻게 맞물리는지만 짧게 복기한다.
 

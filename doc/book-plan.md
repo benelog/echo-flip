@@ -23,17 +23,17 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 | 장 | 제목 | 파일 | 상태 |
 |---|---|---|---|
-| 도입 | 무엇을 만드는가 — Echo Flip의 요구사항 | `doc/intro.md` | 초안 완료 |
-| 1부 1장 | 기술 선택 — 왜 이 조합인가 | `doc/part1/tech-choices.md` | 초안 완료 |
-| 1부 2장 | Go — 작은 서버를 위한 백엔드 언어 | `doc/part1/go.md` | 초안 완료 |
-| 1부 3장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
-| 1부 4장 | TypeScript — 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
-| 1부 5장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 초안 완료 |
-| 1부 6장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 초안 완료 |
-| 2부 7장 | Claude Code — AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 초안 완료 |
-| 2부 8장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 초안 완료 |
-| 2부 9장 | Vercel — 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 초안 완료 |
-| 2부 10장 | Supabase — 인증과 데이터베이스 | `doc/part2/supabase.md` | 초안 완료 |
+| 도입 | 무엇을 만드는가 — Echo Flip의 요구사항 | `doc/intro.md` | 검토 완료 |
+| 1부 1장 | 기술 선택 — 왜 이 조합인가 | `doc/part1/tech-choices.md` | 검토 완료 |
+| 1부 2장 | Go — 작은 서버를 위한 백엔드 언어 | `doc/part1/go.md` | 검토 완료 |
+| 1부 3장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 검토 완료 |
+| 1부 4장 | TypeScript — 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 검토 완료 |
+| 1부 5장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 검토 완료 |
+| 1부 6장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 검토 완료 |
+| 2부 7장 | Claude Code — AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 검토 완료 |
+| 2부 8장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 검토 완료 |
+| 2부 9장 | Vercel — 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 검토 완료 |
+| 2부 10장 | Supabase — 인증과 데이터베이스 | `doc/part2/supabase.md` | 검토 완료 |
 
 상태 값: `미착수` → `초안 작성 중` → `초안 완료` → `검토 완료`
 
@@ -84,8 +84,9 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - [x] 전체 10개 장 초안 작성 (2026-07-09, 총 약 5,800줄)
 - [x] 1부 재구성 (2026-07-09): 각 장에 흩어져 있던 기술 선택 이유를 새 1장(`part1/tech-choices.md`)으로 통합, 이후 장 번호 한 칸씩 밀림(총 11개 장). 상호 참조 정합성 수동 검토 완료.
 - [x] 제목 변경 + 무료 티어 보강 (2026-07-09): 새 제목에 맞춰 9장·10장에 "무료 티어로 어디까지 갈 수 있는가" 절 추가(2026년 7월 기준 공식 요금 페이지 수치, 변동 가능성 명시). 수치는 개정 시 재확인 필요.
-- [ ] 전체 통독 검토: 장 간 중복 제거, 상호 참조("N장에서 다룬다") 정합성 확인
+- [x] 전체 통독 검토 (2026-07-09, 병렬 검토 에이전트 4개): 장 간 중복 제거(1↔5장 정적 export 절 통합→5장, 7↔8장 settings.json 전문→8장, 도입↔2장 SRS 코드→2장, 9↔10장 리전 논증→10장, 3·6·8장 반복 설명 축약), 상호 참조 오류 수정(도입 마무리가 1장 대신 2장 예고, 6장의 존재하지 않는 "2장 embed" 참조, 5장의 vitest를 8장으로 오지정), 사실 불일치 수정(1장 zod 실사용 암시, 기동 시간 자릿수, 9장 실행 시간 제한, 8장의 실재하지 않는 CI·프로젝트 지침 서술), 표기 통일(콜드스타트, npx tsc), 5장 vercel.json 발췌 누락 항목 보완. 코드 주석 오류도 수정(pkg/app/app.go Base62→Base36).
 - [x] `npm run build` 통과 확인 후 커밋·push
 - [x] GitHub Pages Source = GitHub Actions 설정 (gh api로 완료)
 - [x] 배포된 사이트에서 렌더링 확인 (홈·도입 장 200 OK, 2026-07-09)
-- [ ] (선택) 이후 세션: 통독 검토 후 상태를 `검토 완료`로 갱신, 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토
+- [x] 통독 검토 후 진도표 상태를 `검토 완료`로 갱신 (2026-07-09)
+- [ ] (선택) 이후 세션: 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토

@@ -191,7 +191,7 @@ case "grade": {
 1라운드 정답만 `firstPassCorrect`에 집계해 재도전이 정답률을 부풀리지 않게 한 것도 리듀서 안의 규칙이다.
 
 이 설계의 장점은 순수 함수라는 데 있다.
-리듀서는 React 없이도 호출할 수 있으므로, 8장에서 다룰 품질 게이트에서 상태 전이를 단위 테스트하기 쉽다.
+리듀서는 React 없이도 호출할 수 있으므로, 4장에서 본 vitest로 상태 전이를 단위 테스트하기 쉽다.
 
 훅 본체는 리듀서를 감싸고, 채점 시 서버 기록까지 함께 처리한다.
 
@@ -284,8 +284,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 `createContext`로 통로를 만들고, `AuthProvider`가 Supabase의 인증 이벤트를 구독해 `session` 상태를 유지하며, Provider 하위의 어떤 컴포넌트든 값을 꺼내 쓸 수 있다.
 `useEffect`의 반환값으로 구독을 해제하는 정리 함수 패턴이 여기서도 등장한다.
 
-로그아웃 이벤트에서 `queryClient.clear()`를 호출하는 줄은 Context와 서버 상태 캐시의 접점이다.
-공유 덱 API처럼 로그인 여부에 따라 응답이 달라지는 엔드포인트가 있어, 이전 사용자 기준으로 캐시된 데이터가 새 방문자에게 노출되지 않도록 캐시를 통째로 비운다.
+로그아웃 이벤트에서 `queryClient.clear()`를 호출하는 줄은 Context와 서버 상태 캐시의 접점으로, 이전 사용자 기준으로 캐시된 데이터가 다음 방문자에게 노출되지 않게 한다.
+왜 이 한 줄이 필요한지는 인증 흐름 전체를 다루는 10장에서 자세히 살펴본다.
 
 꺼내 쓰는 쪽은 커스텀 훅으로 감싼다.
 
@@ -527,7 +527,8 @@ Echo Flip은 이를 두 단계로 우회한다.
   { "source": "/api/:path*", "destination": "/api/index" },
   { "source": "/decks/:slug", "destination": "/deck" },
   { "source": "/shared/:slug", "destination": "/shared-deck" },
-  { "source": "/cards/:id", "destination": "/card" }
+  { "source": "/cards/:id", "destination": "/card" },
+  { "source": "/decks/:slug/cards/new", "destination": "/card" }
 ]
 ```
 
