@@ -1,6 +1,6 @@
-# 9장 Supabase — 인증과 데이터베이스
+# 10장 Supabase — 인증과 데이터베이스
 
-8장에서 정적 프런트엔드와 Go 서버리스 함수를 Vercel 한 곳에 배포하는 과정을 살펴봤다.
+9장에서 정적 프런트엔드와 Go 서버리스 함수를 Vercel 한 곳에 배포하는 과정을 살펴봤다.
 이번 장에서는 마지막 남은 조각인 사용자 인증과 데이터베이스를 Supabase로 해결하는 방법을 해부한다.
 브라우저에서 OAuth 로그인으로 토큰을 얻고 Go API가 그 토큰을 검증하기까지의 전체 흐름, 서버리스 환경 특유의 DB 연결 문제와 연결 풀러, 리전 배치와 환경 변수 구성까지 실제 코드를 따라가며 짚어 보겠다.
 그리고 왜 다른 대안이 아닌 Supabase였는지, Supabase의 어떤 기능을 일부러 쓰지 않았는지도 트레이드오프 관점에서 살펴본다.
@@ -52,7 +52,7 @@ Neon은 서버리스 Postgres로는 훌륭한 선택지이고, 브랜치별로 D
 이미 인증을 해결한 프로젝트라면 Neon이 더 가벼운 선택일 수 있다.
 
 Firebase는 인증과 DB를 통합 제공한다는 점에서 Supabase와 가장 비슷한 대안이다.
-그러나 Firestore는 NoSQL 문서 저장소라서 5장에서 설계한 관계형 스키마 — 외래 키 제약, JOIN, 집계 쿼리 — 를 그대로 옮길 수 없다.
+그러나 Firestore는 NoSQL 문서 저장소라서 6장에서 설계한 관계형 스키마 — 외래 키 제약, JOIN, 집계 쿼리 — 를 그대로 옮길 수 없다.
 더 큰 문제는 벤더 종속(vendor lock-in)으로, Firestore 전용 API로 작성한 데이터 계층은 다른 곳으로 이식할 수 없지만 Supabase의 DB는 표준 PostgreSQL이라 `pg_dump` 한 번으로 어디로든 옮길 수 있다.
 반대로 모바일 SDK와 실시간 동기화가 핵심인 앱이라면 Firebase의 오프라인 지원과 실시간 리스너가 더 나은 답이다.
 
@@ -203,7 +203,7 @@ export function safeNext(next: string | null): string {
 
 ### 세션을 앱 전체에 공급하는 AuthProvider
 
-로그인 상태는 여러 화면이 함께 쓰므로 4장에서 다룬 Context로 공급한다.
+로그인 상태는 여러 화면이 함께 쓰므로 5장에서 다룬 Context로 공급한다.
 `src/components/AuthProvider.tsx`에서 상태 관리 부분을 발췌한다.
 
 ```ts
@@ -306,7 +306,7 @@ func keyfuncFor(jwksURL, secret string) (jwt.Keyfunc, error) {
 
 기본 경로는 아래쪽 JWKS 분기다.
 `github.com/MicahParks/keyfunc` 라이브러리가 JWKS 문서를 내려받아 캐시하고 주기적으로 갱신하며, 토큰 헤더의 키 ID(`kid`)에 맞는 공개키를 골라 준다.
-패키지 전역 변수 `jwks`를 `sync.Once`로 한 번만 초기화하는 것은 8장에서 본 서버리스 함수의 생명주기 때문이다.
+패키지 전역 변수 `jwks`를 `sync.Once`로 한 번만 초기화하는 것은 9장에서 본 서버리스 함수의 생명주기 때문이다.
 웜 인스턴스는 여러 요청을 처리하므로, JWKS 클라이언트를 재사용하면 첫 요청 이후에는 네트워크 조회 없이 검증할 수 있다.
 
 위쪽 분기는 공유 시크릿(HS256) 폴백이다.
@@ -371,7 +371,7 @@ func parseUserID(raw string, kf jwt.Keyfunc) (uuid.UUID, error) {
 `WithExpirationRequired`는 `exp` 클레임이 아예 없는, 영원히 유효한 토큰을 거부한다.
 
 검증을 통과하면 `sub` 클레임이 사용자 식별자다.
-이 값은 Supabase `auth.users` 테이블의 UUID이고, 5장에서 설계한 `profiles.id`가 이 값을 그대로 쓴다.
+이 값은 Supabase `auth.users` 테이블의 UUID이고, 6장에서 설계한 `profiles.id`가 이 값을 그대로 쓴다.
 인증 시스템의 사용자와 우리 스키마의 사용자가 같은 키로 이어지는 접점이다.
 
 ### 필수 인증과 선택 인증
@@ -481,7 +481,7 @@ func Pool(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
 
 ### 마이그레이션은 direct 연결로
 
-그런데 5장에서 다룬 스키마 마이그레이션은 반대로 풀러를 거치면 안 된다.
+그런데 6장에서 다룬 스키마 마이그레이션은 반대로 풀러를 거치면 안 된다.
 `internal/db/migrate.go`의 주석이 이유를 밝힌다.
 
 ```go
@@ -512,7 +512,7 @@ func main() {
 
 ## 리전 콜로케이션 — 함수와 DB를 같은 곳에
 
-8장에서 본 `vercel.json`은 함수 리전을 고정하고 있다.
+9장에서 본 `vercel.json`은 함수 리전을 고정하고 있다.
 
 ```json
 {
@@ -538,7 +538,7 @@ Vercel 무료 티어의 함수 리전 선택지가 제한적이어서 함수를 
 
 ## RLS 전략 — 정책 0개로 잠근다
 
-5장에서 설계한 RLS 전략이 이 장의 인증 구조와 어떻게 맞물리는지만 짧게 복기한다.
+6장에서 설계한 RLS 전략이 이 장의 인증 구조와 어떻게 맞물리는지만 짧게 복기한다.
 
 Supabase는 anon key만 있으면 PostgREST 자동 API로 테이블에 접근할 수 있는 구조인데, anon key는 프런트엔드 번들에 들어가는 공개 값이라 그대로 두면 Go API의 인증·인가 로직을 우회하는 뒷문이 열린다.
 Echo Flip은 모든 테이블에 RLS를 켜되 정책을 하나도 만들지 않았다.

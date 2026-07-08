@@ -23,30 +23,32 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 | 장 | 제목 | 파일 | 상태 |
 |---|---|---|---|
 | 도입 | 무엇을 만드는가 — Echo Flip의 요구사항 | `doc/intro.md` | 초안 완료 |
-| 1부 1장 | Go — 작은 서버를 위한 백엔드 언어 | `doc/part1/go.md` | 초안 완료 |
-| 1부 2장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
-| 1부 3장 | TypeScript — 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
-| 1부 4장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 초안 완료 |
-| 1부 5장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 초안 완료 |
-| 2부 6장 | Claude Code — AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 초안 완료 |
-| 2부 7장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 초안 완료 |
-| 2부 8장 | Vercel — 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 초안 완료 |
-| 2부 9장 | Supabase — 인증과 데이터베이스 | `doc/part2/supabase.md` | 초안 완료 |
+| 1부 1장 | 기술 선택 — 왜 이 조합인가 | `doc/part1/tech-choices.md` | 초안 완료 |
+| 1부 2장 | Go — 작은 서버를 위한 백엔드 언어 | `doc/part1/go.md` | 초안 완료 |
+| 1부 3장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
+| 1부 4장 | TypeScript — 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
+| 1부 5장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 초안 완료 |
+| 1부 6장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 초안 완료 |
+| 2부 7장 | Claude Code — AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 초안 완료 |
+| 2부 8장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 초안 완료 |
+| 2부 9장 | Vercel — 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 초안 완료 |
+| 2부 10장 | Supabase — 인증과 데이터베이스 | `doc/part2/supabase.md` | 초안 완료 |
 
 상태 값: `미착수` → `초안 작성 중` → `초안 완료` → `검토 완료`
 
 ### 장별 필수 내용 요약
 
 - **도입**: 앱 소개(영어 암기 카드), 기능 요구사항(양방향 카드·덱·학습 흐름·SRS·스마트 덱·통계·공유·CSV·사전 API·TTS), 비기능 요구사항(무료 인프라, 운영 부담 최소화, PWA), 전체 아키텍처 개요(정적 Next + Vercel Go 함수 + Supabase), 책의 구성과 범위 안내.
-- **1장 Go**: 선택 이유(서버리스 콜드스타트·단일 바이너리·적은 메모리 vs Node/JVM 대안), 모듈·패키지·`cmd`/`internal`/`pkg` 구조, 구조체·다중 반환·에러 처리, 테이블 주도 테스트(`internal/srs/srs_test.go`), 품질 도구(gofmt, go vet, go build, staticcheck). 예제: `internal/srs/`, `internal/smartrules/`.
-- **2장 Gin**: 선택 이유(표준 `net/http`·chi·Echo와 비교), 라우터 조립(`pkg/app/app.go`), 로컬 서버와 Vercel 함수가 같은 앱을 공유하는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS, JWT 인증 `internal/auth/jwt.go`), handlers→store 계층 분리.
-- **3장 TypeScript**: 선택 이유(JS의 한계, 타입이 주는 검증 신호), 타입 기초(`src/lib/types.ts`), 유니온·제네릭, zod 런타임 검증, 순수 로직 모듈(`csv.ts`, `dictionary.ts`), 품질 도구(tsc strict, vitest).
-- **4장 React/Next.js**: 선택 이유(생태계, 컴포넌트 모델, Next 정적 export), 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), Tailwind 간단히.
-- **5장 DBMS 설계**: 요구사항→테이블 도출, 스키마(`internal/db/migrations/*.sql`), 키·제약·인덱스, 마이그레이션 관리(`cmd/migrate`), SRS 데이터 모델, RLS 전략(정책 0개 enable로 PostgREST 차단, Go API 전용 접근).
-- **6장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
-- **7장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
-- **8장 Vercel**: 선택 이유(무료 티어에서 정적+함수 올인원, Koyeb 상주 서버 대안과 비교), 정적 export 배포, Go 서버리스 함수(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`), `vercel.json` rewrites, 리전 iad1 고정.
-- **9장 Supabase**: 선택 이유(무료 Postgres+Auth 통합, Neon·Firebase 대안 비교), OAuth 로그인 흐름과 Go의 JWKS 검증, pgx 연결(트랜잭션 풀러 6543 + simple protocol이 필요한 이유), 리전 콜로케이션.
+- **1장 기술 선택**: 1부 기술들의 선택 이유를 한 장에 모은 장. 공통 선택 기준(무료·관리 최소·AI 협업·서버리스 적합) → 왜 Go(vs Node/Python/JVM) → 왜 Gin(vs net/http·chi·Echo) → 왜 TypeScript(vs JS) → 왜 React·Next.js·정적 export(vs Vue/Svelte) → 왜 관계형 DB·PostgreSQL(vs SQLite/NoSQL). Vercel·Supabase 선택 이유는 9·10장 소관.
+- **2장 Go**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조, 구조체·다중 반환·에러 처리, 테이블 주도 테스트(`internal/srs/srs_test.go`), 품질 도구(gofmt, go vet, go build, staticcheck). 예제: `internal/srs/`, `internal/smartrules/`.
+- **3장 Gin**: 라우터 조립(`pkg/app/app.go`), 로컬 서버와 Vercel 함수가 같은 앱을 공유하는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS, JWT 인증 `internal/auth/jwt.go`), handlers→store 계층 분리.
+- **4장 TypeScript**: 타입 기초(`src/lib/types.ts`), 유니온·제네릭, zod 런타임 검증, 순수 로직 모듈(`csv.ts`, `dictionary.ts`), 품질 도구(tsc strict, vitest).
+- **5장 React/Next.js**: 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), Tailwind 간단히.
+- **6장 DBMS 설계**: 요구사항→테이블 도출, 스키마(`internal/db/migrations/*.sql`), 키·제약·인덱스, 마이그레이션 관리(`cmd/migrate`), SRS 데이터 모델, RLS 전략(정책 0개 enable로 PostgREST 차단, Go API 전용 접근).
+- **7장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
+- **8장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
+- **9장 Vercel**: 선택 이유(무료 티어에서 정적+함수 올인원, Koyeb 상주 서버 대안과 비교), 정적 export 배포, Go 서버리스 함수(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`), `vercel.json` rewrites, 리전 iad1 고정.
+- **10장 Supabase**: 선택 이유(무료 Postgres+Auth 통합, Neon·Firebase 대안 비교), OAuth 로그인 흐름과 Go의 JWKS 검증, pgx 연결(트랜잭션 풀러 6543 + simple protocol이 필요한 이유), 리전 콜로케이션.
 
 ## 문체 가이드 (모든 장 공통)
 
@@ -79,6 +81,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - [x] VitePress 스켈레톤 (`doc/package.json`, `.vitepress/config.ts`, `index.md`)
 - [x] GitHub Actions 워크플로 (`.github/workflows/book.yml`)
 - [x] 전체 10개 장 초안 작성 (2026-07-09, 총 약 5,800줄)
+- [x] 1부 재구성 (2026-07-09): 각 장에 흩어져 있던 기술 선택 이유를 새 1장(`part1/tech-choices.md`)으로 통합, 이후 장 번호 한 칸씩 밀림(총 11개 장). 상호 참조 정합성 수동 검토 완료.
 - [ ] 전체 통독 검토: 장 간 중복 제거, 상호 참조("N장에서 다룬다") 정합성 확인
 - [x] `npm run build` 통과 확인 후 커밋·push
 - [x] GitHub Pages Source = GitHub Actions 설정 (gh api로 완료)
