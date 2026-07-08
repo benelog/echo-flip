@@ -17,6 +17,8 @@ export interface ProfileSettings {
 
 export interface Deck {
   id: string;
+  /** Short Base62 identifier used in URLs (/decks/{slug}) and deck API paths. */
+  slug: string;
   name: string;
   description: string | null;
   cardCount: number;
@@ -75,7 +77,6 @@ export interface Card {
 }
 
 export interface CardInput {
-  deckId?: string;
   text: string;
   meaning: string;
   cardType: CardType;

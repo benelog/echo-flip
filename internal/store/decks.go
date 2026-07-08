@@ -11,6 +11,7 @@ import (
 
 type Deck struct {
 	ID          uuid.UUID  `json:"id"`
+	Slug        string     `json:"slug"`
 	Name        string     `json:"name"`
 	Description *string    `json:"description"`
 	CardCount   int        `json:"cardCount"`
@@ -23,16 +24,18 @@ type Deck struct {
 const deckSelect = `
 	select d.id, d.name, d.description,
 	       (select count(*) from cards c where c.deck_id = d.id) as card_count,
-	       d.share_slug, d.shared_at, d.created_at, d.updated_at
+	       d.share_slug, d.shared_at, d.created_at, d.updated_at, d.seq
 	from decks d`
 
 func scanDeck(row pgx.Row) (Deck, error) {
 	var d Deck
+	var seq int64
 	err := row.Scan(&d.ID, &d.Name, &d.Description, &d.CardCount,
-		&d.ShareSlug, &d.SharedAt, &d.CreatedAt, &d.UpdatedAt)
+		&d.ShareSlug, &d.SharedAt, &d.CreatedAt, &d.UpdatedAt, &seq)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return d, ErrNotFound
 	}
+	d.Slug = encodeDeckSlug(seq)
 	return d, err
 }
 
@@ -57,13 +60,38 @@ func (s *Store) GetDeck(ctx context.Context, userID, deckID uuid.UUID) (Deck, er
 	return scanDeck(s.pool.QueryRow(ctx, deckSelect+` where d.user_id = $1 and d.id = $2`, userID, deckID))
 }
 
+// GetDeckBySlug loads a deck by its public Base62 URL slug.
+func (s *Store) GetDeckBySlug(ctx context.Context, userID uuid.UUID, slug string) (Deck, error) {
+	seq, err := decodeDeckSlug(slug)
+	if err != nil {
+		return Deck{}, ErrNotFound
+	}
+	return scanDeck(s.pool.QueryRow(ctx, deckSelect+` where d.user_id = $1 and d.seq = $2`, userID, seq))
+}
+
+// DeckIDBySlug resolves a deck slug to the internal deck id, doubling as the
+// caller's ownership/existence check.
+func (s *Store) DeckIDBySlug(ctx context.Context, userID uuid.UUID, slug string) (uuid.UUID, error) {
+	seq, err := decodeDeckSlug(slug)
+	if err != nil {
+		return uuid.Nil, ErrNotFound
+	}
+	var id uuid.UUID
+	err = s.pool.QueryRow(ctx,
+		`select id from decks where user_id = $1 and seq = $2`, userID, seq).Scan(&id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return uuid.Nil, ErrNotFound
+	}
+	return id, err
+}
+
 func (s *Store) CreateDeck(ctx context.Context, userID uuid.UUID, name string, description *string) (Deck, error) {
 	return scanDeck(s.pool.QueryRow(ctx,
 		`with ins as (
 		   insert into decks (user_id, name, description) values ($1, $2, $3)
-		   returning id, name, description, created_at, updated_at
+		   returning id, name, description, created_at, updated_at, seq
 		 )
-		 select id, name, description, 0, null::text, null::timestamptz, created_at, updated_at from ins`,
+		 select id, name, description, 0, null::text, null::timestamptz, created_at, updated_at, seq from ins`,
 		userID, name, description))
 }
 

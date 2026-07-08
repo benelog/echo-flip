@@ -65,7 +65,7 @@ function Dashboard() {
         {decks?.slice(0, 3).map((deck) => (
           <Link
             key={deck.id}
-            href={`/deck?id=${deck.id}`}
+            href={`/decks/${deck.slug}`}
             className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3.5 dark:border-neutral-800 dark:bg-neutral-900"
           >
             <span className="font-medium">{deck.name}</span>

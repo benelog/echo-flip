@@ -8,7 +8,7 @@ import { parseCsv } from "@/lib/csv";
 import type { BulkResult } from "@/lib/types";
 import { useToast } from "./Toast";
 
-export function CsvImportButton({ deckId }: { deckId: string }) {
+export function CsvImportButton({ deckSlug }: { deckSlug: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -16,12 +16,12 @@ export function CsvImportButton({ deckId }: { deckId: string }) {
 
   const upload = useMutation({
     mutationFn: (cards: unknown[]) =>
-      api<BulkResult>(`/api/decks/${deckId}/cards/bulk`, {
+      api<BulkResult>(`/api/decks/${deckSlug}/cards/bulk`, {
         method: "POST",
         body: JSON.stringify({ cards }),
       }),
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["cards", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["cards", deckSlug] });
       queryClient.invalidateQueries({ queryKey: ["decks"] });
       toast(
         `${res.added}개 추가, ${res.skipped}개 중복 건너뜀` +

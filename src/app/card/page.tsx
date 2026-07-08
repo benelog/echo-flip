@@ -13,7 +13,7 @@ import type { Card, CardInput } from "@/lib/types";
 
 function CardEditor() {
   const params = useSearchParams();
-  const deckId = params.get("deckId");
+  const deckSlug = params.get("deck");
   const cardId = params.get("id");
   const router = useRouter();
   const toast = useToast();
@@ -30,14 +30,14 @@ function CardEditor() {
       cardId
         ? api<Card>(`/api/cards/${cardId}`, {
             method: "PATCH",
-            body: JSON.stringify({ ...input, deckId }),
+            body: JSON.stringify({ ...input, deckSlug }),
           })
         : api<Card>("/api/cards", {
             method: "POST",
-            body: JSON.stringify({ ...input, deckId }),
+            body: JSON.stringify({ ...input, deckSlug }),
           }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cards", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["cards", deckSlug] });
       queryClient.invalidateQueries({ queryKey: ["card", cardId] });
       queryClient.invalidateQueries({ queryKey: ["decks"] });
       if (cardId) {
@@ -45,13 +45,13 @@ function CardEditor() {
         router.back();
       } else {
         toast("카드를 추가했어요");
-        router.replace(`/deck?id=${deckId}`);
+        router.replace(`/decks/${deckSlug}`);
       }
     },
     onError: (e) => toast(e.message, "error"),
   });
 
-  if (!deckId) return <p className="text-neutral-500">덱을 찾을 수 없어요.</p>;
+  if (!deckSlug) return <p className="text-neutral-500">덱을 찾을 수 없어요.</p>;
   if (cardId && isLoading)
     return <p className="text-neutral-500">불러오는 중…</p>;
 
@@ -59,7 +59,7 @@ function CardEditor() {
     <div className="flex flex-col gap-5">
       <header className="flex items-center gap-2">
         <Link
-          href={`/deck?id=${deckId}`}
+          href={`/decks/${deckSlug}`}
           aria-label="뒤로"
           className="p-1 text-neutral-500"
         >

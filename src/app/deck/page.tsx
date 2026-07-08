@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ChevronLeft,
@@ -23,34 +23,39 @@ import { downloadBlob } from "@/lib/csv";
 import type { Card, Deck, ShareInfo } from "@/lib/types";
 
 function DeckDetail() {
-  const params = useSearchParams();
-  const deckId = params.get("id");
+  // This static page serves /decks/{slug} via rewrites (vercel.json in prod,
+  // next.config.ts in dev), so the slug only exists in the browser URL:
+  // undefined until mounted, null when the path carries no slug.
+  const [slug, setSlug] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    setSlug(window.location.pathname.split("/")[2] || null);
+  }, []);
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
 
   const { data: deck } = useQuery({
-    queryKey: ["deck", deckId],
-    queryFn: () => api<Deck>(`/api/decks/${deckId}`),
-    enabled: !!deckId,
+    queryKey: ["deck", slug],
+    queryFn: () => api<Deck>(`/api/decks/${slug}`),
+    enabled: !!slug,
   });
   const { data: cards } = useQuery({
-    queryKey: ["cards", deckId],
-    queryFn: () => api<Card[]>(`/api/decks/${deckId}/cards`),
-    enabled: !!deckId,
+    queryKey: ["cards", slug],
+    queryFn: () => api<Card[]>(`/api/decks/${slug}/cards`),
+    enabled: !!slug,
   });
 
   const deleteCard = useMutation({
     mutationFn: (cardId: string) => api(`/api/cards/${cardId}`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cards", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["cards", slug] });
       queryClient.invalidateQueries({ queryKey: ["decks"] });
     },
     onError: (e) => toast(e.message, "error"),
   });
 
   const deleteDeck = useMutation({
-    mutationFn: () => api(`/api/decks/${deckId}`, { method: "DELETE" }),
+    mutationFn: () => api(`/api/decks/${slug}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["decks"] });
       router.replace("/decks");
@@ -60,7 +65,7 @@ function DeckDetail() {
 
   const exportCsv = async () => {
     try {
-      const blob = await apiBlob(`/api/decks/${deckId}/export`);
+      const blob = await apiBlob(`/api/decks/${slug}/export`);
       downloadBlob(blob, `${deck?.name ?? "deck"}.csv`);
     } catch {
       toast("내보내기에 실패했어요", "error");
@@ -80,9 +85,9 @@ function DeckDetail() {
 
   const share = useMutation({
     mutationFn: () =>
-      api<ShareInfo>(`/api/decks/${deckId}/share`, { method: "POST" }),
+      api<ShareInfo>(`/api/decks/${slug}/share`, { method: "POST" }),
     onSuccess: (info) => {
-      queryClient.invalidateQueries({ queryKey: ["deck", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["deck", slug] });
       queryClient.invalidateQueries({ queryKey: ["shared-decks"] });
       void copyShareLink(info.shareSlug);
     },
@@ -90,16 +95,19 @@ function DeckDetail() {
   });
 
   const unshare = useMutation({
-    mutationFn: () => api(`/api/decks/${deckId}/share`, { method: "DELETE" }),
+    mutationFn: () => api(`/api/decks/${slug}/share`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["deck", deckId] });
+      queryClient.invalidateQueries({ queryKey: ["deck", slug] });
       queryClient.invalidateQueries({ queryKey: ["shared-decks"] });
       toast("공유를 해제했어요");
     },
     onError: (e) => toast(e.message, "error"),
   });
 
-  if (!deckId) return <p className="text-neutral-500">덱을 찾을 수 없어요.</p>;
+  if (slug === undefined)
+    return <p className="text-neutral-500">불러오는 중…</p>;
+  if (slug === null)
+    return <p className="text-neutral-500">덱을 찾을 수 없어요.</p>;
 
   return (
     <div className="flex flex-col gap-5">
@@ -120,9 +128,9 @@ function DeckDetail() {
         </button>
       </header>
 
-      {(cards?.length ?? 0) > 0 && (
+      {deck && (cards?.length ?? 0) > 0 && (
         <Link
-          href={`/study?mode=deck&deckId=${deckId}&title=${encodeURIComponent(deck?.name ?? "")}`}
+          href={`/study?mode=deck&deckId=${deck.id}&title=${encodeURIComponent(deck.name)}`}
           className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white"
         >
           <GraduationCap size={20} /> 이 덱 학습하기 ({cards!.length}장)
@@ -131,12 +139,12 @@ function DeckDetail() {
 
       <div className="flex flex-wrap gap-2">
         <Link
-          href={`/card?deckId=${deckId}`}
+          href={`/card?deck=${slug}`}
           className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
         >
           <Plus size={16} /> 카드 추가
         </Link>
-        <CsvImportButton deckId={deckId} />
+        <CsvImportButton deckSlug={slug} />
         <button
           onClick={exportCsv}
           className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
@@ -192,7 +200,7 @@ function DeckDetail() {
               )}
             </div>
             <Link
-              href={`/card?deckId=${deckId}&id=${card.id}`}
+              href={`/card?deck=${slug}&id=${card.id}`}
               aria-label="카드 수정"
               className="p-1.5 text-neutral-400"
             >
@@ -220,9 +228,7 @@ function DeckDetail() {
 export default function DeckPage() {
   return (
     <AppShell>
-      <Suspense>
-        <DeckDetail />
-      </Suspense>
+      <DeckDetail />
     </AppShell>
   );
 }

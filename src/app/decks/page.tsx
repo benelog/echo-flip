@@ -97,7 +97,7 @@ function DeckList() {
         {decks?.map((deck) => (
           <Link
             key={deck.id}
-            href={`/deck?id=${deck.id}`}
+            href={`/decks/${deck.slug}`}
             className="rounded-xl border border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-neutral-900"
           >
             <div className="flex items-center justify-between">

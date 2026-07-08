@@ -77,14 +77,15 @@ func build() (*gin.Engine, error) {
 
 		api.GET("/decks", h.ListDecks)
 		api.POST("/decks", h.CreateDeck)
-		api.GET("/decks/:id", h.GetDeck)
-		api.PATCH("/decks/:id", h.UpdateDeck)
-		api.DELETE("/decks/:id", h.DeleteDeck)
-		api.GET("/decks/:id/cards", h.ListDeckCards)
-		api.POST("/decks/:id/cards/bulk", h.BulkCreateCards)
-		api.GET("/decks/:id/export", h.ExportDeck)
-		api.POST("/decks/:id/share", h.ShareDeck)
-		api.DELETE("/decks/:id/share", h.UnshareDeck)
+		// Decks are addressed by their short Base62 slug, not the UUID.
+		api.GET("/decks/:slug", h.GetDeck)
+		api.PATCH("/decks/:slug", h.UpdateDeck)
+		api.DELETE("/decks/:slug", h.DeleteDeck)
+		api.GET("/decks/:slug/cards", h.ListDeckCards)
+		api.POST("/decks/:slug/cards/bulk", h.BulkCreateCards)
+		api.GET("/decks/:slug/export", h.ExportDeck)
+		api.POST("/decks/:slug/share", h.ShareDeck)
+		api.DELETE("/decks/:slug/share", h.UnshareDeck)
 
 		api.POST("/shared-decks/:slug/import", h.ImportSharedDeck)
 

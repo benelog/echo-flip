@@ -35,7 +35,7 @@ function SharedDeckPreview() {
     onSuccess: (deck) => {
       queryClient.invalidateQueries({ queryKey: ["decks"] });
       toast(`'${deck.name}' 덱을 가져왔어요`);
-      router.replace(`/deck?id=${deck.id}`);
+      router.replace(`/decks/${deck.slug}`);
     },
     onError: (e) => toast(e.message, "error"),
   });

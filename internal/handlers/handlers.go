@@ -66,6 +66,17 @@ func pathUUID(c *gin.Context, name string) (uuid.UUID, bool) {
 	return id, true
 }
 
+// pathDeckID resolves the :slug path param (Base62 deck slug) to the caller's
+// deck id; a malformed or foreign slug responds 404.
+func (h *Handlers) pathDeckID(c *gin.Context) (uuid.UUID, bool) {
+	id, err := h.Store.DeckIDBySlug(c.Request.Context(), auth.UserID(c), c.Param("slug"))
+	if err != nil {
+		fail(c, err)
+		return uuid.Nil, false
+	}
+	return id, true
+}
+
 func validCardType(t string) bool {
 	return t == "word" || t == "sentence" || t == "idiom" || t == "concept"
 }

@@ -7,21 +7,20 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
 	"github.com/benelog/echo-flip/internal/auth"
 	"github.com/benelog/echo-flip/internal/store"
 )
 
 type cardBody struct {
-	DeckID   uuid.UUID `json:"deckId"`
-	Text     string    `json:"text"`
-	Meaning  string    `json:"meaning"`
-	CardType string    `json:"cardType"`
-	Tags     []string  `json:"tags"`
-	Phonetic *string   `json:"phonetic"`
-	Example  *string   `json:"example"`
-	Notes    *string   `json:"notes"`
+	DeckSlug string   `json:"deckSlug"`
+	Text     string   `json:"text"`
+	Meaning  string   `json:"meaning"`
+	CardType string   `json:"cardType"`
+	Tags     []string `json:"tags"`
+	Phonetic *string  `json:"phonetic"`
+	Example  *string  `json:"example"`
+	Notes    *string  `json:"notes"`
 }
 
 func (b *cardBody) toInput() (store.CardInput, string) {
@@ -40,23 +39,29 @@ func (b *cardBody) toInput() (store.CardInput, string) {
 		b.Tags = []string{}
 	}
 	return store.CardInput{
-		DeckID: b.DeckID, Text: b.Text, Meaning: b.Meaning,
+		Text: b.Text, Meaning: b.Meaning,
 		CardType: b.CardType, Tags: b.Tags,
 		Phonetic: b.Phonetic, Example: b.Example, Notes: b.Notes,
 	}, ""
 }
 
+// resolveDeck fills in.DeckID from the body's deck slug.
+func (h *Handlers) resolveDeck(c *gin.Context, b *cardBody, in *store.CardInput) bool {
+	deckID, err := h.Store.DeckIDBySlug(c.Request.Context(), auth.UserID(c), b.DeckSlug)
+	if err != nil {
+		fail(c, err)
+		return false
+	}
+	in.DeckID = deckID
+	return true
+}
+
 func (h *Handlers) ListDeckCards(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
+	deckID, ok := h.pathDeckID(c)
 	if !ok {
 		return
 	}
-	userID := auth.UserID(c)
-	if _, err := h.Store.GetDeck(c.Request.Context(), userID, deckID); err != nil {
-		fail(c, err)
-		return
-	}
-	cards, err := h.Store.ListCards(c.Request.Context(), userID, deckID)
+	cards, err := h.Store.ListCards(c.Request.Context(), auth.UserID(c), deckID)
 	if err != nil {
 		fail(c, err)
 		return
@@ -73,6 +78,9 @@ func (h *Handlers) CreateCard(c *gin.Context) {
 	in, msg := body.toInput()
 	if msg != "" {
 		badRequest(c, msg)
+		return
+	}
+	if !h.resolveDeck(c, &body, &in) {
 		return
 	}
 	card, err := h.Store.CreateCard(c.Request.Context(), auth.UserID(c), in)
@@ -111,6 +119,9 @@ func (h *Handlers) UpdateCard(c *gin.Context) {
 		badRequest(c, msg)
 		return
 	}
+	if !h.resolveDeck(c, &body, &in) {
+		return
+	}
 	card, err := h.Store.UpdateCard(c.Request.Context(), auth.UserID(c), cardID, in)
 	if err != nil {
 		fail(c, err)
@@ -133,7 +144,7 @@ func (h *Handlers) DeleteCard(c *gin.Context) {
 
 // BulkCreateCards imports rows the client parsed from CSV.
 func (h *Handlers) BulkCreateCards(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
+	deckID, ok := h.pathDeckID(c)
 	if !ok {
 		return
 	}
@@ -168,17 +179,13 @@ func (h *Handlers) BulkCreateCards(c *gin.Context) {
 
 // ExportDeck streams the deck as CSV (UTF-8 BOM for Excel compatibility).
 func (h *Handlers) ExportDeck(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
-	if !ok {
-		return
-	}
 	userID := auth.UserID(c)
-	deck, err := h.Store.GetDeck(c.Request.Context(), userID, deckID)
+	deck, err := h.Store.GetDeckBySlug(c.Request.Context(), userID, c.Param("slug"))
 	if err != nil {
 		fail(c, err)
 		return
 	}
-	cards, err := h.Store.ListCards(c.Request.Context(), userID, deckID)
+	cards, err := h.Store.ListCards(c.Request.Context(), userID, deck.ID)
 	if err != nil {
 		fail(c, err)
 		return

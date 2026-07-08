@@ -19,11 +19,7 @@ func (h *Handlers) ListDecks(c *gin.Context) {
 }
 
 func (h *Handlers) GetDeck(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
-	if !ok {
-		return
-	}
-	deck, err := h.Store.GetDeck(c.Request.Context(), auth.UserID(c), deckID)
+	deck, err := h.Store.GetDeckBySlug(c.Request.Context(), auth.UserID(c), c.Param("slug"))
 	if err != nil {
 		fail(c, err)
 		return
@@ -49,7 +45,7 @@ func (h *Handlers) CreateDeck(c *gin.Context) {
 }
 
 func (h *Handlers) UpdateDeck(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
+	deckID, ok := h.pathDeckID(c)
 	if !ok {
 		return
 	}
@@ -74,7 +70,7 @@ func (h *Handlers) UpdateDeck(c *gin.Context) {
 }
 
 func (h *Handlers) DeleteDeck(c *gin.Context) {
-	deckID, ok := pathUUID(c, "id")
+	deckID, ok := h.pathDeckID(c)
 	if !ok {
 		return
 	}
