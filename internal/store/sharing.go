@@ -3,12 +3,14 @@ package store
 import (
 	"context"
 	"crypto/rand"
-	"encoding/base64"
 	"errors"
+	"math/big"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type ShareInfo struct {
@@ -38,27 +40,57 @@ type SharedCard struct {
 	Notes    *string  `json:"notes"`
 }
 
+// A share slug is not a secret — the /shared gallery lists every shared deck
+// publicly — so it needs no entropy for secrecy; it only has to be globally
+// unique. It's a random 5-char Base36 token (same case-insensitive alphabet as
+// the deck slug); the rare collision is retried against the unique index in
+// ShareDeck.
+const shareSlugLen = 5
+
+var shareSlugSpace = new(big.Int).Exp(big.NewInt(36), big.NewInt(shareSlugLen), nil)
+
 func newShareSlug() string {
-	b := make([]byte, 9)
-	rand.Read(b)
-	return base64.RawURLEncoding.EncodeToString(b) // 12 URL-safe chars
+	n, err := rand.Int(rand.Reader, shareSlugSpace)
+	if err != nil {
+		panic("crypto/rand failed: " + err.Error())
+	}
+	s := n.Text(36) // lowercase Base36
+	if len(s) < shareSlugLen {
+		s = strings.Repeat("0", shareSlugLen-len(s)) + s
+	}
+	return s
 }
 
 // ShareDeck enables sharing, keeping any existing slug so links stay stable.
+// The short share slug is globally unique, so on the rare collision we retry
+// with a fresh one; coalesce means an already-shared deck reuses its slug and
+// can never collide.
 func (s *Store) ShareDeck(ctx context.Context, userID, deckID uuid.UUID) (ShareInfo, error) {
 	var info ShareInfo
-	err := s.pool.QueryRow(ctx,
-		`update decks set
-		   share_slug = coalesce(share_slug, $3),
-		   shared_at = coalesce(shared_at, now())
-		 where user_id = $1 and id = $2
-		 returning share_slug, shared_at`,
-		userID, deckID, newShareSlug()).
-		Scan(&info.ShareSlug, &info.SharedAt)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return info, ErrNotFound
+	for attempt := 0; attempt < 5; attempt++ {
+		err := s.pool.QueryRow(ctx,
+			`update decks set
+			   share_slug = coalesce(share_slug, $3),
+			   shared_at = coalesce(shared_at, now())
+			 where user_id = $1 and id = $2
+			 returning share_slug, shared_at`,
+			userID, deckID, newShareSlug()).
+			Scan(&info.ShareSlug, &info.SharedAt)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return info, ErrNotFound
+		}
+		if isUniqueViolation(err) {
+			continue
+		}
+		return info, err
 	}
-	return info, err
+	return info, errors.New("could not generate a unique share slug")
+}
+
+// isUniqueViolation reports whether err is a Postgres unique-constraint error.
+func isUniqueViolation(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }
 
 func (s *Store) UnshareDeck(ctx context.Context, userID, deckID uuid.UUID) error {

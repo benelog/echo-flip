@@ -119,9 +119,8 @@ func (h *Handlers) UpdateCard(c *gin.Context) {
 		badRequest(c, msg)
 		return
 	}
-	if !h.resolveDeck(c, &body, &in) {
-		return
-	}
+	// UpdateCard edits content only and keeps the card in its deck, so no deck
+	// slug is needed (the card is identified by its UUID alone).
 	card, err := h.Store.UpdateCard(c.Request.Context(), auth.UserID(c), cardID, in)
 	if err != nil {
 		fail(c, err)

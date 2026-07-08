@@ -30,7 +30,7 @@ function SharedGallery() {
         {decks?.map((deck) => (
           <Link
             key={deck.shareSlug}
-            href={`/shared-deck?slug=${deck.shareSlug}`}
+            href={`/shared/${deck.shareSlug}`}
             className="rounded-xl border border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-neutral-900"
           >
             <div className="flex items-center justify-between gap-2">

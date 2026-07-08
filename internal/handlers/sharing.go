@@ -9,7 +9,7 @@ import (
 	"github.com/benelog/echo-flip/internal/auth"
 )
 
-var slugPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{8,64}$`)
+var slugPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{4,64}$`)
 
 func pathSlug(c *gin.Context) (string, bool) {
 	slug := c.Param("slug")

@@ -15,6 +15,7 @@ import (
 type Card struct {
 	ID        uuid.UUID `json:"id"`
 	DeckID    uuid.UUID `json:"deckId"`
+	DeckSlug  string    `json:"deckSlug"` // populated by GetCard for the edit page's deck link
 	Text      string    `json:"text"`
 	Meaning   string    `json:"meaning"`
 	CardType  string    `json:"cardType"`
@@ -82,7 +83,18 @@ func (s *Store) ListCards(ctx context.Context, userID, deckID uuid.UUID) ([]Card
 }
 
 func (s *Store) GetCard(ctx context.Context, userID, cardID uuid.UUID) (Card, error) {
-	return scanCard(s.pool.QueryRow(ctx, cardSelect+` where user_id = $1 and id = $2`, userID, cardID))
+	c, err := scanCard(s.pool.QueryRow(ctx, cardSelect+` where user_id = $1 and id = $2`, userID, cardID))
+	if err != nil {
+		return c, err
+	}
+	// The edit page reaches a card by /cards/{id} without a deck in the URL, so
+	// hand it the deck slug for the back link.
+	var seq int64
+	if err := s.pool.QueryRow(ctx, `select seq from decks where id = $1`, c.DeckID).Scan(&seq); err != nil {
+		return c, err
+	}
+	c.DeckSlug = encodeDeckSlug(seq)
+	return c, nil
 }
 
 // CreateCard inserts the card and its SRS row in one transaction; the deck

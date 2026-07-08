@@ -8,11 +8,14 @@ const nextConfig: NextConfig = {
   turbopack: { root: __dirname },
 };
 
-// Static export ignores rewrites — in production Vercel maps /decks/{slug}
-// to the static /deck page (vercel.json); next dev needs the same mapping.
+// Static export ignores rewrites — in production Vercel maps these pretty URLs
+// to their static pages (vercel.json); next dev needs the same mapping.
 if (process.env.NODE_ENV === "development") {
   nextConfig.rewrites = async () => [
     { source: "/decks/:slug", destination: "/deck" },
+    { source: "/shared/:slug", destination: "/shared-deck" },
+    { source: "/cards/:id", destination: "/card" },
+    { source: "/decks/:slug/cards/new", destination: "/card" },
   ];
 }
 

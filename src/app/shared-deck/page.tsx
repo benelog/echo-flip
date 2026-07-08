@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Download, LogIn } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -15,8 +15,13 @@ const ctaClass =
   "flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white";
 
 function SharedDeckPreview() {
-  const params = useSearchParams();
-  const slug = params.get("slug");
+  // Served at /shared/{slug} via rewrites (vercel.json in prod, next.config.ts
+  // in dev), so the slug lives only in the browser URL path: undefined until
+  // mounted, null when the path carries no slug.
+  const [slug, setSlug] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    setSlug(window.location.pathname.split("/")[2] || null);
+  }, []);
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -40,7 +45,9 @@ function SharedDeckPreview() {
     onError: (e) => toast(e.message, "error"),
   });
 
-  if (!slug)
+  if (slug === undefined)
+    return <p className="py-12 text-center text-neutral-500">불러오는 중…</p>;
+  if (slug === null)
     return <p className="py-12 text-center text-neutral-500">잘못된 링크예요.</p>;
   if (error)
     return (
@@ -86,7 +93,7 @@ function SharedDeckPreview() {
         </button>
       ) : (
         <Link
-          href={`/login?next=${encodeURIComponent(`/shared-deck?slug=${slug}`)}`}
+          href={`/login?next=${encodeURIComponent(`/shared/${slug}`)}`}
           className={ctaClass}
         >
           <LogIn size={20} />
@@ -117,9 +124,7 @@ function SharedDeckPreview() {
 export default function SharedDeckPage() {
   return (
     <AppShell requireAuth={false}>
-      <Suspense>
-        <SharedDeckPreview />
-      </Suspense>
+      <SharedDeckPreview />
     </AppShell>
   );
 }

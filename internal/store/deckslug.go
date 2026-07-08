@@ -5,19 +5,22 @@ import (
 	"strings"
 )
 
-// Deck URL slugs are always exactly 4 Base36 characters. Base36 (0-9, a-z) is
+// Deck URL slugs are always exactly 2 Base36 characters. Base36 (0-9, a-z) is
 // case-insensitive, so users can type a slug without worrying about case.
-// Exposing the raw seq column directly would leak a sequential counter ("0001",
-// "0002", ...), so seq is first run through a multiplicative permutation over
-// the 36^4 slug space: consecutive decks land on scattered, non-obvious slugs.
-// The mapping is a bijection, so a slug still decodes back to its seq for
-// lookups. The UUID id stays internal.
+// Exposing the raw seq column directly would leak a sequential counter ("01",
+// "02", ...), so seq is first run through a multiplicative permutation over the
+// 36^2 slug space: consecutive decks land on scattered, non-obvious slugs. The
+// mapping is a bijection, so a slug still decodes back to its seq for lookups.
+// The UUID id stays internal.
 const slugAlphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 // slugLen is the fixed slug width; slugSpace = 36^slugLen is the number of
-// distinct slugs (and the largest seq the permutation can address, ~1.68M).
-const slugLen = 4
-const slugSpace = 36 * 36 * 36 * 36
+// distinct slugs and the largest seq the permutation can address. seq is a
+// GLOBAL identity sequence, so slugLen=2 caps the total number of decks across
+// all users at slugSpace-1 (1295); the 1296th deck ever created would get an
+// empty slug. Widen slugLen (or switch seq to per-user numbering) to lift it.
+const slugLen = 2
+const slugSpace = 36 * 36
 
 // slugMul is coprime to slugSpace (not divisible by 2 or 3, the prime factors
 // of 36), which makes multiplication by it modulo slugSpace invertible.

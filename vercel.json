@@ -3,6 +3,9 @@
   "regions": ["iad1"],
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/decks/:slug", "destination": "/deck" }
+    { "source": "/decks/:slug", "destination": "/deck" },
+    { "source": "/shared/:slug", "destination": "/shared-deck" },
+    { "source": "/cards/:id", "destination": "/card" },
+    { "source": "/decks/:slug/cards/new", "destination": "/card" }
   ]
 }

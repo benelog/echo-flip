@@ -61,6 +61,8 @@ export interface SharedDeckDetail {
 export interface Card {
   id: string;
   deckId: string;
+  /** Deck's Base36 slug; set on single-card fetches so the editor can link back. */
+  deckSlug: string;
   text: string;
   meaning: string;
   cardType: CardType;

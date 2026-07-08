@@ -75,7 +75,7 @@ function DeckDetail() {
   const copyShareLink = async (slug: string) => {
     try {
       await navigator.clipboard.writeText(
-        `${window.location.origin}/shared-deck?slug=${slug}`,
+        `${window.location.origin}/shared/${slug}`,
       );
       toast("공유 링크를 복사했어요");
     } catch {
@@ -139,7 +139,7 @@ function DeckDetail() {
 
       <div className="flex flex-wrap gap-2">
         <Link
-          href={`/card?deck=${slug}`}
+          href={`/decks/${slug}/cards/new`}
           className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
         >
           <Plus size={16} /> 카드 추가
@@ -200,7 +200,7 @@ function DeckDetail() {
               )}
             </div>
             <Link
-              href={`/card?deck=${slug}&id=${card.id}`}
+              href={`/cards/${card.id}`}
               aria-label="카드 수정"
               className="p-1.5 text-neutral-400"
             >
