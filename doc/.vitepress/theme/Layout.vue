@@ -1,11 +1,11 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
 import { useData, useRoute } from 'vitepress'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-const { frontmatter } = useData()
+const { page } = useData()
 const route = useRoute()
-const isHome = computed(() => frontmatter.value.layout === 'home')
+const isHome = computed(() => page.value.relativePath === 'index.md')
 
 // 목차(왼쪽 사이드바) 접기/펼치기 — 이북 뷰어의 몰입 모드
 const tocHidden = ref(false)
@@ -31,11 +31,25 @@ function onScroll() {
   progress.value = max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0
 }
 
+// 좌우 화살표 — 하단 페이저의 이전/다음 장 링크를 읽어 온다
+const prevHref = ref('')
+const nextHref = ref('')
+
+function updatePager() {
+  prevHref.value = document.querySelector('.pager-link.prev')?.getAttribute('href') ?? ''
+  nextHref.value = document.querySelector('.pager-link.next')?.getAttribute('href') ?? ''
+}
+
 // ←/→ 키로 장 이동
 function onKey(e) {
   if (e.target !== document.body || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
   if (e.key === 'ArrowRight') document.querySelector('.pager-link.next')?.click()
   if (e.key === 'ArrowLeft') document.querySelector('.pager-link.prev')?.click()
+}
+
+function refresh() {
+  onScroll()
+  updatePager()
 }
 
 onMounted(() => {
@@ -45,7 +59,7 @@ onMounted(() => {
   applyTocState()
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKey)
-  onScroll()
+  nextTick(refresh)
 })
 
 onUnmounted(() => {
@@ -55,7 +69,11 @@ onUnmounted(() => {
 
 watch(
   () => route.path,
-  () => requestAnimationFrame(onScroll),
+  async () => {
+    await nextTick()
+    requestAnimationFrame(refresh)
+    setTimeout(refresh, 300)
+  },
 )
 </script>
 
@@ -78,6 +96,18 @@ watch(
         </svg>
         <span>목차</span>
       </button>
+    </template>
+    <template #layout-bottom>
+      <a v-if="!isHome && prevHref" class="ef-arrow prev" :href="prevHref" aria-label="이전 장">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </a>
+      <a v-if="!isHome && nextHref" class="ef-arrow next" :href="nextHref" aria-label="다음 장">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </a>
     </template>
   </DefaultTheme.Layout>
 </template>

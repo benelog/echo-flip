@@ -19,7 +19,9 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - 소스 위치: `doc/` (독립 `package.json`, 앱 의존성과 분리)
 - 로컬 확인: `cd doc && npm install && npm run dev` / 빌드 검증: `npm run build`
 - 책 테마 (2026-07-09): `.vitepress/theme/custom.css` — 본문 명조(Noto Serif KR)·제목 고딕의 한국어 종이책 관례, 행간 2.05·양쪽 정렬, 인쇄용 CSS 포함
-- 이북 뷰어 레이아웃 (2026-07-09): 오른쪽 아웃라인 제거(목차는 왼쪽 하나만), 상단 바 "목차" 버튼으로 사이드바 접기/펼치기(localStorage 유지), 본문은 회색 배경 위 중앙 페이지 카드, 상단 읽기 진행 바, ←/→ 키로 장 이동. `.vitepress/theme/Layout.vue`(DefaultTheme 확장) + `custom.css`
+- 이북 뷰어 레이아웃 (2026-07-09): 오른쪽 아웃라인 제거(목차는 왼쪽 하나만), 상단 바 "목차" 버튼으로 사이드바 접기/펼치기(localStorage 유지), 본문은 회색 배경 위 중앙 페이지 카드, 상단 읽기 진행 바, 화면 좌우 화살표 버튼과 ←/→ 키로 장 이동(Google Play 북스식). 홈(`index.md`)은 `layout: page` 기반 책 표지 랜딩. `.vitepress/theme/Layout.vue`(DefaultTheme 확장) + `custom.css`
+- 폰트 (2026-07-09): 본문 Noto Serif KR, 제목·UI는 `--vp-font-family-base`에 Noto Sans KR 웹폰트 포함. 한글 폰트가 없는 CI 러너에서 PDF의 제목·코드 주석 한글이 깨지던 문제를 웹폰트 폴백 + book.yml의 fonts-noto-cjk 설치로 해결
+- 표현 원칙 (2026-07-09 지시): Echo Flip은 "영어 암기 앱"이 아니라 **"암기 카드 앱"**으로 표현한다. 영어 단어·숙어·문장뿐 아니라 용어·개념 설명에도 쓸 수 있다는 것이 상세 설명. TTS·사전 자동 채우기 등은 부가 기능으로 소개
 - PDF (2026-07-09): `npm run pdf`(`scripts/export-pdf.mjs`)가 표지·차례(쪽 번호 포함)를 생성하고 빌드 결과를 장 순서대로 인쇄해 `dist/echo-flip-book.pdf` 한 권으로 병합(시스템 Chrome + puppeteer-core + pdf-lib). 본문에만 연속 쪽 번호, 장별 북마크(PDF 아웃라인) 포함. CI(book.yml)가 매 배포마다 재생성. 다운로드 링크는 홈 hero와 상단 nav에 있음
 
 ## 목차와 파일 매핑

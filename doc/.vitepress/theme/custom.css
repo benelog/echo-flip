@@ -6,6 +6,13 @@
 :root {
   --ef-font-serif: 'Noto Serif KR', 'KoPubWorld Batang', 'Nanum Myeongjo',
     Georgia, 'Times New Roman', serif;
+  /* 제목·UI용 고딕. 웹폰트(Noto Sans KR)를 포함해 한글 폰트가 없는
+     환경(PDF를 만드는 CI 등)에서도 한글이 깨지지 않는다. */
+  --vp-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  /* 코드 안의 한글 주석도 같은 이유로 Noto Sans KR로 폴백시킨다 */
+  --vp-font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Monaco, Consolas, 'Liberation Mono', 'Noto Sans KR', monospace;
 }
 
 /* 본문 텍스트를 명조체로 */
@@ -183,6 +190,177 @@
   font-family: var(--vp-font-family-base);
 }
 
+/* 좌우 장 이동 화살표 */
+.ef-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.ef-arrow:hover {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+@media (min-width: 960px) {
+  .ef-arrow {
+    display: flex;
+  }
+
+  .ef-arrow.next {
+    right: 24px;
+  }
+
+  .ef-arrow.prev {
+    left: calc(var(--vp-sidebar-width, 272px) + 24px);
+  }
+
+  .ef-toc-hidden .ef-arrow.prev {
+    left: 24px;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   홈 — 책 표지
+   ────────────────────────────────────────────────────────────── */
+
+.ef-home {
+  min-height: calc(100vh - var(--vp-nav-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 24px 72px;
+  background: var(--vp-c-bg-alt);
+}
+
+.ef-book {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, 88vw);
+  aspect-ratio: 1 / 1.42;
+  padding: 44px 38px 36px;
+  box-sizing: border-box;
+  border-radius: 4px 14px 14px 4px;
+  background: linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+  color: #fff;
+  overflow: hidden;
+  text-decoration: none !important;
+  box-shadow:
+    inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
+    0 18px 40px -12px rgba(22, 29, 54, 0.55);
+  transition: translate 0.25s, box-shadow 0.25s;
+}
+
+.ef-book:hover {
+  translate: 0 -6px;
+  box-shadow:
+    inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
+    0 28px 52px -12px rgba(22, 29, 54, 0.6);
+}
+
+.ef-book-rule {
+  width: 56px;
+  border-top: 4px solid #8ea2d8;
+  margin-bottom: 30px;
+}
+
+.ef-book h1 {
+  margin: 0 0 18px;
+  font-family: var(--ef-font-serif);
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.5;
+  font-weight: 700;
+  color: #fff;
+  word-break: keep-all;
+}
+
+.ef-book-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.82);
+  word-break: keep-all;
+}
+
+.ef-book-author {
+  margin: auto 0 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ef-book-zero {
+  position: absolute;
+  right: -14px;
+  bottom: -34px;
+  font-size: 190px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.05);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+}
+
+.ef-home-desc {
+  max-width: 560px;
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--vp-c-text-2);
+  word-break: keep-all;
+}
+
+.ef-home-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ef-btn {
+  display: inline-block;
+  padding: 9px 22px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none !important;
+  border: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg);
+  transition: border-color 0.25s, color 0.25s, background-color 0.25s;
+}
+
+.ef-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.ef-btn.brand {
+  background: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+  color: #fff;
+}
+
+.ef-btn.brand:hover {
+  background: var(--vp-c-brand-2);
+  color: #fff;
+}
+
 /* ──────────────────────────────────────────────────────────────
    인쇄·PDF
    내비게이션·사이드바를 걷어내고 본문만 종이에 얹는다.
@@ -242,7 +420,8 @@
   }
 
   .ef-progress,
-  .ef-toc-toggle {
+  .ef-toc-toggle,
+  .ef-arrow {
     display: none !important;
   }
 
