@@ -28,7 +28,7 @@ function Dashboard() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">echo-flip</h1>
+        <h1 className="text-xl font-bold">Echo Flip</h1>
         {(summary?.streak ?? 0) > 0 && (
           <span className="flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-600 dark:bg-orange-950 dark:text-orange-400">
             <Flame size={16} /> {summary!.streak}일 연속

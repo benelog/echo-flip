@@ -12,7 +12,7 @@ export function TopBar() {
     <header className="flex h-12 items-center justify-between border-b border-neutral-200 px-4 dark:border-neutral-800">
       {/* "/" is auth-gated; send anonymous visitors to the public gallery. */}
       <Link href={session ? "/" : "/shared"} className="text-sm font-bold">
-        🔊 echo-flip
+        🔊 Echo Flip
       </Link>
       {loading ? (
         <span className="text-xs text-neutral-400">…</span>

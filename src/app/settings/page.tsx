@@ -110,7 +110,7 @@ function Settings() {
         <LogOut size={18} /> 로그아웃
       </button>
 
-      <p className="text-center text-xs text-neutral-400">echo-flip v0.1.0</p>
+      <p className="text-center text-xs text-neutral-400">Echo Flip v0.1.0</p>
     </div>
   );
 }

@@ -59,7 +59,7 @@ function LoginContent() {
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-10 px-6">
       <div className="text-center">
         <p className="text-5xl">🔊</p>
-        <h1 className="mt-4 text-3xl font-bold">echo-flip</h1>
+        <h1 className="mt-4 text-3xl font-bold">Echo Flip</h1>
         <p className="mt-2 text-neutral-500">
           영어 단어·문장·숙어를
           <br />

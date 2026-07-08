@@ -1,12 +1,15 @@
 package store
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestDeckSlugRoundTrip(t *testing.T) {
-	for _, seq := range []int64{1, 61, 62, 3843, 238328, 1_000_000, 14_776_336} {
+	for _, seq := range []int64{1, 2, 35, 36, 1295, 1296, 46656, 1_000_000, 1_679_615} {
 		slug := encodeDeckSlug(seq)
-		if slug == "" {
-			t.Fatalf("encodeDeckSlug(%d) returned empty", seq)
+		if len(slug) != slugLen {
+			t.Fatalf("encodeDeckSlug(%d) = %q, want %d chars", seq, slug, slugLen)
 		}
 		got, err := decodeDeckSlug(slug)
 		if err != nil {
@@ -18,17 +21,55 @@ func TestDeckSlugRoundTrip(t *testing.T) {
 	}
 }
 
-func TestEncodeDeckSlug(t *testing.T) {
-	cases := map[int64]string{1: "1", 61: "z", 62: "10", 0: "", -5: ""}
-	for seq, want := range cases {
-		if got := encodeDeckSlug(seq); got != want {
-			t.Errorf("encodeDeckSlug(%d) = %q, want %q", seq, got, want)
+// A broad round trip guards against an arithmetic slip in the permutation or
+// its inverse, and confirms slugs are always 4 chars and never collide.
+func TestDeckSlugBijective(t *testing.T) {
+	seen := make(map[string]int64)
+	for seq := int64(1); seq < 20000; seq++ {
+		slug := encodeDeckSlug(seq)
+		if len(slug) != slugLen {
+			t.Fatalf("encodeDeckSlug(%d) = %q, want %d chars", seq, slug, slugLen)
+		}
+		if prev, dup := seen[slug]; dup {
+			t.Fatalf("slug %q collides: seq %d and %d", slug, prev, seq)
+		}
+		seen[slug] = seq
+		if got, err := decodeDeckSlug(slug); err != nil || got != seq {
+			t.Fatalf("round trip %d -> %q -> %d (err %v)", seq, slug, got, err)
+		}
+	}
+}
+
+// Slugs must not read as a sequence: adjacent seq values encode to unrelated slugs.
+func TestDeckSlugNotSequential(t *testing.T) {
+	if a, b := encodeDeckSlug(1), encodeDeckSlug(2); a == "0001" || b == "0002" {
+		t.Errorf("slugs look sequential: 1 -> %q, 2 -> %q", a, b)
+	}
+}
+
+// Base36 slugs are case-insensitive: an uppercased slug resolves to the same deck.
+func TestDeckSlugCaseInsensitive(t *testing.T) {
+	for _, seq := range []int64{1, 42, 1_000_000} {
+		slug := encodeDeckSlug(seq)
+		got, err := decodeDeckSlug(strings.ToUpper(slug))
+		if err != nil || got != seq {
+			t.Errorf("decodeDeckSlug(%q) = %d, %v; want %d", strings.ToUpper(slug), got, err, seq)
+		}
+	}
+}
+
+func TestEncodeDeckSlugOutOfRange(t *testing.T) {
+	for _, seq := range []int64{0, -5, slugSpace, slugSpace + 1} {
+		if got := encodeDeckSlug(seq); got != "" {
+			t.Errorf("encodeDeckSlug(%d) = %q, want empty", seq, got)
 		}
 	}
 }
 
 func TestDecodeDeckSlugInvalid(t *testing.T) {
-	for _, s := range []string{"", "abc!", "한글", "aaaaaaaaaaa"} {
+	// Wrong length, non-Base36 bytes, multibyte input, and the zero slug
+	// (which maps back to seq 0) must all be rejected.
+	for _, s := range []string{"", "abc", "abcde", "abc!", "한글", "0000"} {
 		if _, err := decodeDeckSlug(s); err == nil {
 			t.Errorf("decodeDeckSlug(%q) expected error", s)
 		}

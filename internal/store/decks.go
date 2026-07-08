@@ -60,7 +60,7 @@ func (s *Store) GetDeck(ctx context.Context, userID, deckID uuid.UUID) (Deck, er
 	return scanDeck(s.pool.QueryRow(ctx, deckSelect+` where d.user_id = $1 and d.id = $2`, userID, deckID))
 }
 
-// GetDeckBySlug loads a deck by its public Base62 URL slug.
+// GetDeckBySlug loads a deck by its public Base36 URL slug.
 func (s *Store) GetDeckBySlug(ctx context.Context, userID uuid.UUID, slug string) (Deck, error) {
 	seq, err := decodeDeckSlug(slug)
 	if err != nil {

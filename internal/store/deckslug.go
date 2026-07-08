@@ -5,37 +5,72 @@ import (
 	"strings"
 )
 
-// Deck URL slugs are the deck's seq column in Base62: short (4 chars cover
-// ~14.7M decks), stable, and cheap to decode. The UUID id stays internal.
-const slugAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+// Deck URL slugs are always exactly 4 Base36 characters. Base36 (0-9, a-z) is
+// case-insensitive, so users can type a slug without worrying about case.
+// Exposing the raw seq column directly would leak a sequential counter ("0001",
+// "0002", ...), so seq is first run through a multiplicative permutation over
+// the 36^4 slug space: consecutive decks land on scattered, non-obvious slugs.
+// The mapping is a bijection, so a slug still decodes back to its seq for
+// lookups. The UUID id stays internal.
+const slugAlphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
 
-// 62^10 still fits in int64; longer input could overflow during decode.
-const slugMaxLen = 10
+// slugLen is the fixed slug width; slugSpace = 36^slugLen is the number of
+// distinct slugs (and the largest seq the permutation can address, ~1.68M).
+const slugLen = 4
+const slugSpace = 36 * 36 * 36 * 36
+
+// slugMul is coprime to slugSpace (not divisible by 2 or 3, the prime factors
+// of 36), which makes multiplication by it modulo slugSpace invertible.
+// slugMulInv reverses it.
+const slugMul = 1038007
+
+var slugMulInv = modInverse(slugMul, slugSpace)
 
 func encodeDeckSlug(seq int64) string {
-	if seq <= 0 {
+	if seq <= 0 || seq >= slugSpace {
 		return ""
 	}
-	var buf [slugMaxLen]byte
-	i := len(buf)
-	for n := seq; n > 0; n /= 62 {
-		i--
-		buf[i] = slugAlphabet[n%62]
+	n := (seq * slugMul) % slugSpace
+	var buf [slugLen]byte
+	for i := slugLen - 1; i >= 0; i-- {
+		buf[i] = slugAlphabet[n%36]
+		n /= 36
 	}
-	return string(buf[i:])
+	return string(buf[:])
 }
 
 func decodeDeckSlug(s string) (int64, error) {
-	if s == "" || len(s) > slugMaxLen {
+	if len(s) != slugLen {
 		return 0, fmt.Errorf("invalid deck slug %q", s)
 	}
+	s = strings.ToLower(s) // slugs are case-insensitive
 	var n int64
 	for i := 0; i < len(s); i++ {
 		v := strings.IndexByte(slugAlphabet, s[i])
 		if v < 0 {
 			return 0, fmt.Errorf("invalid deck slug %q", s)
 		}
-		n = n*62 + int64(v)
+		n = n*36 + int64(v)
 	}
-	return n, nil
+	seq := (n * slugMulInv) % slugSpace
+	if seq <= 0 {
+		return 0, fmt.Errorf("invalid deck slug %q", s)
+	}
+	return seq, nil
+}
+
+// modInverse returns a^-1 mod m via the extended Euclidean algorithm, assuming
+// gcd(a, m) == 1. Used once at startup to derive slugMulInv from slugMul.
+func modInverse(a, m int64) int64 {
+	t, newT := int64(0), int64(1)
+	r, newR := m, a
+	for newR != 0 {
+		q := r / newR
+		t, newT = newT, t-q*newT
+		r, newR = newR, r-q*newR
+	}
+	if t < 0 {
+		t += m
+	}
+	return t
 }

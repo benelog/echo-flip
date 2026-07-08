@@ -3,10 +3,10 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "echo-flip — 영어 암기 카드",
+  title: "Echo Flip — 영어 암기 카드",
   description: "영어 단어·문장·숙어를 카드로 외우는 학습 앱",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "echo-flip" },
+  appleWebApp: { capable: true, title: "Echo Flip" },
 };
 
 export const viewport: Viewport = {
