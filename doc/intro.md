@@ -1,0 +1,429 @@
+# 도입 — 무엇을 만드는가: Echo Flip의 요구사항
+
+책의 본문에 들어가기 전에, 앞으로 계속 소재로 삼을 앱이 무엇인지부터 분명히 해 두려 한다.
+이 장에서는 영어 암기 카드 앱 Echo Flip의 기능 요구사항을 사용자 시나리오 중심으로 정리하고, 무료 인프라 운영이라는 비기능 요구사항이 기술 선택을 어떻게 끌고 갔는지 짚어 보겠다.
+이어서 전체 아키텍처를 한눈에 조망하고, 이 책의 구성과 다루는 범위를 안내한다.
+요구사항을 먼저 공유해 두면 이후 각 장에서 "왜 이렇게 만들었는가"라는 질문에 답하기가 훨씬 수월해진다.
+
+## Echo Flip은 어떤 앱인가
+
+Echo Flip은 영어 단어·문장·숙어·개념을 카드 뒤집기로 암기하는 학습 앱이다.
+카드 앞면에는 원문(text), 뒷면에는 뜻(meaning)이 적혀 있고, 사용자는 카드를 뒤집어 답을 확인한 뒤 스스로 맞았는지 틀렸는지를 판정한다.
+종이 단어장을 넘기던 경험을 웹과 모바일로 옮기되, 간격 반복(Spaced Repetition) 알고리즘으로 "오늘 무엇을 복습할지"를 앱이 대신 골라 주는 것이 핵심이다.
+
+이 앱에는 또 하나의 배경이 있다.
+Echo Flip은 개인 개발자가 AI 코딩 에이전트인 Claude Code와 함께 만든 앱이다.
+요구사항을 정리하고 기술을 선택하고 결과를 검증하는 일은 사람이 했고, 코드의 상당 부분은 에이전트가 작성했다.
+그래서 이 저장소에는 앱 코드뿐 아니라 에이전트가 스스로 품질을 지키게 만드는 장치 — 훅(Hook)과 서브에이전트(Subagent) 설정 — 도 함께 들어 있다.
+AI와 함께 개발하는 방식 자체도 이 책이 다루는 주제 중 하나이며, 2부에서 자세히 살펴본다.
+
+혼자 만들고 혼자 운영하는 앱이라는 점은 이후 모든 기술 결정에 영향을 준다.
+팀도 없고 예산도 없으므로, 기능은 욕심내되 인프라는 최대한 단순하고 저렴해야 한다.
+이 제약이 어떤 아키텍처로 이어졌는지가 이 장의 후반부 주제다.
+
+## 기능 요구사항 — 사용자 시나리오로 살펴보기
+
+기능 목록을 나열하는 대신, 사용자가 앱을 쓰는 흐름을 따라가며 요구사항을 정리해 보겠다.
+학습 앱의 하루는 대체로 "재료를 만들고 → 학습하고 → 복습 큐를 소화하고 → 성취를 확인하는" 순서로 흘러간다.
+
+### 학습 재료 만들기 — 카드, 덱, 태그
+
+사용자는 먼저 덱(Deck)을 만들고 그 안에 카드를 채운다.
+카드는 양방향이다.
+원문(text)에는 영어 단어·문장·용어를, 뜻(meaning)에는 설명을 적는다.
+"원문을 보고 뜻을 떠올리기"와 "뜻을 보고 원문을 떠올리기" 중 어느 방향으로도 학습할 수 있어야 하므로, 카드 모델은 앞면·뒷면(front/back)이 아니라 대칭적인 두 필드로 설계했다.
+카드에는 태그를 붙일 수 있어 "동사", "TOEIC" 같은 분류로 여러 덱을 가로질러 묶을 수 있다.
+
+카드를 한 장씩 입력하는 일은 지루하므로 두 가지 지름길을 마련했다.
+
+첫째, CSV 가져오기/내보내기다.
+`text,meaning,type,tags,phonetic,example` 헤더의 CSV 파일을 통째로 들여올 수 있고, 태그는 `|` 문자로 구분한다.
+초기 버전의 `front,back` 헤더도 하위 호환으로 인식한다.
+스프레드시트에 정리해 둔 단어장을 그대로 옮겨 오는 시나리오를 겨냥한 기능이다.
+
+둘째, 무료 사전 API 자동 채우기다.
+영어 단어를 입력하면 Free Dictionary API(api.dictionaryapi.dev)를 호출해 발음기호·뜻·예문을 자동으로 채워 준다.
+이 API는 키 발급이 필요 없고 CORS가 열려 있어서 브라우저에서 직접 호출할 수 있다.
+관련 코드는 `src/lib/dictionary.ts`에 있으며, 3장에서 TypeScript의 타입 설계 예제로 다시 등장한다.
+
+여기에 텍스트 음성 변환(Text-to-Speech, TTS) 버튼을 더했다.
+브라우저에 내장된 Web Speech API를 사용하므로 별도 서버나 유료 음성 API 없이 영어 발음을 들을 수 있다.
+"Echo"라는 이름이 여기서 나왔다.
+
+### 학습하기 — 뒤집고, 판정하고, 다시 도전한다
+
+학습 세션의 흐름은 다음과 같다.
+
+첫째, 방향을 선택한다.
+원문→뜻으로 볼지, 뜻→원문으로 볼지를 세션 시작 시점에 고른다.
+
+둘째, 카드를 뒤집는다.
+질문 면을 보고 답을 떠올린 뒤 카드를 탭하면 반대 면이 나타난다.
+"Flip"이라는 이름이 여기서 나왔다.
+
+셋째, 스스로 맞음/틀림을 판정한다.
+객관식 문제를 자동 채점하는 방식이 아니라, 사용자가 정직하게 자기 답을 평가하는 방식이다.
+채점 로직을 만들지 않아도 되니 구현이 단순해지고, 단답이 아닌 문장·개념 카드에도 똑같이 적용된다는 장점이 있다.
+대신 판정의 신뢰도가 사용자에게 달려 있다는 한계는 감수한다.
+
+넷째, 덱을 한 바퀴 소화하면 틀린 카드만 모아 재도전 라운드가 시작된다.
+모든 카드를 맞힐 때까지 라운드가 반복되므로, 세션이 끝나는 시점에는 적어도 단기 기억에는 전부 들어가 있게 된다.
+이 흐름을 관리하는 상태 로직은 `src/hooks/useStudySession.ts`에 있고, 4장에서 React 훅 예제로 해부한다.
+
+### 꾸준히 복습하기 — 간격 반복과 "오늘 복습" 큐
+
+암기 앱의 승부처는 학습 화면이 아니라 복습 스케줄링이다.
+Echo Flip은 간격 반복 알고리즘의 고전인 SM-2의 이진(binary) 변형을 사용한다.
+원래 SM-2는 0~5의 6단계 품질 점수를 입력받지만, "이번 답이 4점인지 5점인지"를 매번 고민하게 만드는 것은 카드 뒤집기의 리듬을 깨뜨린다.
+그래서 UI는 맞음/틀림 두 버튼만 제공하고, 내부적으로 맞음을 품질 5, 틀림을 품질 2로 사상한다.
+
+핵심 로직은 Go로 작성한 순수 함수 하나다.
+`internal/srs/srs.go`에서 발췌한다.
+
+```go
+// Grade returns the next SRS state and due time after a first-pass answer.
+// Retry-round answers must not be graded.
+func Grade(s State, correct bool, now time.Time) (State, time.Time) {
+	if correct {
+		s.Repetitions++
+		switch s.Repetitions {
+		case 1:
+			s.IntervalDays = 1
+		case 2:
+			s.IntervalDays = 6
+		default:
+			s.IntervalDays = math.Round(s.IntervalDays * s.EaseFactor)
+		}
+		s.EaseFactor += easeGainCorrect
+	} else {
+		s.Repetitions = 0
+		s.IntervalDays = 1
+		s.EaseFactor = math.Max(MinEase, s.EaseFactor-easeLossIncorrect)
+	}
+	due := now.Add(time.Duration(s.IntervalDays * float64(24*time.Hour)))
+	return s, due
+}
+```
+
+맞히면 복습 간격이 1일 → 6일 → 이전 간격 × 용이도(ease factor) 순으로 늘어나고, 틀리면 간격이 1일로 초기화되면서 용이도가 깎인다.
+잘 외운 카드는 점점 뜸하게, 헷갈리는 카드는 자주 나타나는 구조다.
+주석에 적힌 대로 재도전 라운드의 답은 채점에 반영하지 않는다는 규칙도 눈여겨보자.
+방금 본 카드를 다시 맞힌 것을 "장기 기억 성공"으로 치면 간격이 부당하게 늘어나기 때문이다.
+
+이 함수 덕분에 홈 화면의 "오늘 복습" 큐가 자동으로 구성된다.
+사용자는 매일 앱을 열고 큐에 쌓인 카드만 소화하면 된다.
+알고리즘 구현과 테이블 주도 테스트는 1장에서, 이를 담는 `card_srs` 테이블 설계는 5장에서 다룬다.
+
+### 무엇을 공부할지 고르기 — 규칙 기반 스마트 덱
+
+복습 큐만으로는 부족한 순간이 있다.
+"유난히 자주 틀리는 카드만 몰아서 보고 싶다"거나 "한동안 안 본 카드를 점검하고 싶다"는 요구다.
+Echo Flip은 이를 스마트 덱으로 해결한다.
+스마트 덱은 카드를 소유하지 않는 가상의 덱으로, 규칙(rule)을 JSON으로 저장해 두었다가 학습 시점에 쿼리로 변환해 카드를 골라낸다.
+
+`internal/smartrules/rules.go`에서 규칙의 종류를 발췌한다.
+
+```go
+type RuleType string
+
+const (
+	HighError RuleType = "high_error"
+	Stale     RuleType = "stale"
+	Tag       RuleType = "tag"
+	Recent    RuleType = "recent"
+)
+```
+
+오답률이 높은 카드(high_error), 오래 안 본 카드(stale), 특정 태그의 카드(tag), 최근 추가한 카드(recent)의 네 가지 규칙을 지원한다.
+예를 들어 high_error 규칙의 기본값은 "3회 이상 시도했고 오답률이 40% 이상인 카드"다.
+머신러닝 같은 거창한 추천이 아니라 SQL 한 줄로 표현되는 규칙 기반 추천이지만, 개인 학습 앱에는 이 정도가 오히려 예측 가능하고 유지보수하기 쉽다.
+학습 시점마다 쿼리를 다시 실행하므로 스마트 덱의 내용물이 낡을(stale) 일도 없다.
+
+### 성취 확인과 나눔 — 통계와 덱 공유
+
+꾸준함을 유지하려면 성취가 보여야 한다.
+Echo Flip은 일별 학습량, 정답률, 연속 학습일(streak), 덱별 성취도를 통계 화면에서 보여 준다.
+이를 위해 모든 학습 세션과 카드별 답안을 `study_sessions`, `review_logs` 테이블에 기록한다.
+
+마지막으로 덱 공유다.
+잘 만든 단어장은 혼자 쓰기 아깝다.
+사용자는 자기 덱의 공유 링크를 만들 수 있고, 공유된 덱은 공유 덱 갤러리에 노출된다.
+다른 사용자는 로그인하지 않고도 공유 덱을 미리 볼 수 있으며, "내 덱으로 가져오기"를 누르면 카드가 복사되어 자기 계정으로 들어온다.
+이때 학습 기록(SRS 상태)은 복사하지 않고 새로 시작한다.
+원저자의 기억 상태가 내 기억 상태일 수는 없기 때문이다.
+
+## 비기능 요구사항 — 무료로, 혼자서, 오래 운영하기
+
+기능 요구사항보다 기술 선택을 더 강하게 규정한 것은 비기능 요구사항이었다.
+네 가지를 짚어 보겠다.
+
+첫째, 완전 무료 인프라로 운영한다.
+개인 학습 앱은 수익 모델이 없으므로 고정비가 발생하는 순간 운영을 접게 된다.
+호스팅·데이터베이스·인증까지 전부 무료 티어 안에서 해결해야 한다.
+유료 전환을 전제로 한 "체험판 무료"가 아니라, 트래픽이 적은 개인 앱이라면 영구적으로 무료인 티어를 골랐다.
+
+둘째, 관리할 플랫폼을 최소화한다.
+혼자 운영하는 앱에서 대시보드가 세 개, 네 개로 늘어나면 어느 순간 어딘가의 설정이 만료되거나 어긋난다.
+Echo Flip은 배포 대상 플랫폼을 Vercel 하나로, 데이터 계층을 Supabase 하나로 묶어 관리 지점을 둘로 줄였다.
+프런트엔드와 백엔드를 서로 다른 곳에 배포하는 구성(예: 프런트는 Vercel, API는 별도 컨테이너 호스팅)도 검토했지만, 오리진이 갈라지면 CORS 설정과 배포 동기화라는 운영 부담이 따라온다.
+상주 서버가 꼭 필요한 앱(웹소켓, 장시간 작업)이라면 그쪽이 낫지만, 요청-응답형 API만 있는 이 앱에는 한 플랫폼 올인원이 맞았다.
+
+셋째, PWA(Progressive Web App)로 웹과 Android를 모두 커버한다.
+네이티브 앱을 만들면 스토어 등록비와 심사, 별도 코드베이스라는 비용이 생긴다.
+암기 카드 앱은 카메라나 푸시 같은 네이티브 기능이 필수가 아니므로, 웹 앱에 매니페스트를 더해 홈 화면에 설치하는 것으로 충분하다.
+`src/app/manifest.ts`에서 발췌한다.
+
+```ts
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Echo Flip — 영어 암기 카드",
+    short_name: "Echo Flip",
+    // ...
+    start_url: "/",
+    display: "standalone",
+    // ...
+  };
+}
+```
+
+`display: "standalone"` 덕분에 Android Chrome에서 "홈 화면에 추가"를 누르면 주소창 없는 독립 실행형 앱처럼 동작한다.
+iOS Safari에서도 같은 방식으로 설치할 수 있다.
+
+넷째, 서버리스(Serverless) 콜드스타트(Cold Start)를 최소화한다.
+무료 티어의 서버리스 함수는 요청이 없으면 잠들고, 첫 요청에서 깨어나는 시간이 사용자 체감 지연이 된다.
+콜드스타트는 런타임의 기동 속도와 바이너리 크기에 좌우되므로, 백엔드 언어로 컴파일 언어인 Go를 선택했다.
+단일 바이너리로 빌드되고 기동이 수 밀리초 수준이라 서버리스와 궁합이 좋다.
+Node.js로 백엔드까지 통일하면 언어가 하나로 줄어드는 장점이 있고 팀에 따라 그쪽이 더 나은 선택일 수 있지만, 이 프로젝트에서는 콜드스타트와 적은 메모리 사용, 그리고 강타입 언어로 핵심 알고리즘(SRS)을 견고하게 작성하려는 목적을 우선했다.
+이 트레이드오프는 1장에서 본격적으로 다룬다.
+
+같은 이유로 지연 시간의 다른 축인 API↔DB 거리도 관리한다.
+Vercel 함수 리전을 iad1(미국 동부)로 고정하고 Supabase 프로젝트도 같은 East US 리전에 만들어, 함수와 데이터베이스가 같은 지역 안에서 통신하게 했다.
+사용자가 한국에 있어도 브라우저↔서버 왕복은 한 번이지만 API↔DB 왕복은 요청당 여러 번일 수 있으므로, DB를 함수 옆에 두는 쪽이 전체 지연에 유리하다.
+
+## 전체 아키텍처 개요
+
+이상의 요구사항이 수렴한 아키텍처를 그림 하나로 정리해 보자.
+
+```text
+[브라우저 / Android PWA]
+   │
+   │ ① 로그인: Supabase Auth와 직접 OAuth(Google/GitHub) → JWT 획득
+   │ ② 정적 자원: HTML/JS/CSS 내려받기
+   │ ③ 데이터: /api/* 요청에 JWT를 실어 호출
+   ▼
+[Vercel — 무료 티어, 함수 리전 iad1]
+   ├─ 정적 파일: Next.js 정적 export 결과물(out/)
+   └─ 서버리스 함수: api/index.go → Gin 라우터(Go)
+          │
+          │ ④ SQL — 트랜잭션 풀러(포트 6543), JWT는 JWKS로 검증
+          ▼
+[Supabase — 무료 티어, East US 리전]
+   ├─ PostgreSQL: profiles, decks, cards, card_srs,
+   │              study_sessions, review_logs, smart_decks
+   └─ Auth: Google/GitHub OAuth 처리, JWT 발급
+```
+
+구성 요소는 셋뿐이다.
+브라우저에서 동작하는 정적 프런트엔드, Vercel 서버리스 함수로 배포되는 Go API, 그리고 데이터베이스와 인증을 겸하는 Supabase다.
+각각을 조금 더 들여다보겠다.
+
+### 프런트엔드 — Next.js 정적 export
+
+프런트엔드는 Next.js(App Router)로 작성하되, 서버 렌더링 없이 정적 파일로만 빌드한다.
+`next.config.ts`의 설정이 이를 결정한다.
+
+```ts
+// Static export: the frontend deploys as pure static files on Vercel while
+// /api/* is served by the Go function (see vercel.json rewrites).
+const nextConfig: NextConfig = {
+  output: "export",
+  images: { unoptimized: true },
+  // ...
+};
+```
+
+`output: "export"` 한 줄로 빌드 결과가 순수 HTML/JS/CSS가 되고, Node.js 서버 없이 어디서든 서빙할 수 있다.
+서버 컴포넌트의 동적 렌더링을 포기하는 대신, 배포가 파일 복사만큼 단순해지고 무료 티어의 함수 실행 시간을 프런트엔드가 소모하지 않는다.
+스타일링은 Tailwind CSS, 서버 상태 관리는 TanStack Query, 런타임 검증은 zod를 사용하며 React 19와 Next.js 16 기반이다.
+정적 export가 라우팅에 가하는 제약과 그 우회법은 4장에서 다룬다.
+
+### 백엔드 — Go/Gin을 Vercel 함수로
+
+백엔드는 Go와 웹 프레임워크 Gin으로 작성한 단일 API 서버다.
+로컬에서는 `cmd/server`로 띄우는 평범한 HTTP 서버지만, 배포 시에는 Vercel 서버리스 함수 하나로 감싼다.
+진입점인 `api/index.go`는 이것이 전부다.
+
+```go
+// Package handler is the Vercel serverless entrypoint. vercel.json rewrites
+// every /api/* request here; the original path is preserved, so the Gin
+// router dispatches normally.
+package handler
+
+import (
+	"net/http"
+
+	"github.com/benelog/echo-flip/pkg/app"
+)
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	engine, err := app.Engine()
+	if err != nil {
+		http.Error(w, "server misconfigured: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	engine.ServeHTTP(w, r)
+}
+```
+
+Gin 엔진 조립은 `pkg/app`에 있고, 로컬 서버와 Vercel 함수가 같은 엔진을 공유한다.
+덕분에 로컬에서 검증한 라우팅·미들웨어가 배포 환경에서도 동일하게 동작한다.
+API 엔드포인트마다 함수를 쪼개는 대신 함수 하나가 모든 `/api/*` 요청을 받는 캐치올(catch-all) 구조라, 무료 티어의 함수 개수 제한과도 무관하고 콜드스타트도 한 곳에서만 발생한다.
+이 연결을 완성하는 것이 `vercel.json`의 재작성(rewrite) 규칙이다.
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["iad1"],
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/decks/:slug", "destination": "/deck" },
+    { "source": "/shared/:slug", "destination": "/shared-deck" },
+    { "source": "/cards/:id", "destination": "/card" },
+    { "source": "/decks/:slug/cards/new", "destination": "/card" }
+  ]
+}
+```
+
+첫 번째 규칙이 모든 `/api/*` 요청을 Go 함수로 보내고, 나머지는 정적 export된 페이지에 `/decks/abcd` 같은 예쁜 URL을 입히는 규칙이다.
+프런트와 API가 같은 오리진에서 서빙되므로 운영 환경에서는 CORS 문제가 아예 생기지 않는다.
+Gin의 구조는 2장에서, Vercel 함수의 제약(예: `internal/` 패키지를 import할 수 없어 공유 코드를 `pkg/`에 두는 이유)은 8장에서 다룬다.
+
+### 데이터와 인증 — Supabase
+
+Supabase는 관리형 PostgreSQL과 인증을 한 계정으로 제공한다.
+Echo Flip은 이 중 두 가지만 쓴다.
+PostgreSQL 데이터베이스, 그리고 Google/GitHub OAuth 로그인이다.
+
+인증 흐름은 이렇다.
+브라우저가 Supabase Auth와 직접 OAuth를 왕복해 JWT를 받고, 이후 모든 API 요청에 그 JWT를 실어 보낸다.
+Go API는 Supabase의 JWKS(JSON Web Key Set) 엔드포인트에서 공개키를 받아 JWT 서명을 검증한다.
+백엔드가 세션 저장소를 가질 필요가 없으니 서버리스와 잘 맞는 무상태(stateless) 구조다.
+
+한 가지 특이한 결정이 있다.
+Supabase는 브라우저에서 DB에 직접 접근하는 PostgREST API를 기본 제공하지만, Echo Flip은 이를 쓰지 않는다.
+모든 테이블에 행 수준 보안(Row Level Security, RLS)을 켜되 정책을 하나도 만들지 않아, 공개 키(anon key)로는 어떤 데이터에도 접근할 수 없게 막았다.
+데이터 접근은 오직 Go API를 통해서만 이루어진다.
+RLS 정책만으로 권한을 다 표현하는 구성도 가능하고 백엔드 코드가 줄어드는 매력이 있지만, SRS 채점이나 덱 복사처럼 여러 테이블을 묶는 트랜잭션 로직은 결국 서버 코드가 필요했다.
+접근 경로를 하나로 통일하는 쪽이 보안 검토도 단순해진다.
+이 설계와 트레이드오프는 5장과 9장에서 자세히 다룬다.
+
+### 기술 스택 요약
+
+의존성 목록으로 스택을 요약해 두겠다.
+`go.mod`에서 직접 의존성만 발췌한다.
+
+```go
+module github.com/benelog/echo-flip
+
+go 1.26.4
+
+require (
+	github.com/MicahParks/keyfunc/v3 v3.8.0   // JWKS 조회·캐시
+	github.com/gin-contrib/cors v1.7.7
+	github.com/gin-gonic/gin v1.12.0          // HTTP 프레임워크
+	github.com/golang-jwt/jwt/v5 v5.3.1       // JWT 검증
+	github.com/golang-migrate/migrate/v4 v4.19.1 // DB 마이그레이션
+	github.com/google/uuid v1.6.0
+	github.com/jackc/pgx/v5 v5.10.0           // PostgreSQL 드라이버
+)
+```
+
+프런트엔드 의존성은 `package.json`에서 발췌한다.
+
+```json
+{
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.1",
+    "@tanstack/react-query": "^5.101.2",
+    "lucide-react": "^1.23.0",
+    "next": "16.2.10",
+    "papaparse": "^5.5.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  }
+}
+```
+
+양쪽 모두 의존성이 열 개를 넘지 않는다.
+개인 프로젝트에서 의존성 하나는 곧 업그레이드 부담 하나이므로, 표준 라이브러리와 프레임워크 기본 기능으로 해결되는 일에는 라이브러리를 추가하지 않는다는 원칙을 지켰다.
+
+## 이 책의 구성
+
+이 책은 두 부로 나뉜다.
+1부는 코드를 읽고 쓰는 데 필요한 언어·프레임워크·데이터베이스 지식을, 2부는 그 코드를 만들어 내고 배포하는 도구와 인프라를 다룬다.
+
+1부 "언어와 프레임워크로 코드 이해하기"의 구성은 다음과 같다.
+
+1장 Go에서는 서버리스 백엔드 언어로 Go를 선택한 트레이드오프와 함께, 모듈·패키지 구조, 구조체와 에러 처리, 테이블 주도 테스트를 SRS·스마트 덱 코드로 익힌다.
+Go를 처음 접하는 독자가 이 저장소의 백엔드 코드를 읽을 수 있게 되는 것이 목표다.
+
+2장 Gin에서는 표준 `net/http`나 chi 같은 대안과 비교하며 Gin을 고른 이유를 짚고, 라우터 조립·JSON 바인딩·미들웨어(CORS, JWT 인증)와 handlers→store 계층 분리를 살펴본다.
+
+3장 TypeScript에서는 타입이 프런트엔드 코드에 주는 검증 신호를 살펴보고, 유니온 타입과 제네릭, zod 런타임 검증을 CSV 파서와 사전 API 매퍼 같은 순수 로직 모듈로 익힌다.
+
+4장 React와 Next.js에서는 컴포넌트와 props, 훅, Context, TanStack Query를 카드 뒤집기 UI와 학습 세션 훅으로 배우고, 정적 export 환경에서의 라우팅 전략을 다룬다.
+
+5장 PostgreSQL 데이터베이스 설계에서는 이 장의 요구사항이 어떻게 일곱 개 테이블로 도출되는지 따라가며, 키·제약·인덱스, 마이그레이션 관리, SRS 데이터 모델, RLS 전략을 다룬다.
+
+2부 "앱을 만드는 도구와 인프라"의 구성은 다음과 같다.
+
+6장 Claude Code에서는 AI 코딩 에이전트가 도구 호출 루프로 동작하는 원리와 CLAUDE.md·권한·세션 개념을 소개하고, 이 프로젝트에서 지시→생성→검증 흐름이 실제로 어떻게 굴러갔는지, 그 안에서 사람의 역할은 무엇인지 나눈다.
+
+7장 서브에이전트와 훅에서는 에이전트가 만든 코드의 품질을 기계적으로 지키는 장치를 다룬다.
+gofmt·go vet을 자동 실행하는 훅과, 별도 컨텍스트에서 종합 검증을 수행하고 요약만 반환하는 서브에이전트를 이 저장소의 실제 설정으로 해부한다.
+
+8장 Vercel에서는 정적 프런트와 Go 함수를 한 플랫폼에 배포하는 구성을 다룬다.
+Go 서버리스 함수의 제약과 `vercel.json` 설정, 리전 고정의 의미를 상주 서버 대안과 비교하며 살펴본다.
+
+9장 Supabase에서는 OAuth 로그인 흐름과 Go에서의 JWKS 검증, pgx로 트랜잭션 풀러에 연결할 때의 함정, 리전 콜로케이션을 다룬다.
+
+앞에서부터 순서대로 읽도록 구성했지만, 각 장은 독립적으로도 읽을 수 있다.
+백엔드 경험자라면 1·2장을 건너뛰고 3장부터, 인프라가 급한 독자라면 2부부터 펼쳐도 된다.
+
+## 이 책이 다루는 것과 다루지 않는 것
+
+범위를 분명히 해 두자.
+
+이 책은 Echo Flip의 모든 화면과 API를 나열하는 매뉴얼이 아니다.
+카드 CRUD 핸들러 하나하나, 페이지 컴포넌트 하나하나를 순서대로 해설하지 않는다.
+그런 코드는 저장소를 직접 여는 편이 빠르다.
+
+대신 이 책은 두 가지에 집중한다.
+
+첫째, 기술 선택의 이유다.
+왜 Go인가, 왜 정적 export인가, 왜 Vercel과 Supabase인가를 대안과 트레이드오프로 설명한다.
+독자의 프로젝트는 Echo Flip과 조건이 다를 것이므로, 결론보다 판단 근거를 전달하는 데 무게를 둔다.
+
+둘째, 다른 앱에도 옮겨 쓸 수 있는 핵심 패턴이다.
+로컬 서버와 서버리스 함수가 앱 조립 코드를 공유하는 구조, JWT를 JWKS로 검증하는 무상태 인증, 규칙을 JSON으로 저장했다가 쿼리로 변환하는 스마트 덱, 훅과 서브에이전트로 만드는 품질 게이트 같은 것들이다.
+각 장의 코드 예제는 전부 이 저장소에서 실제로 동작하는 코드에서 발췌했으며, 본문에 파일 경로를 함께 적어 두었으니 언제든 원본을 열어 맥락을 확인할 수 있다.
+
+반면 다음 주제는 다루지 않거나 최소한으로만 언급한다.
+각 언어의 완결된 입문(공식 튜토리얼을 대체하지 않는다), CSS와 시각 디자인, 네이티브 앱 개발, 그리고 대규모 트래픽을 전제한 확장 전략이다.
+이 책의 무대는 어디까지나 "개인 개발자가 무료 인프라로 만들고 운영하는 앱"이다.
+
+## 정리
+
+이 장에서는 책 전체의 소재가 될 Echo Flip의 요구사항과 아키텍처를 조망했다.
+
+Echo Flip은 양방향 카드와 덱·태그, 뒤집기와 자기 판정과 재도전 라운드로 이어지는 학습 흐름, SM-2 이진 변형의 간격 반복, 규칙 기반 스마트 덱, 학습 통계, 덱 공유, CSV 입출력, 사전 API 자동 채우기, TTS를 갖춘 영어 암기 학습 앱이다.
+개인 개발자가 Claude Code와 함께 만들었고, 완전 무료 인프라·최소 운영 부담·PWA·짧은 콜드스타트라는 비기능 요구사항이 기술 선택을 이끌었다.
+
+그 결과가 세 조각짜리 아키텍처다.
+Next.js 정적 export 프런트엔드와 Go/Gin 서버리스 함수를 Vercel 한 플랫폼에 배포하고, PostgreSQL과 OAuth 인증은 Supabase가 맡는다.
+데이터 접근은 Go API로 일원화하고, RLS는 정책 없이 켜서 우회 경로를 차단했다.
+
+다음 장부터는 이 아키텍처의 첫 조각인 백엔드 언어 Go를 살펴보겠다.
+서버리스라는 무대에서 Go가 왜 유리한지, 그리고 이 저장소의 Go 코드를 읽는 데 필요한 문법이 무엇인지부터 시작한다.
