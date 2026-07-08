@@ -10,7 +10,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - 목적: 이 앱의 모든 코드를 해설하는 책이 아니다. 비슷한 앱을 직접 만들 수 있도록 언어·프레임워크·배포 인프라 지식을 이 앱의 실제 코드 예제로 전달한다.
 - 각 기술의 **선택 이유(트레이드오프)** 를 반드시 다룬다: 왜 Go인가, 왜 TypeScript·React인가, 왜 Vercel·Supabase인가.
 - 배포: GitHub Pages (https://benelog.github.io/echo-flip/), `.github/workflows/book.yml`이 `doc/**` 변경 push 시 자동 배포.
-  - 최초 1회 수동 설정 필요: GitHub 저장소 Settings → Pages → Source를 **GitHub Actions**로 변경.
+  - Pages Source는 GitHub Actions로 설정 완료(2026-07-09, `gh api repos/benelog/echo-flip/pages -X POST -f build_type=workflow`).
 
 ## 기술 구성
 
@@ -81,5 +81,6 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - [x] 전체 10개 장 초안 작성 (2026-07-09, 총 약 5,800줄)
 - [ ] 전체 통독 검토: 장 간 중복 제거, 상호 참조("N장에서 다룬다") 정합성 확인
 - [x] `npm run build` 통과 확인 후 커밋·push
-- [ ] (사용자 수동) GitHub Settings → Pages → Source = GitHub Actions 설정
-- [ ] 배포된 사이트에서 렌더링 확인
+- [x] GitHub Pages Source = GitHub Actions 설정 (gh api로 완료)
+- [x] 배포된 사이트에서 렌더링 확인 (홈·도입 장 200 OK, 2026-07-09)
+- [ ] (선택) 이후 세션: 통독 검토 후 상태를 `검토 완료`로 갱신, 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토
