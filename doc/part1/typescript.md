@@ -446,7 +446,7 @@ export function ruleLabel(rule: SmartRule): string {
 유니온 타입과 `switch`의 궁합도 여기서 드러난다.
 `rule.type`은 `SmartRuleType` 유니온이므로 컴파일러는 네 개의 `case`가 모든 경우를 소진했음을 안다.
 그래서 `default` 없이도 반환 타입이 `string`으로 성립한다.
-나중에 유니온에 다섯 번째 규칙이 추가되면, 이 함수는 "string을 반환하지 않는 경로가 있다"는 컴파일 오류를 내며 수정 지점을 알려 준다.
+나중에 유니온에 다섯 번째 규칙이 추가되면, 이 함수는 "string을 반환하지 않는 경로가 있다"는 컴파일 오류를 내며 수정할 곳을 알려 준다.
 도메인 확장이 컴파일 오류라는 형태의 할 일 목록을 만들어 주는 것이다.
 
 ### 왜 이렇게 나누는가
@@ -613,4 +613,4 @@ ESLint는 타입 검사가 다루지 않는 영역을 짚는 정적 분석(stati
 strict 모드 `tsconfig.json`과 `tsc --noEmit`, vitest가 이 프로젝트의 품질 게이트이고, ESLint는 협업 확대나 훅 복잡도 증가 시점에 도입할 후보로 남겨 두었다.
 
 다음 5장에서는 이 타입들 위에서 화면을 만드는 React와 Next.js를 다룬다.
-`api<T>`가 TanStack Query와 만나고, `parseCsv`가 가져오기 다이얼로그와 만나는 지점을 보게 될 것이다.
+`api<T>`가 TanStack Query와 만나고, `parseCsv`가 가져오기 다이얼로그와 만나는 장면을 보게 될 것이다.
