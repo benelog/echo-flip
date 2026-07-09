@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LogIn, LogOut } from "lucide-react";
 import { useAuth } from "./AuthProvider";
+import { Logo } from "./Logo";
 
 /** App-wide header strip showing login status and a logout / login action. */
 export function TopBar() {
@@ -11,8 +12,11 @@ export function TopBar() {
   return (
     <header className="flex h-12 items-center justify-between border-b border-neutral-200 px-4 dark:border-neutral-800">
       {/* "/" is auth-gated; send anonymous visitors to the public gallery. */}
-      <Link href={session ? "/" : "/shared"} className="text-sm font-bold">
-        🔊 Echo Flip
+      <Link
+        href={session ? "/" : "/shared"}
+        className="flex items-center gap-1.5 text-sm font-bold"
+      >
+        <Logo size={18} /> Echo Flip
       </Link>
       {loading ? (
         <span className="text-xs text-neutral-400">…</span>

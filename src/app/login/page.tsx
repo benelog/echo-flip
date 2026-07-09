@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { AUTH_NEXT_KEY, safeNext } from "@/lib/authNext";
 import { supabase } from "@/lib/supabase";
+import { Logo } from "@/components/Logo";
 
 function GoogleIcon() {
   return (
@@ -58,10 +59,10 @@ function LoginContent() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col items-center justify-center gap-10 px-6">
       <div className="text-center">
-        <p className="text-5xl">🔊</p>
+        <Logo size={64} className="mx-auto" />
         <h1 className="mt-4 text-3xl font-bold">Echo Flip</h1>
         <p className="mt-2 text-neutral-500">
-          영어 단어·문장·숙어를
+          단어·문장·숙어·개념을
           <br />
           카드로 뒤집으며 외워요
         </p>

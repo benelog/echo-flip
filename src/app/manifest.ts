@@ -4,9 +4,9 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Echo Flip — 영어 암기 카드",
+    name: "Echo Flip — 암기 카드",
     short_name: "Echo Flip",
-    description: "영어 단어·문장·숙어를 카드로 외우는 학습 앱",
+    description: "단어·문장·숙어·개념을 카드로 뒤집으며 외우는 학습 앱",
     lang: "ko",
     start_url: "/",
     display: "standalone",
