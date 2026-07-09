@@ -1,11 +1,17 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'
-import { useData, useRoute } from 'vitepress'
+import { useData, useRoute, useRouter } from 'vitepress'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { blockAnchors, findRange, loadList, saveList, serializeRange } from './ebook'
 
 const { page } = useData()
 const route = useRoute()
+const router = useRouter()
 const isHome = computed(() => page.value.relativePath === 'index.md')
+
+function docRoot() {
+  return document.querySelector('.vp-doc')
+}
 
 // 목차(왼쪽 사이드바) 접기/펼치기 — 이북 뷰어의 몰입 모드
 const tocHidden = ref(false)
@@ -26,13 +32,17 @@ function toggleToc() {
 
 // ── 페이지 넘김 모드 ──────────────────────────────────────────
 // 데스크톱에서는 장을 아래로 스크롤하지 않고, 본문을 CSS 다단으로
-// 흘려 한 화면을 넘는 내용이 오른쪽 열(다음 페이지)로 이어지게 한다.
-// 페이지 넘김 = 다단 컨테이너를 열 너비만큼 가로 스크롤.
+// 흘려 한 화면을 넘는 내용이 다음 열(페이지)로 이어지게 한다.
+// 폭이 넉넉하면 두 열 = 펼친 책의 좌우 페이지가 된다.
+// 페이지 넘김 = 다단 컨테이너를 화면 폭만큼 가로 스크롤.
 const pagedActive = ref(false)
-const curPage = ref(0)
-const numPages = ref(1)
+const curPage = ref(0) // 펼침면(spread) 인덱스
+const numPages = ref(1) // 펼침면 수
+const totalCols = ref(1) // 실제 페이지(열) 수
+const cols = ref(1) // 한 화면에 보이는 페이지 수 (1 또는 2)
+const cardRect = ref(null) // 페이지 카드의 화면 위치 (리본 배치용)
 let scroller = null // .content-container — 다단 + overflow hidden
-let step = 0 // 페이지 하나의 폭(열 너비 + 열 간격)
+let step = 0 // 한 번 넘길 때의 폭 (화면 폭 + 열 간격)
 
 function isPagedViewport() {
   return window.matchMedia('(min-width: 960px)').matches
@@ -40,12 +50,14 @@ function isPagedViewport() {
 
 function measure() {
   if (!scroller) return
-  const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0
+  const style = getComputedStyle(scroller)
+  const gap = parseFloat(style.columnGap) || 0
+  cols.value = parseInt(style.columnCount) || 1
+  const colW = (scroller.clientWidth - (cols.value - 1) * gap) / cols.value
   step = scroller.clientWidth + gap
-  numPages.value =
-    step > 0
-      ? Math.max(1, Math.round((scroller.scrollWidth - scroller.clientWidth) / step) + 1)
-      : 1
+  totalCols.value =
+    colW > 0 ? Math.max(1, Math.round((scroller.scrollWidth + gap) / (colW + gap))) : 1
+  numPages.value = Math.max(1, Math.ceil(totalCols.value / cols.value))
   if (curPage.value > numPages.value - 1) curPage.value = numPages.value - 1
   applyPage(false)
 }
@@ -54,16 +66,29 @@ function applyPage(smooth = true) {
   scroller?.scrollTo({ left: curPage.value * step, behavior: smooth ? 'smooth' : 'auto' })
 }
 
+function pageOfX(x) {
+  return Math.min(numPages.value - 1, Math.max(0, Math.floor(x / step + 0.02)))
+}
+
 function setupPaged() {
   pagedActive.value = isPagedViewport() && !isHome.value
   document.documentElement.classList.toggle('ef-paged', pagedActive.value)
   if (!pagedActive.value) {
+    document.documentElement.classList.remove('ef-two')
     scroller = null
+    cardRect.value = null
+    isBookmarked.value = false
     return
   }
   window.scrollTo(0, 0)
   scroller = document.querySelector('.VPDoc .content-container')
+  if (!scroller) return
+  // 자리가 넉넉하면 두 페이지 펼침 (카드 폭이 커지므로 열 수 지정 전에 판단)
+  const avail = document.querySelector('.VPDoc .container')?.clientWidth ?? 0
+  document.documentElement.classList.toggle('ef-two', avail >= 1020)
+  cardRect.value = scroller.parentElement?.getBoundingClientRect() ?? null
   measure()
+  updateBookmarkState()
   try {
     if (sessionStorage.getItem('ef-open-last')) {
       sessionStorage.removeItem('ef-open-last')
@@ -111,22 +136,12 @@ function jumpToHash(hash) {
     document.getElementById(id.normalize('NFC')) ??
     document.getElementById(id.normalize('NFD'))
   if (!el) return
-  const x =
-    el.getBoundingClientRect().left -
-    scroller.getBoundingClientRect().left +
-    scroller.scrollLeft
-  curPage.value = Math.min(numPages.value - 1, Math.max(0, Math.round(x / step)))
+  curPage.value = pageOfX(elX(el))
   applyPage(false)
 }
 
-function onClick(e) {
-  if (!pagedActive.value) return
-  const a = e.target.closest('a[href]')
-  if (!a || a.target === '_blank') return
-  const url = new URL(a.href, location.href)
-  if (url.origin !== location.origin || url.pathname !== location.pathname || !url.hash) return
-  // VitePress의 scrollIntoView가 끝난 뒤 페이지 경계에 다시 맞춘다
-  setTimeout(() => jumpToHash(url.hash), 100)
+function onHashChange() {
+  jumpToHash(location.hash)
 }
 
 // 휠·트랙패드로 페이지 넘기기 (장 경계는 넘지 않는다)
@@ -136,7 +151,7 @@ let wheelLockUntil = 0
 
 function onWheel(e) {
   if (!pagedActive.value || e.ctrlKey) return
-  if (e.target.closest('.VPNav, .VPSidebar, .VPLocalSearchBox')) return
+  if (e.target.closest('.VPNav, .VPSidebar, .VPLocalSearchBox, .ef-panel')) return
   const now = e.timeStamp
   if (now < wheelLockUntil) return
   if (now - wheelAt > 300) wheelAcc = 0
@@ -166,6 +181,16 @@ const progress = computed(() => {
   return numPages.value > 1 ? ((curPage.value + 1) / numPages.value) * 100 : 100
 })
 
+// 페이지 번호 표시 — 펼침이면 "3–4 / 52"
+const pageLabel = computed(() => {
+  if (cols.value === 2) {
+    const left = curPage.value * 2 + 1
+    const right = Math.min(left + 1, totalCols.value)
+    return `${left === right ? left : `${left}–${right}`} / ${totalCols.value}`
+  }
+  return `${curPage.value + 1} / ${numPages.value}`
+})
+
 // 좌우 화살표 — 하단 페이저의 이전/다음 장 링크를 읽어 온다
 const prevHref = ref('')
 const nextHref = ref('')
@@ -178,8 +203,296 @@ function updatePager() {
 const hasPrev = computed(() => curPage.value > 0 || !!prevHref.value)
 const hasNext = computed(() => curPage.value < numPages.value - 1 || !!nextHref.value)
 
+// ── 북마크 ────────────────────────────────────────────────────
+// 현재 펼침면에서 시작하는 첫 블록 요소를 기준점으로 저장한다.
+// 창 크기가 바뀌어도 그 요소가 있는 페이지로 되돌아갈 수 있다.
+const BM_KEY = 'ef-bookmarks'
+const bookmarks = ref([])
+const isBookmarked = ref(false)
+
+const uid = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2)
+
+function elX(el) {
+  if (!scroller) return 0
+  return el.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft
+}
+
+function resolveBookmarkEl(rec) {
+  const root = docRoot()
+  if (!root) return null
+  const els = blockAnchors(root)
+  const snip = (e) => (e.textContent || '').slice(0, 40)
+  let el = els[rec.anchor.idx]
+  if (!el || (rec.anchor.text && snip(el) !== rec.anchor.text)) {
+    el = els.find((e) => rec.anchor.text && snip(e) === rec.anchor.text) ?? el ?? null
+  }
+  return el
+}
+
+function resolveBookmarkPage(rec) {
+  const el = resolveBookmarkEl(rec)
+  if (!el) return -1
+  const p = pageOfX(elX(el)) + (rec.anchor.dpage || 0)
+  return Math.min(numPages.value - 1, Math.max(0, p))
+}
+
+function updateBookmarkState() {
+  if (!pagedActive.value || !scroller) {
+    isBookmarked.value = false
+    return
+  }
+  isBookmarked.value = bookmarks.value.some(
+    (b) => b.path === location.pathname && resolveBookmarkPage(b) === curPage.value,
+  )
+}
+
+function toggleBookmark() {
+  if (!pagedActive.value || !scroller) return
+  const onThis = bookmarks.value.filter(
+    (b) => b.path === location.pathname && resolveBookmarkPage(b) === curPage.value,
+  )
+  if (onThis.length) {
+    bookmarks.value = bookmarks.value.filter((b) => !onThis.includes(b))
+  } else {
+    const root = docRoot()
+    if (!root) return
+    const els = blockAnchors(root)
+    // 현재 펼침면에서 시작하는 첫 요소. 펼침면 전체가 하나의 긴 요소
+    // (예: 코드 블록) 안이면 그 요소를 기준으로 페이지 차이를 기록한다.
+    let pick = null
+    let pickIdx = -1
+    let spanIdx = -1
+    for (let i = 0; i < els.length; i++) {
+      const p = pageOfX(elX(els[i]))
+      if (p === curPage.value) {
+        pick = els[i]
+        pickIdx = i
+        break
+      }
+      if (p < curPage.value) spanIdx = i
+      if (p > curPage.value) break
+    }
+    if (!pick && spanIdx >= 0) {
+      pick = els[spanIdx]
+      pickIdx = spanIdx
+    }
+    if (!pick) return
+    bookmarks.value = [
+      ...bookmarks.value,
+      {
+        id: uid(),
+        path: location.pathname,
+        title: page.value.title,
+        anchor: {
+          idx: pickIdx,
+          text: (pick.textContent || '').slice(0, 40),
+          dpage: curPage.value - pageOfX(elX(pick)),
+        },
+        at: Date.now(),
+      },
+    ]
+  }
+  saveList(BM_KEY, bookmarks.value)
+  updateBookmarkState()
+}
+
+function removeBookmark(id) {
+  bookmarks.value = bookmarks.value.filter((b) => b.id !== id)
+  saveList(BM_KEY, bookmarks.value)
+  updateBookmarkState()
+}
+
+// ── 형광펜 ────────────────────────────────────────────────────
+// CSS Custom Highlight API로 칠한다. DOM을 바꾸지 않으므로 Vue가
+// 관리하는 본문과 충돌하지 않는다.
+const HL_KEY = 'ef-highlights'
+const HL_COLORS = ['yellow', 'green', 'pink']
+const highlights = ref([])
+const selTool = ref(null) // { mode: 'new' | 'edit', x, y, id? }
+let pendingRange = null
+let liveRanges = [] // 현재 문서에 그려진 형광펜 [{ id, color, range }]
+
+function highlightSupported() {
+  return typeof Highlight !== 'undefined' && typeof CSS !== 'undefined' && CSS.highlights
+}
+
+function paintHighlights() {
+  if (!highlightSupported()) return
+  for (const c of HL_COLORS) CSS.highlights.delete(`ef-hl-${c}`)
+  liveRanges = []
+  const root = docRoot()
+  if (!root) return
+  const byColor = {}
+  for (const rec of highlights.value) {
+    if (rec.path !== location.pathname) continue
+    const range = findRange(root, rec)
+    if (!range) continue
+    liveRanges.push({ id: rec.id, color: rec.color, range })
+    ;(byColor[rec.color] ??= []).push(range)
+  }
+  for (const [c, ranges] of Object.entries(byColor)) {
+    CSS.highlights.set(`ef-hl-${c}`, new Highlight(...ranges))
+  }
+}
+
+function onSelectionEnd(e) {
+  if (e.target instanceof Element && e.target.closest('.ef-seltool')) return
+  // click 이벤트가 지나간 뒤에 선택 상태를 읽는다
+  setTimeout(() => {
+    if (!highlightSupported()) return
+    const sel = window.getSelection()
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) return
+    const range = sel.getRangeAt(0)
+    const root = docRoot()
+    if (!root || !root.contains(range.commonAncestorContainer)) return
+    if (!range.toString().trim()) return
+    pendingRange = range.cloneRange()
+    const rect = range.getBoundingClientRect()
+    selTool.value = {
+      mode: 'new',
+      x: Math.min(Math.max(rect.left + rect.width / 2 - 72, 8), window.innerWidth - 190),
+      y: Math.max(rect.top - 48, 8),
+    }
+  }, 0)
+}
+
+function addHighlight(color) {
+  const root = docRoot()
+  if (!root || !pendingRange) return
+  const ser = serializeRange(root, pendingRange)
+  if (!ser) return
+  highlights.value = [
+    ...highlights.value,
+    { id: uid(), path: location.pathname, title: page.value.title, color, at: Date.now(), ...ser },
+  ]
+  saveList(HL_KEY, highlights.value)
+  window.getSelection()?.removeAllRanges()
+  pendingRange = null
+  selTool.value = null
+  paintHighlights()
+}
+
+function recolorHighlight(id, color) {
+  highlights.value = highlights.value.map((h) => (h.id === id ? { ...h, color } : h))
+  saveList(HL_KEY, highlights.value)
+  selTool.value = null
+  paintHighlights()
+}
+
+function removeHighlight(id) {
+  highlights.value = highlights.value.filter((h) => h.id !== id)
+  saveList(HL_KEY, highlights.value)
+  selTool.value = null
+  paintHighlights()
+}
+
+function onSelToolPick(color) {
+  if (selTool.value?.mode === 'edit') recolorHighlight(selTool.value.id, color)
+  else addHighlight(color)
+}
+
+// ── 북마크·형광펜 패널 ────────────────────────────────────────
+const panelOpen = ref(false)
+const sortedBookmarks = computed(() => [...bookmarks.value].sort((a, b) => b.at - a.at))
+const sortedHighlights = computed(() => [...highlights.value].sort((a, b) => b.at - a.at))
+
+function openItem(type, rec) {
+  panelOpen.value = false
+  if (rec.path === location.pathname) {
+    jumpNow(type, rec)
+    return
+  }
+  try {
+    sessionStorage.setItem('ef-pending', JSON.stringify({ type, id: rec.id }))
+  } catch {}
+  router.go(rec.path)
+}
+
+function jumpNow(type, rec) {
+  if (type === 'bm') {
+    const el = resolveBookmarkEl(rec)
+    if (!el) return
+    if (pagedActive.value) {
+      curPage.value = resolveBookmarkPage(rec)
+      applyPage(false)
+      updateBookmarkState()
+    } else {
+      el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    }
+  } else {
+    const root = docRoot()
+    const range = root && findRange(root, rec)
+    if (!range) return
+    if (pagedActive.value) {
+      curPage.value = pageOfX(
+        range.getBoundingClientRect().left -
+          scroller.getBoundingClientRect().left +
+          scroller.scrollLeft,
+      )
+      applyPage(false)
+    } else {
+      range.startContainer.parentElement?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+  }
+}
+
+function consumePending() {
+  let raw = null
+  try {
+    raw = sessionStorage.getItem('ef-pending')
+    if (raw) sessionStorage.removeItem('ef-pending')
+  } catch {}
+  if (!raw) return
+  try {
+    const { type, id } = JSON.parse(raw)
+    const rec = (type === 'bm' ? bookmarks : highlights).value.find((r) => r.id === id)
+    if (rec) jumpNow(type, rec)
+  } catch {}
+}
+
+// ── 전역 이벤트 ───────────────────────────────────────────────
+function onClick(e) {
+  const t = e.target instanceof Element ? e.target : null
+  if (t && t.closest('.ef-seltool, .ef-panel, .ef-panel-btn, .ef-ribbon')) return
+  if (selTool.value) selTool.value = null
+  if (panelOpen.value) panelOpen.value = false
+  // 형광펜을 클릭하면 색 바꾸기/삭제 팝업
+  const sel = window.getSelection()
+  if ((!sel || sel.isCollapsed) && t && t.closest('.vp-doc')) {
+    for (const lr of liveRanges) {
+      for (const r of lr.range.getClientRects()) {
+        if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+          selTool.value = {
+            mode: 'edit',
+            id: lr.id,
+            x: Math.min(Math.max(e.clientX - 72, 8), window.innerWidth - 190),
+            y: Math.max(e.clientY - 52, 8),
+          }
+          return
+        }
+      }
+    }
+  }
+  // 같은 문서 안 앵커 링크 → 해당 페이지로
+  if (!pagedActive.value) return
+  const a = t && t.closest('a[href]')
+  if (!a || a.target === '_blank') return
+  const url = new URL(a.href, location.href)
+  if (url.origin !== location.origin || url.pathname !== location.pathname || !url.hash) return
+  // VitePress의 scrollIntoView가 끝난 뒤 페이지 경계에 다시 맞춘다
+  setTimeout(() => jumpToHash(url.hash), 100)
+}
+
 // ←/→ 키로 페이지·장 이동
 function onKey(e) {
+  if (e.key === 'Escape') {
+    selTool.value = null
+    panelOpen.value = false
+    return
+  }
   if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
   // 입력 중이거나 검색창 등이 열려 있으면 페이지를 넘기지 않는다
   const t = e.target
@@ -207,30 +520,39 @@ function onResize() {
   setupPaged()
 }
 
-function onHashChange() {
-  jumpToHash(location.hash)
-}
-
 function refresh() {
   onScroll()
   updatePager()
   setupPaged()
+  paintHighlights()
+  consumePending()
+  updateBookmarkState()
 }
 
 onMounted(() => {
   try {
     tocHidden.value = localStorage.getItem('ef-toc-hidden') === '1'
   } catch {}
+  bookmarks.value = loadList(BM_KEY)
+  highlights.value = loadList(HL_KEY)
   applyTocState()
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('keydown', onKey)
   window.addEventListener('resize', onResize)
   window.addEventListener('hashchange', onHashChange)
   window.addEventListener('wheel', onWheel, { passive: true })
+  window.addEventListener('mouseup', onSelectionEnd)
+  window.addEventListener('touchend', onSelectionEnd)
   document.addEventListener('click', onClick)
   nextTick(refresh)
   // 웹폰트가 늦게 적용되면 줄바꿈이 달라져 페이지 수가 바뀐다
-  document.fonts?.ready?.then(() => setTimeout(measure, 0))
+  document.fonts?.ready?.then(() =>
+    setTimeout(() => {
+      measure()
+      paintHighlights()
+      updateBookmarkState()
+    }, 0),
+  )
 })
 
 onUnmounted(() => {
@@ -239,14 +561,23 @@ onUnmounted(() => {
   window.removeEventListener('resize', onResize)
   window.removeEventListener('hashchange', onHashChange)
   window.removeEventListener('wheel', onWheel)
+  window.removeEventListener('mouseup', onSelectionEnd)
+  window.removeEventListener('touchend', onSelectionEnd)
   document.removeEventListener('click', onClick)
-  document.documentElement.classList.remove('ef-paged')
+  document.documentElement.classList.remove('ef-paged', 'ef-two')
+})
+
+watch(curPage, () => {
+  selTool.value = null
+  updateBookmarkState()
 })
 
 watch(
   () => route.path,
   async () => {
     curPage.value = 0
+    selTool.value = null
+    panelOpen.value = false
     await nextTick()
     requestAnimationFrame(refresh)
     setTimeout(refresh, 300)
@@ -273,6 +604,19 @@ watch(
         </svg>
         <span>목차</span>
       </button>
+      <button
+        v-if="!isHome"
+        class="ef-toc-toggle ef-panel-btn"
+        type="button"
+        title="북마크와 형광펜"
+        :aria-expanded="panelOpen"
+        @click="panelOpen = !panelOpen"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+          <path d="M6 3h12v18l-6-4.5L6 21z" />
+        </svg>
+        <span>책갈피</span>
+      </button>
     </template>
     <template #layout-bottom>
       <button
@@ -297,7 +641,68 @@ watch(
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>
-      <div v-if="!isHome && pagedActive" class="ef-page-num">{{ curPage + 1 }} / {{ numPages }}</div>
+      <div v-if="!isHome && pagedActive" class="ef-page-num">{{ pageLabel }}</div>
+
+      <!-- 북마크 리본 — 페이지 카드 오른쪽 위 -->
+      <button
+        v-if="!isHome && pagedActive && cardRect"
+        class="ef-ribbon"
+        :class="{ active: isBookmarked }"
+        type="button"
+        :title="isBookmarked ? '북마크 해제' : '이 페이지 북마크'"
+        :style="{ left: cardRect.right - 64 + 'px', top: cardRect.top - 1 + 'px' }"
+        @click="toggleBookmark"
+      >
+        <svg width="22" height="30" viewBox="0 0 24 32" :fill="isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+          <path d="M4 1h16v29l-8-6.5L4 30z" />
+        </svg>
+      </button>
+
+      <!-- 형광펜 선택 도구 -->
+      <div v-if="selTool" class="ef-seltool" :style="{ left: selTool.x + 'px', top: selTool.y + 'px' }">
+        <button
+          v-for="c in HL_COLORS"
+          :key="c"
+          class="ef-hl-dot"
+          :class="c"
+          type="button"
+          :title="selTool.mode === 'edit' ? '색 바꾸기' : '형광펜'"
+          @click="onSelToolPick(c)"
+        />
+        <button v-if="selTool.mode === 'edit'" class="ef-hl-del" type="button" @click="removeHighlight(selTool.id)">
+          삭제
+        </button>
+      </div>
+
+      <!-- 북마크·형광펜 패널 -->
+      <div v-if="panelOpen && !isHome" class="ef-panel">
+        <div class="ef-panel-section">북마크</div>
+        <p v-if="!sortedBookmarks.length" class="ef-panel-empty">
+          페이지 오른쪽 위 리본을 누르면 이 자리에 저장됩니다.
+        </p>
+        <ul v-else class="ef-panel-list">
+          <li v-for="b in sortedBookmarks" :key="b.id">
+            <button class="ef-panel-item" type="button" @click="openItem('bm', b)">
+              <span class="ef-panel-item-title">{{ b.title }}</span>
+              <span class="ef-panel-item-text">{{ b.anchor.text }}</span>
+            </button>
+            <button class="ef-panel-x" type="button" aria-label="북마크 삭제" @click="removeBookmark(b.id)">×</button>
+          </li>
+        </ul>
+        <div class="ef-panel-section">형광펜</div>
+        <p v-if="!sortedHighlights.length" class="ef-panel-empty">
+          본문을 드래그하면 형광펜을 칠할 수 있습니다.
+        </p>
+        <ul v-else class="ef-panel-list">
+          <li v-for="h in sortedHighlights" :key="h.id">
+            <button class="ef-panel-item" type="button" @click="openItem('hl', h)">
+              <span class="ef-panel-item-title"><i class="ef-hl-dot small" :class="h.color" />{{ h.title }}</span>
+              <span class="ef-panel-item-text">{{ h.text.slice(0, 64) }}</span>
+            </button>
+            <button class="ef-panel-x" type="button" aria-label="형광펜 삭제" @click="removeHighlight(h.id)">×</button>
+          </li>
+        </ul>
+      </div>
     </template>
   </DefaultTheme.Layout>
 </template>
