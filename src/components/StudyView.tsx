@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Check, RotateCcw, X } from "lucide-react";
+import { Check, PartyPopper, RotateCcw, X } from "lucide-react";
 import { useStudySession } from "@/hooks/useStudySession";
 import type { Card, StudyDirection } from "@/lib/types";
 import { Flashcard } from "./Flashcard";
@@ -45,7 +45,7 @@ export function StudyView({
     );
     return (
       <div className="flex flex-col items-center gap-6 py-16 text-center">
-        <p className="text-4xl">🎉</p>
+        <PartyPopper size={40} className="text-amber-500" />
         <h2 className="text-xl font-bold">학습 완료!</h2>
         <dl className="grid grid-cols-3 gap-4 text-center">
           <div>
