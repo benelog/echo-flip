@@ -21,17 +21,17 @@ const SITE = 'benelog.github.io/echo-flip'
 
 // 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.
 const chapters = [
-  { route: 'intro', title: '도입 — 무엇을 만드는가: Echo Flip의 요구사항' },
-  { route: 'part1/tech-choices', title: '1장 기술 선택 — 왜 이 조합인가', part: '1부 언어와 프레임워크로 코드 이해하기' },
-  { route: 'part1/go', title: '2장 Go — 작은 서버를 위한 백엔드 언어' },
+  { route: 'intro', title: '도입: 무엇을 만드는가' },
+  { route: 'part1/tech-choices', title: '1장 기술 선택: 왜 이 조합인가', part: '1부 언어와 프레임워크로 코드 이해하기' },
+  { route: 'part1/go', title: '2장 Go: 작은 서버를 위한 백엔드 언어' },
   { route: 'part1/gin', title: '3장 Gin으로 만드는 HTTP API' },
-  { route: 'part1/typescript', title: '4장 TypeScript — 타입으로 지키는 프런트엔드' },
+  { route: 'part1/typescript', title: '4장 TypeScript: 타입으로 지키는 프런트엔드' },
   { route: 'part1/react', title: '5장 React와 Next.js로 만드는 화면' },
   { route: 'part1/database', title: '6장 PostgreSQL 데이터베이스 설계' },
-  { route: 'part2/claude-code', title: '7장 Claude Code — AI 에이전트와 개발하기', part: '2부 앱을 만드는 도구와 인프라' },
+  { route: 'part2/claude-code', title: '7장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
   { route: 'part2/agents-hooks', title: '8장 서브에이전트와 훅으로 만드는 품질 게이트' },
-  { route: 'part2/vercel', title: '9장 Vercel — 한 플랫폼에 모두 배포하기' },
-  { route: 'part2/supabase', title: '10장 Supabase — 인증과 데이터베이스' },
+  { route: 'part2/vercel', title: '9장 Vercel: 한 플랫폼에 모두 배포하기' },
+  { route: 'part2/supabase', title: '10장 Supabase: 인증과 데이터베이스' },
 ]
 
 const FONT_LINKS = `
@@ -47,12 +47,23 @@ function coverHtml() {
     .cover {
       position: relative; box-sizing: border-box; width: 210mm; height: 296mm;
       padding: 34mm 26mm 26mm; overflow: hidden;
-      background: linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+      /* 위: 모서리 광, 가운데: 점 패턴 질감, 아래: 남색 그러데이션 (웹 표지와 동일) */
+      background-image:
+        radial-gradient(circle at 82% 8%, rgba(142,162,216,.22), transparent 55%),
+        radial-gradient(rgba(255,255,255,.05) 0.35mm, transparent 0.35mm),
+        linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+      background-size: auto, 6mm 6mm, auto;
       color: #fff; font-family: 'Noto Serif KR', serif;
       display: flex; flex-direction: column;
     }
-    .rule { width: 34mm; border-top: 1.2mm solid #8ea2d8; margin-bottom: 14mm; }
+    .frame { position: absolute; inset: 7mm; border: 0.3mm solid rgba(255,255,255,.13); border-radius: 1mm 3mm 3mm 1mm; }
+    .rule { width: 34mm; height: 1.2mm; border-radius: 0.6mm; background: linear-gradient(90deg, #f6c453, #8ea2d8); margin-bottom: 14mm; }
     h1 { font-size: 34pt; line-height: 1.45; font-weight: 700; margin: 0 0 10mm; word-break: keep-all; }
+    h1 .gold { color: #f6c453; }
+    .cards { position: absolute; top: 29mm; right: 24mm; width: 42mm; height: 28mm; font-family: 'Noto Sans KR', sans-serif; }
+    .cards span { position: absolute; display: flex; align-items: center; justify-content: center; width: 24mm; height: 16mm; border-radius: 1.6mm; font-size: 12pt; font-weight: 700; }
+    .cards .front { top: 0; right: 15mm; border: 0.4mm solid rgba(255,255,255,.38); background: rgba(255,255,255,.04); color: rgba(255,255,255,.75); transform: rotate(-8deg); }
+    .cards .back { top: 8mm; right: 0; background: #8ea2d8; color: #1d2747; transform: rotate(7deg); }
     .subtitle { font-family: 'Noto Sans KR', sans-serif; font-size: 13.5pt; font-weight: 400; color: rgba(255,255,255,.82); margin: 0; line-height: 1.8; word-break: keep-all; }
     .bottom { margin-top: auto; font-family: 'Noto Sans KR', sans-serif; }
     .author { font-size: 13pt; font-weight: 500; margin: 0 0 2.5mm; }
@@ -60,8 +71,10 @@ function coverHtml() {
     .zero { position: absolute; right: -6mm; bottom: -14mm; font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 340pt; line-height: 1; color: rgba(255,255,255,.05); letter-spacing: -0.04em; }
   </style></head><body>
   <div class="cover">
+    <div class="frame"></div>
+    <div class="cards"><span class="front">A</span><span class="back">가</span></div>
     <div class="rule"></div>
-    <h1>월 0원으로 운영하는<br>나의 웹 앱</h1>
+    <h1>월 <span class="gold">0원</span>으로 운영하는<br>나의 웹 앱</h1>
     <p class="subtitle">${SUBTITLE}</p>
     <div class="bottom">
       <p class="author">${AUTHOR} 지음</p>
