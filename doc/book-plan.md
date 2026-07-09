@@ -74,7 +74,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 | 파일 | 소유 용어 |
 |---|---|
-| `intro.md` | API, 프런트엔드와 백엔드, 간격 반복(SRS), 서버리스, 콜드스타트, PWA, 무료 티어, JWT |
+| `intro.md` | API, 프런트엔드와 백엔드, 간격 반복(SRS), 서버리스, 콜드스타트, PWA, 무료 티어, OAuth, JWT |
 | `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, 트레이드오프 |
 | `part1/go.md` | 모듈과 패키지, 구조체, 다중 반환값과 에러 처리, 순수 함수, 테이블 주도 테스트, 포매터와 정적 분석 |
 | `part1/gin.md` | HTTP 요청과 응답, 라우터와 라우팅, 엔드포인트, 핸들러, JSON과 바인딩, 미들웨어, CORS |
@@ -84,7 +84,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 | `part2/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md) |
 | `part2/agents-hooks.md` | 훅(Claude Code), 종료 코드, 서브에이전트, 품질 게이트 |
 | `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN |
-| `part2/supabase.md` | 관리형 서비스, OAuth, JWKS와 서명 검증, 무상태, 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션 |
+| `part2/supabase.md` | 관리형 서비스, JWKS와 서명 검증, 무상태, 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션 |
 
 **훅(Hook)은 동음이의어다.** 5장의 훅은 React의 상태 관리 함수이고, 8장의 훅은 Claude Code가 자동 실행하는 스크립트다.
 각 장의 상자에서 서로 다른 것임을 한 문장으로 구분해 준다.
