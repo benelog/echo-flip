@@ -236,6 +236,58 @@
   }
 }
 
+/* ──────────────────────────────────────────────────────────────
+   책장 넘김 애니메이션
+   Layout.vue가 페이지를 넘길 때 본문 복제본으로 만든 종이 한 장을
+   책등을 축으로 3D 회전시킨다. 요소는 애니메이션 동안만 존재한다.
+   ────────────────────────────────────────────────────────────── */
+
+.ef-flip {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.ef-flip-sheet {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.ef-flip-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--vp-c-bg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.ef-flip-face.back {
+  transform: rotateY(180deg);
+}
+
+.ef-flip-cover {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--vp-c-bg);
+}
+
+/* 종이 면의 음영과 바닥에 드리우는 그림자 — 투명도는 JS가 움직인다 */
+.ef-flip-shade {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* 페이지 번호 (n / 전체) — 카드 아래 가운데 */
 .ef-page-num {
   position: fixed;

@@ -63,7 +63,130 @@ function measure() {
 }
 
 function applyPage(smooth = true) {
+  flipCleanup?.()
   scroller?.scrollTo({ left: curPage.value * step, behavior: smooth ? 'smooth' : 'auto' })
+}
+
+// ── 책장 넘김 애니메이션 ──────────────────────────────────────
+// 넘어가는 페이지를 복제해 책등을 축으로 3D 회전시킨다. 앞면은
+// 지금 보이는 면, 뒷면은 넘긴 뒤 나타날 면이라 실제 종이를 젖히는
+// 것처럼 보인다. 밑장은 목표 페이지로 즉시 스크롤해 두고, 넘기는
+// 종이가 내려앉을 자리는 이전 내용 복제본(cover)으로 가려 뒀다가
+// 애니메이션이 끝나면 통째로 걷어 낸다.
+const FLIP_MS = 560
+let flipCleanup = null
+
+function animateFlip(from, to) {
+  if (!scroller || !step || from === to) return false
+  if (!('animate' in Element.prototype)) return false
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+  const forward = to > from
+  const W = scroller.clientWidth
+  const H = scroller.clientHeight
+  const S = from * step
+  const T = to * step
+  const two = cols.value === 2
+  const w = two ? W / 2 : W // 넘기는 종이 한 장의 폭
+  const px = two ? W / 2 : 0 // 회전축(책등) 위치
+
+  flipCleanup?.()
+  scroller.scrollTo({ left: T, behavior: 'auto' })
+
+  // x0 위치에 놓여 scrollX 지점의 내용을 보여 주는 본문 복제본
+  const cloneAt = (x0, scrollX) => {
+    const c = scroller.cloneNode(true)
+    for (const el of c.querySelectorAll('[id]')) el.removeAttribute('id')
+    c.removeAttribute('id')
+    c.style.cssText = `position:absolute;top:0;left:${-(scrollX + x0)}px;width:${W}px;height:${H}px;margin:0;`
+    return c
+  }
+  const shadeEl = (background) => {
+    const s = document.createElement('div')
+    s.className = 'ef-flip-shade'
+    s.style.background = background
+    return s
+  }
+
+  const overlay = document.createElement('div')
+  overlay.className = 'ef-flip'
+  overlay.style.cssText =
+    `left:${scroller.offsetLeft}px;top:${scroller.offsetTop}px;width:${W}px;height:${H}px;` +
+    `perspective:${Math.max(1400, W * 1.6)}px;perspective-origin:${px}px 50%;`
+
+  // 넘어가는 종이 — 책등 쪽 모서리를 축으로 회전
+  const sheet = document.createElement('div')
+  sheet.className = 'ef-flip-sheet'
+  sheet.style.cssText = `left:${px}px;width:${w}px;`
+
+  const front = document.createElement('div')
+  front.className = 'ef-flip-face'
+  front.appendChild(cloneAt(px, forward ? S : T))
+  const frontShade = shadeEl(
+    'linear-gradient(to right, rgba(0,0,0,0.32), rgba(0,0,0,0.05) 55%, transparent)',
+  )
+  front.appendChild(frontShade)
+
+  const back = document.createElement('div')
+  back.className = 'ef-flip-face back'
+  // 펼침 모드에서는 종이 뒷면이 반대쪽 페이지 내용, 한 페이지 모드에서는
+  // 뒷면이 화면 밖으로 넘어가므로 빈 종이로 둔다.
+  if (two) back.appendChild(cloneAt(px - w, forward ? T : S))
+  const backShade = shadeEl(
+    'linear-gradient(to left, rgba(0,0,0,0.32), rgba(0,0,0,0.05) 55%, transparent)',
+  )
+  back.appendChild(backShade)
+  sheet.append(front, back)
+
+  // 종이가 내려앉을 자리 — 끝날 때까지 이전 내용을 보여 준다
+  let cast = null
+  if (two || !forward) {
+    const cover = document.createElement('div')
+    cover.className = 'ef-flip-cover'
+    const cx = forward ? px - w : px
+    cover.style.cssText = `left:${cx}px;width:${w}px;`
+    cover.appendChild(cloneAt(cx, S))
+    cast = shadeEl(
+      forward
+        ? 'linear-gradient(to left, rgba(0,0,0,0.28), transparent 65%)'
+        : 'linear-gradient(to right, rgba(0,0,0,0.28), transparent 65%)',
+    )
+    cover.appendChild(cast)
+    overlay.appendChild(cover)
+  }
+  overlay.appendChild(sheet)
+  scroller.parentElement.appendChild(overlay)
+
+  const opts = { duration: FLIP_MS, easing: 'cubic-bezier(0.45, 0.05, 0.22, 1)', fill: 'forwards' }
+  const anim = sheet.animate(
+    forward
+      ? [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-180deg)' }]
+      : [{ transform: 'rotateY(-180deg)' }, { transform: 'rotateY(0deg)' }],
+    opts,
+  )
+  // 들리는 면은 빛에서 멀어지며 어두워지고, 내려앉는 면은 밝아진다
+  const lift = forward ? frontShade : backShade
+  const land = forward ? backShade : frontShade
+  lift.animate([{ opacity: 0 }, { opacity: 0.9, offset: 0.5 }, { opacity: 1 }], opts)
+  land.animate([{ opacity: 1 }, { opacity: 0.9, offset: 0.5 }, { opacity: 0 }], opts)
+  // 내려앉기 직전 종이 그림자가 바닥에 드리운다
+  cast?.animate(
+    [
+      { opacity: 0 },
+      { opacity: 0.2, offset: 0.5 },
+      { opacity: 1, offset: 0.85 },
+      { opacity: 0 },
+    ],
+    opts,
+  )
+
+  const finish = () => {
+    flipCleanup = null
+    overlay.remove()
+  }
+  flipCleanup = finish
+  anim.onfinish = finish
+  anim.oncancel = finish
+  return true
 }
 
 function pageOfX(x) {
@@ -121,8 +244,9 @@ function turnPage(dir) {
   const target = curPage.value + dir
   if (target < 0) return goChapter('prev')
   if (target > numPages.value - 1) return goChapter('next')
+  const from = curPage.value
   curPage.value = target
-  applyPage()
+  if (!animateFlip(from, target)) applyPage()
 }
 
 // 본문 안 앵커 링크(검색 결과 등)를 누르면 해당 제목이 있는 페이지로 넘긴다
@@ -163,8 +287,9 @@ function onWheel(e) {
   wheelLockUntil = now + 450
   const target = curPage.value + dir
   if (target < 0 || target > numPages.value - 1) return
+  const from = curPage.value
   curPage.value = target
-  applyPage()
+  if (!animateFlip(from, target)) applyPage()
 }
 
 // 읽기 진행 바 — 페이지 모드에서는 페이지 비율, 스크롤 모드에서는 스크롤 비율
@@ -508,11 +633,13 @@ function onKey(e) {
     e.preventDefault()
     turnPage(-1)
   } else if (pagedActive.value && e.key === 'Home') {
+    const from = curPage.value
     curPage.value = 0
-    applyPage()
+    if (!animateFlip(from, 0)) applyPage()
   } else if (pagedActive.value && e.key === 'End') {
+    const from = curPage.value
     curPage.value = numPages.value - 1
-    applyPage()
+    if (!animateFlip(from, curPage.value)) applyPage()
   }
 }
 
@@ -564,6 +691,7 @@ onUnmounted(() => {
   window.removeEventListener('mouseup', onSelectionEnd)
   window.removeEventListener('touchend', onSelectionEnd)
   document.removeEventListener('click', onClick)
+  flipCleanup?.()
   document.documentElement.classList.remove('ef-paged', 'ef-two')
 })
 
