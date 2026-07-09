@@ -773,6 +773,50 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
+   용어 상자
+   `::: info 용어 · XXX` 컨테이너를 본문과 구분되는 사전 항목처럼 보이게 한다.
+   본문이 명조이므로 상자 안은 고딕으로 두어 결을 달리한다.
+   ────────────────────────────────────────────────────────────── */
+
+.vp-doc .custom-block.info {
+  border: 1px solid var(--vp-c-divider);
+  border-left: 4px solid var(--vp-c-brand-1);
+  border-radius: 6px;
+  background: var(--vp-c-bg-soft);
+  padding: 14px 18px 4px;
+  margin: 1.6em 0;
+  /* 다단(페이지 넘김) 모드와 인쇄에서 상자가 두 쪽에 걸치지 않게 */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.vp-doc .custom-block.info .custom-block-title {
+  font-family: var(--vp-font-family-base);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--vp-c-brand-1);
+  margin-bottom: 0.2em;
+}
+
+.vp-doc .custom-block.info p,
+.vp-doc .custom-block.info li {
+  font-family: var(--vp-font-family-base);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  text-align: left;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc .custom-block.info p {
+  margin: 0.5em 0;
+}
+
+.vp-doc .custom-block.info code {
+  font-size: 0.85em;
+}
+
+/* ──────────────────────────────────────────────────────────────
    인쇄·PDF
    내비게이션·사이드바를 걷어내고 본문만 종이에 얹는다.
    ────────────────────────────────────────────────────────────── */
@@ -875,5 +919,18 @@
   .vp-doc h2,
   .vp-doc h3 {
     break-after: avoid;
+  }
+
+  /* 용어 상자는 배경 없이 테두리만 남기고, 쪽을 넘어 갈라지지 않게 */
+  .vp-doc .custom-block.info {
+    background: none !important;
+    border: 1px solid #999 !important;
+    border-left: 3px solid #333 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vp-doc .custom-block.info .custom-block-title {
+    color: #000 !important;
   }
 }
