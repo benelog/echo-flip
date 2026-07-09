@@ -42,7 +42,7 @@ export default defineConfig({
         ],
       },
       {
-        text: '2부 앱을 만드는 도구와 인프라',
+        text: '2부 에이전트와 인프라로 앱 만들고 운영하기',
         items: [
           { text: '7장 Claude Code — AI 에이전트와 개발하기', link: '/part2/claude-code' },
           { text: '8장 서브에이전트와 훅으로 만드는 품질 게이트', link: '/part2/agents-hooks' },
