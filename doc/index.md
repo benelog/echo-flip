@@ -5,8 +5,9 @@ sidebar: false
 
 <div class="ef-home">
   <a class="ef-book" href="/echo-flip/intro" aria-label="읽기 시작">
+    <div class="ef-book-cards" aria-hidden="true"><span>A</span><span>가</span></div>
     <div class="ef-book-rule"></div>
-    <h1>월 0원으로 운영하는<br>나의 웹 앱</h1>
+    <h1>월 <span class="ef-zero">0원</span>으로 운영하는<br>나의 웹 앱</h1>
     <p class="ef-book-subtitle">혼자 만들고, 무료로 배포하고,<br>AI와 함께 개발한다</p>
     <p class="ef-book-author">benelog 지음</p>
     <div class="ef-book-zero">&#8361;0</div>

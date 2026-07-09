@@ -655,7 +655,16 @@
   justify-content: center;
   gap: 28px;
   padding: 48px 24px 72px;
-  background: var(--vp-c-bg-alt);
+  /* 표지 뒤로 은은한 광을 깔아 책이 조명 아래 놓인 느낌을 준다 */
+  background:
+    radial-gradient(640px 460px at 50% 42%, rgba(51, 67, 110, 0.09), transparent 70%),
+    var(--vp-c-bg-alt);
+}
+
+.dark .ef-home {
+  background:
+    radial-gradient(640px 460px at 50% 42%, rgba(142, 162, 216, 0.08), transparent 70%),
+    var(--vp-c-bg-alt);
 }
 
 .ef-book {
@@ -667,7 +676,12 @@
   padding: 44px 38px 36px;
   box-sizing: border-box;
   border-radius: 4px 14px 14px 4px;
-  background: linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+  /* 위: 모서리 광, 가운데: 점 패턴 질감, 아래: 기존 남색 그러데이션 */
+  background-image:
+    radial-gradient(circle at 82% 8%, rgba(142, 162, 216, 0.22), transparent 55%),
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
+  background-size: auto, 22px 22px, auto;
   color: #fff;
   overflow: hidden;
   text-decoration: none !important;
@@ -675,6 +689,16 @@
     inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
     0 18px 40px -12px rgba(22, 29, 54, 0.55);
   transition: translate 0.25s, box-shadow 0.25s;
+}
+
+/* 표지 안쪽 액자선 — 고전 양장본의 이중 테두리 느낌 */
+.ef-book::after {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 2px 10px 10px 2px;
+  pointer-events: none;
 }
 
 .ef-book:hover {
@@ -686,8 +710,50 @@
 
 .ef-book-rule {
   width: 56px;
-  border-top: 4px solid #8ea2d8;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #f6c453, #8ea2d8);
   margin-bottom: 30px;
+}
+
+/* 암기 카드 모티프 — 원문(A)과 뜻(가) 카드가 겹쳐 뒤집히는 순간 */
+.ef-book-cards {
+  position: absolute;
+  top: 42px;
+  right: 38px;
+  width: 78px;
+  height: 52px;
+}
+
+.ef-book-cards span {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 30px;
+  border-radius: 6px;
+  font-family: var(--vp-font-family-base);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ef-book-cards span:first-child {
+  top: 0;
+  right: 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  transform: rotate(-8deg);
+}
+
+.ef-book-cards span:last-child {
+  top: 14px;
+  right: 0;
+  background: #8ea2d8;
+  color: #1d2747;
+  transform: rotate(7deg);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
 }
 
 .ef-book h1 {
@@ -698,6 +764,11 @@
   font-weight: 700;
   color: #fff;
   word-break: keep-all;
+}
+
+/* 제목의 "0원"만 금색으로 — 무료 운영이라는 주제를 표지에서 힘주어 말한다 */
+.ef-book h1 .ef-zero {
+  color: #f6c453;
 }
 
 .ef-book-subtitle {
