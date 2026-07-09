@@ -1,4 +1,4 @@
-# 2장 Go — 작은 서버를 위한 백엔드 언어
+# 2장 Go: 작은 서버를 위한 백엔드 언어
 
 Echo Flip의 백엔드 API는 Go(고)로 작성해 Vercel 서버리스 함수(Serverless Function)로 배포한다.
 Go를 선택한 이유는 1장에서 정리했다.
