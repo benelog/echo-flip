@@ -121,6 +121,111 @@
   }
 }
 
+/* ──────────────────────────────────────────────────────────────
+   페이지 넘김 모드 (데스크톱)
+   장을 아래로 스크롤하지 않고 종이책처럼 페이지 단위로 넘긴다.
+   본문을 고정 높이의 CSS 다단(column)으로 흘려, 한 화면을 넘는
+   내용은 오른쪽 열(=다음 페이지)로 이어진다. 페이지 넘김은
+   Layout.vue가 다단 컨테이너를 열 너비만큼 가로 스크롤해 처리한다.
+   ────────────────────────────────────────────────────────────── */
+
+@media (min-width: 960px) {
+  html.ef-paged,
+  html.ef-paged body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .ef-paged .VPDoc {
+    padding: 20px 32px 40px !important;
+  }
+
+  /* 종이 페이지 카드 — 화면 높이에 맞춰 고정 */
+  .ef-paged .VPDoc .content {
+    height: calc(100vh - var(--vp-nav-height) - 60px);
+    padding: 44px 60px 40px !important;
+    background: var(--vp-c-bg);
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* 다단 컨테이너 — 넘치는 내용이 오른쪽 열로 흐른다 */
+  .ef-paged .VPDoc .content-container {
+    height: 100%;
+    overflow: hidden;
+    column-count: 1;
+    column-gap: 96px;
+    column-fill: auto;
+    /* 카드 장식은 부모(.content)로 옮겼으므로 제거 */
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* 열(페이지) 사이에서 요소가 자연스럽게 나뉘도록 */
+  .ef-paged .vp-doc h1,
+  .ef-paged .vp-doc h2,
+  .ef-paged .vp-doc h3,
+  .ef-paged .vp-doc h4 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  /* overflow가 있는 요소는 열 사이에서 분할되지 못하고 통째로 밀리거나
+     페이지보다 길면 잘린다. 인쇄와 같은 방식으로 줄 안에서 개행시켜
+     코드가 페이지에 걸쳐 자연스럽게 이어지게 한다. */
+  .ef-paged .vp-doc [class*='language-'] {
+    overflow: visible;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .ef-paged .vp-doc [class*='language-'] pre,
+  .ef-paged .vp-doc [class*='language-'] code {
+    overflow: visible;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ef-paged .vp-doc img {
+    max-height: 60vh;
+    break-inside: avoid;
+  }
+
+  /* 첫 페이지 상단이 들쭉날쭉하지 않게 */
+  .ef-paged .vp-doc > div > *:first-child {
+    margin-top: 0;
+  }
+
+  .ef-paged .prev-next {
+    margin-top: 40px;
+  }
+}
+
+/* 페이지 번호 (n / 전체) — 카드 아래 가운데 */
+.ef-page-num {
+  position: fixed;
+  bottom: 10px;
+  left: calc(50% + var(--vp-sidebar-width, 272px) / 2);
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--vp-c-text-3);
+  pointer-events: none;
+}
+
+.ef-toc-hidden .ef-page-num {
+  left: 50%;
+}
+
 /* 상단 바의 목차 접기/펼치기 버튼 (데스크톱 전용) */
 .ef-toc-toggle {
   display: none;
@@ -190,7 +295,7 @@
   font-family: var(--vp-font-family-base);
 }
 
-/* 좌우 장 이동 화살표 */
+/* 좌우 페이지 넘김 화살표 */
 .ef-arrow {
   position: fixed;
   top: 50%;
@@ -199,6 +304,8 @@
   display: none;
   width: 44px;
   height: 44px;
+  padding: 0;
+  cursor: pointer;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
@@ -421,8 +528,27 @@
 
   .ef-progress,
   .ef-toc-toggle,
-  .ef-arrow {
+  .ef-arrow,
+  .ef-page-num {
     display: none !important;
+  }
+
+  /* 화면용 페이지 넘김 모드(다단·고정 높이)를 종이에서는 해제 */
+  html.ef-paged,
+  html.ef-paged body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .ef-paged .VPDoc .content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .ef-paged .VPDoc .content-container {
+    height: auto !important;
+    overflow: visible !important;
+    column-count: auto !important;
   }
 
   /* 코드가 가로 스크롤로 잘리지 않게 줄 안에서 개행 */
