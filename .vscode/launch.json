@@ -6,8 +6,7 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/cmd/server",
-      "envFile": "${workspaceFolder}/.env.local"
+      "program": "${workspaceFolder}/cmd/server"
     },
     {
       "name": "Go: 현재 파일의 패키지 테스트",

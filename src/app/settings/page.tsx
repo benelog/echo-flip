@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { useTts } from "@/hooks/useTts";
 import { api } from "@/lib/api";
+import { localMode } from "@/lib/supabase";
 import type { Profile, ProfileSettings } from "@/lib/types";
 
 function Settings() {
@@ -103,12 +104,14 @@ function Settings() {
         </button>
       </section>
 
-      <button
-        onClick={() => void signOut()}
-        className="flex items-center justify-center gap-2 rounded-xl border border-red-200 py-3 font-medium text-red-600 dark:border-red-900"
-      >
-        <LogOut size={18} /> 로그아웃
-      </button>
+      {!localMode && (
+        <button
+          onClick={() => void signOut()}
+          className="flex items-center justify-center gap-2 rounded-xl border border-red-200 py-3 font-medium text-red-600 dark:border-red-900"
+        >
+          <LogOut size={18} /> 로그아웃
+        </button>
+      )}
 
       <p className="text-center text-xs text-neutral-400">Echo Flip v0.1.0</p>
     </div>

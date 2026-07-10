@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LogIn, LogOut } from "lucide-react";
+import { localMode } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 import { Logo } from "./Logo";
 
@@ -20,6 +21,8 @@ export function TopBar() {
       </Link>
       {loading ? (
         <span className="text-xs text-neutral-400">…</span>
+      ) : localMode ? (
+        <span className="text-xs text-neutral-500">로컬 모드</span>
       ) : session ? (
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate text-xs text-neutral-500">

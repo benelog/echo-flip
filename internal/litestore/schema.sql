@@ -1,0 +1,113 @@
+-- SQLite port of internal/db/migrations/*.up.sql for local single-user mode,
+-- collapsed into one idempotent script (create ... if not exists).
+--
+-- Dialect mapping: uuid -> text (generated in Go), timestamptz -> text in the
+-- fixed-width UTC layout (see timeLayout), jsonb -> text (JSON), text[] ->
+-- text (JSON array), enum -> text + check. Defaults that need gen_random_uuid()
+-- or now() are supplied by Go instead. deck.seq replaces the identity column
+-- with max(seq)+1 at insert. Postgres-only concerns (RLS, role grants, the
+-- GIN tags index) are dropped.
+
+create table if not exists profiles (
+  id text primary key,
+  display_name text,
+  settings text not null default '{}',
+  created_at text not null
+);
+
+create table if not exists decks (
+  id text primary key,
+  user_id text not null references profiles(id) on delete cascade,
+  name text not null,
+  description text,
+  share_slug text,
+  shared_at text,
+  seq integer not null unique,
+  created_at text not null,
+  updated_at text not null
+);
+
+create table if not exists cards (
+  id text primary key,
+  user_id text not null references profiles(id) on delete cascade,
+  deck_id text not null references decks(id) on delete cascade,
+  text text not null,
+  meaning text not null,
+  card_type text not null default 'word'
+    check (card_type in ('word', 'sentence', 'idiom', 'concept')),
+  tags text not null default '[]',
+  phonetic text,
+  example text,
+  notes text,
+  created_at text not null,
+  updated_at text not null
+);
+
+create table if not exists card_srs (
+  card_id text primary key references cards(id) on delete cascade,
+  user_id text not null references profiles(id) on delete cascade,
+  ease_factor real not null default 2.5,
+  interval_days real not null default 0,
+  repetitions integer not null default 0,
+  lapses integer not null default 0,
+  due_at text not null,
+  last_reviewed_at text,
+  correct_count integer not null default 0,
+  incorrect_count integer not null default 0
+);
+
+create table if not exists study_sessions (
+  id text primary key,
+  user_id text not null references profiles(id) on delete cascade,
+  mode text not null check (mode in ('deck', 'due', 'smart')),
+  direction text not null default 'text_to_meaning'
+    check (direction in ('text_to_meaning', 'meaning_to_text')),
+  deck_id text references decks(id) on delete set null,
+  smart_rule text,
+  total_cards integer not null default 0,
+  started_at text not null,
+  ended_at text,
+  completed integer not null default 0
+);
+
+create table if not exists review_logs (
+  id integer primary key autoincrement,
+  user_id text not null references profiles(id) on delete cascade,
+  card_id text not null references cards(id) on delete cascade,
+  session_id text references study_sessions(id) on delete set null,
+  result integer not null,
+  is_retry integer not null default 0,
+  reviewed_at text not null
+);
+
+create table if not exists smart_decks (
+  id text primary key,
+  user_id text not null references profiles(id) on delete cascade,
+  name text not null,
+  rule text not null,
+  created_at text not null
+);
+
+create view if not exists cards_with_stats as
+select
+  c.id, c.user_id, c.deck_id, c.text, c.meaning, c.card_type,
+  c.tags, c.phonetic, c.example, c.notes, c.created_at,
+  s.ease_factor, s.interval_days, s.repetitions, s.lapses, s.due_at,
+  s.last_reviewed_at, s.correct_count, s.incorrect_count,
+  (s.correct_count + s.incorrect_count) as attempts,
+  case when s.correct_count + s.incorrect_count = 0 then 0.0
+       else cast(s.incorrect_count as real) / (s.correct_count + s.incorrect_count)
+  end as error_rate
+from cards c
+join card_srs s on s.card_id = c.id;
+
+create index if not exists decks_user_idx on decks (user_id);
+create unique index if not exists decks_share_slug_idx on decks (share_slug)
+  where share_slug is not null;
+create index if not exists cards_user_idx on cards (user_id);
+create index if not exists cards_deck_idx on cards (deck_id);
+create index if not exists card_srs_user_due_idx on card_srs (user_id, due_at);
+create index if not exists review_logs_user_time_idx on review_logs (user_id, reviewed_at);
+create index if not exists review_logs_card_idx on review_logs (card_id);
+create index if not exists study_sessions_user_idx on study_sessions (user_id, started_at);
+create index if not exists smart_decks_user_idx on smart_decks (user_id);

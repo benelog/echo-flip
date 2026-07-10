@@ -1,24 +1,39 @@
 // Local dev server: go run ./cmd/server (reads .env vars from the shell).
+// Without DATABASE_URL it runs in local mode on a SQLite file, no env needed.
 package main
 
 import (
 	"log"
-	"os"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/benelog/echo-flip/internal/config"
+	"github.com/benelog/echo-flip/internal/litestore"
 	"github.com/benelog/echo-flip/pkg/app"
 )
 
 func main() {
-	engine, err := app.Engine()
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+
+	var engine *gin.Engine
+	if cfg.Driver == "sqlite" {
+		s, err := litestore.Open(cfg.SQLitePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		engine = app.New(cfg, s)
+		log.Printf("echo-flip api listening on :%s (local mode, sqlite: %s)", cfg.Port, cfg.SQLitePath)
+	} else {
+		engine, err = app.Engine()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("echo-flip api listening on :%s (postgres)", cfg.Port)
 	}
-	log.Printf("echo-flip api listening on :%s", port)
-	if err := engine.Run(":" + port); err != nil {
+	if err := engine.Run(":" + cfg.Port); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -40,6 +40,11 @@ yarn-error.log*
 # go
 /bin/
 
+# local mode sqlite database
+echo-flip.db
+*.db-wal
+*.db-shm
+
 # vercel
 .vercel
 

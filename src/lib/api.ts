@@ -1,10 +1,13 @@
 "use client";
 
-import { supabase } from "./supabase";
+import { localMode, supabase } from "./supabase";
 
 // Same origin in production (Vercel serves /api/* via the Go function);
-// point at `go run ./cmd/server` in local dev.
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+// `next dev` defaults to the local `go run ./cmd/server` address so the
+// zero-config local mode needs no env vars. NEXT_PUBLIC_API_URL overrides.
+const BASE =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
 
 export class ApiError extends Error {
   constructor(
@@ -18,6 +21,7 @@ export class ApiError extends Error {
 // Sends the bearer token only when signed in — for endpoints that work
 // anonymously but personalize the response for logged-in callers.
 async function optionalAuthHeader(): Promise<Record<string, string>> {
+  if (localMode) return {}; // the local-mode server ignores auth headers
   const { data } = await supabase().auth.getSession();
   const token = data.session?.access_token;
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -25,7 +29,8 @@ async function optionalAuthHeader(): Promise<Record<string, string>> {
 
 async function authHeader(): Promise<Record<string, string>> {
   const header = await optionalAuthHeader();
-  if (!header.Authorization) throw new ApiError(401, "로그인이 필요합니다");
+  if (!localMode && !header.Authorization)
+    throw new ApiError(401, "로그인이 필요합니다");
   return header;
 }
 

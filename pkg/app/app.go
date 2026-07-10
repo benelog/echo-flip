@@ -1,9 +1,13 @@
 // Package app builds the Gin engine shared by the local dev server
 // (cmd/server) and the Vercel serverless entrypoint (api/index.go).
+//
+// This package must never import internal/litestore: Engine serves Vercel,
+// and the serverless binary must not link SQLite.
 package app
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -36,11 +40,21 @@ func build() (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
+	if cfg.Driver != "postgres" {
+		return nil, fmt.Errorf("app.Engine requires postgres, got driver %q", cfg.Driver)
+	}
 	pool, err := db.Pool(context.Background(), cfg.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
-	h := handlers.New(store.New(pool))
+	return New(cfg, store.New(pool)), nil
+}
+
+// New assembles the router on top of any Store implementation. cfg.AuthMode
+// picks the middleware: Supabase token validation in production, the fixed
+// local user in local mode.
+func New(cfg *config.Config, s handlers.Store) *gin.Engine {
+	h := handlers.New(s)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -56,13 +70,20 @@ func build() (*gin.Engine, error) {
 		}))
 	}
 
+	required := auth.Middleware(cfg.JWKSURL, cfg.JWTSecret)
+	optional := auth.OptionalMiddleware(cfg.JWKSURL, cfg.JWTSecret)
+	if cfg.AuthMode == "local" {
+		required = auth.LocalMiddleware()
+		optional = auth.LocalMiddleware()
+	}
+
 	r.GET("/api/healthz", h.Healthz)
 
 	// Public: browsing shared decks needs no login. Optional auth only lets a
 	// signed-in caller see the "is mine" flag on their own shared decks.
 	// Responses vary by Authorization, so keep shared caches from reusing a
 	// signed-in caller's personalized body for anonymous visitors.
-	pub := r.Group("/api", auth.OptionalMiddleware(cfg.JWKSURL, cfg.JWTSecret), func(c *gin.Context) {
+	pub := r.Group("/api", optional, func(c *gin.Context) {
 		c.Header("Cache-Control", "no-store")
 	})
 	{
@@ -70,7 +91,7 @@ func build() (*gin.Engine, error) {
 		pub.GET("/shared-decks/:slug", h.GetSharedDeck)
 	}
 
-	api := r.Group("/api", auth.Middleware(cfg.JWKSURL, cfg.JWTSecret), h.EnsureProfile())
+	api := r.Group("/api", required, h.EnsureProfile())
 	{
 		api.GET("/me", h.GetMe)
 		api.PATCH("/me", h.UpdateMe)
@@ -107,5 +128,5 @@ func build() (*gin.Engine, error) {
 		api.GET("/stats/daily", h.DailyStats)
 		api.GET("/stats/summary", h.StatsSummary)
 	}
-	return r, nil
+	return r
 }

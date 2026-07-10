@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { localMode, supabase } from "@/lib/supabase";
 
 interface AuthState {
   session: Session | null;
@@ -24,12 +24,20 @@ const AuthContext = createContext<AuthState>({
   signOut: async () => {},
 });
 
+// Local mode runs as a single always-signed-in user. Consumers only read the
+// session's truthiness and `user.email`, so this stub — the one cast in the
+// app — stands in for a real Supabase session.
+const localSession = localMode
+  ? ({ user: { email: "local@localhost" } } as Session)
+  : null;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(localSession);
+  const [loading, setLoading] = useState(!localMode);
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (localMode) return;
     const client = supabase();
     client.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -46,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const signOut = async () => {
+    if (localMode) return;
     // The server revocation can fail (offline, 5xx) without clearing the
     // local session; fall back so the UI always ends up signed out.
     const { error } = await supabase().auth.signOut();
