@@ -21,10 +21,10 @@ const SITE = 'benelog.github.io/echo-flip'
 
 // 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.
 const chapters = [
-  { route: 'intro', title: '도입: 무엇을 만드는가' },
-  { route: 'part1/tech-choices', title: '1장 기술 선택: 왜 이 조합인가', part: '1부 언어와 프레임워크로 코드 이해하기' },
-  { route: 'part1/database-basics', title: '2장 데이터베이스 기초: 테이블, SQL, 인덱스' },
-  { route: 'part1/database', title: '3장 PostgreSQL 데이터베이스 설계' },
+  { route: 'intro', title: '도입: 무엇을 만드는가', part: '도입' },
+  { route: 'part1/tech-choices', title: '1장 기술 선택: 왜 이 조합인가' },
+  { route: 'part1/database-basics', title: '2장 데이터베이스 기초: 테이블, SQL, 인덱스', part: '1부 내 컴퓨터에서 웹 앱 완성하기' },
+  { route: 'part1/database', title: '3장 데이터베이스 설계: 요구사항에서 테이블로' },
   { route: 'part1/go-basics', title: '4장 Go 기초: 모듈, 변수, 함수' },
   { route: 'part1/go', title: '5장 Go 코드 읽기: 구조체, 포인터, 에러 처리' },
   { route: 'part1/go-testing', title: '6장 Go 테스트와 품질 도구' },
@@ -33,16 +33,17 @@ const chapters = [
   { route: 'part1/typescript-async', title: '9장 TypeScript 실전: 비동기 처리와 런타임 검증' },
   { route: 'part1/react', title: '10장 React 기초: 컴포넌트, 상태, 훅' },
   { route: 'part1/react-next', title: '11장 React 실전과 Next.js: 전역 상태와 정적 export' },
-  { route: 'part2/claude-code', title: '12장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
-  { route: 'part2/agents-hooks', title: '13장 서브에이전트와 훅으로 만드는 품질 게이트' },
-  { route: 'part2/local-dev', title: '14장 로컬 개발 환경: direnv와 VS Code' },
-  { route: 'part2/github-actions', title: '15장 GitHub Actions: 원격 품질 게이트' },
-  { route: 'part2/vercel', title: '16장 Vercel: 한 플랫폼에 모두 배포하기' },
-  { route: 'part2/supabase-auth', title: '17장 Supabase 인증: OAuth와 JWKS 검증' },
-  { route: 'part2/supabase-db', title: '18장 Supabase 데이터베이스 연결: pgx와 트랜잭션 풀러' },
-  { route: 'part2/pwa', title: '19장 PWA: 설치되는 앱으로 만들기' },
-  { route: 'part2/free-tier', title: '20장 무료 티어 운영과 한도 관리' },
-  { route: 'part2/whats-next', title: '21장 다음 단계: 여기서 더 공부할 것들' },
+  { route: 'part1/claude-code', title: '12장 Claude Code: AI 에이전트와 개발하기' },
+  { route: 'part1/agents-hooks', title: '13장 서브에이전트와 훅으로 만드는 품질 게이트' },
+  { route: 'part1/local-dev', title: '14장 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기' },
+  { route: 'part2/git', title: '15장 Git: 개념과 브랜치 정책', part: '2부 세상에 공개하고 오래 운영하기' },
+  { route: 'part2/github-actions', title: '16장 GitHub Actions: 원격 품질 게이트' },
+  { route: 'part2/vercel', title: '17장 Vercel: 한 플랫폼에 모두 배포하기' },
+  { route: 'part2/supabase-auth', title: '18장 Supabase 인증: OAuth와 JWKS 검증' },
+  { route: 'part2/supabase-db', title: '19장 Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리' },
+  { route: 'part2/pwa', title: '20장 PWA: 설치되는 앱으로 만들기' },
+  { route: 'part2/free-tier', title: '21장 무료 티어 운영과 한도 관리' },
+  { route: 'part2/whats-next', title: '22장 다음 단계: 여기서 더 공부할 것들' },
 ]
 
 const FONT_LINKS = `

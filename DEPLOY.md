@@ -10,6 +10,8 @@
    - **Transaction pooler (port 6543)** → `DATABASE_URL` (API용)
    - **Direct connection (port 5432)** 또는 Session pooler → `MIGRATE_DATABASE_URL` (마이그레이션용)
 3. Settings → API에서 **Project URL**과 **anon(public) key** 복사
+4. 같은 방법으로 **개발용 프로젝트**를 하나 더 생성 (운영 DB/개발 DB 분리, 이유는 책 19장 참고).
+   개발용 프로젝트의 값들은 로컬 개발과 Vercel **Preview** 스코프(6단계)에 씁니다.
 
 ## 2. DB 마이그레이션
 
@@ -56,12 +58,15 @@ npm run dev                                                    # 터미널 2
 ```bash
 git remote add origin git@github.com:benelog/echo-flip.git
 git push -u origin main
+git branch release && git push origin release   # 운영 배포용 브랜치 (main = 개발용)
 ```
 
 ## 6. Vercel ✋
 
 1. https://vercel.com → Add New Project → echo-flip 저장소 import (Framework: Next.js 자동 감지, Root Directory는 저장소 루트 그대로)
-2. Environment Variables 등록:
+2. Settings → Git → **Production Branch**를 `main`에서 `release`로 변경
+   (이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)
+3. Environment Variables 등록 — 스코프를 나눠 **Production에는 운영 Supabase 프로젝트 값, Preview에는 개발 프로젝트 값**을 넣습니다 (분리 이유는 책 19장):
    | 이름 | 값 |
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` |
@@ -69,7 +74,7 @@ git push -u origin main
    | `NEXT_PUBLIC_API_URL` | (빈 값으로 두거나 아예 만들지 않기 — 같은 오리진) |
    | `DATABASE_URL` | Transaction pooler 문자열 (6543) |
    | `SUPABASE_JWKS_URL` | `https://<ref>.supabase.co/auth/v1/.well-known/jwks.json` |
-3. Deploy → 발급된 URL을 Supabase URL Configuration(3단계)에 반영
+4. `git push origin release`(또는 main→release 병합)로 운영 배포 → 발급된 URL을 Supabase URL Configuration(3단계)에 반영
 
 `vercel.json`이 `/api/*`를 Go 함수(`api/index.go`)로 라우팅하고, 함수 리전은 iad1로 고정되어 있습니다.
 
