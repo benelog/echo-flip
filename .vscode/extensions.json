@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "golang.go",
+    "bradlc.vscode-tailwindcss",
+    "vitest.explorer",
+    "anthropic.claude-code"
+  ]
+}

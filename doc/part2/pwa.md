@@ -1,0 +1,303 @@
+# 19장 PWA: 설치되는 앱으로 만들기
+
+16장에서 앱을 Vercel에 올렸고, 17장과 18장에서 인증과 데이터베이스를 붙였다.
+이제 주소만 있으면 누구나 브라우저로 Echo Flip을 쓸 수 있다.
+
+그런데 암기 앱은 하루에 몇 번씩 짧게 여는 앱이다.
+그때마다 브라우저를 켜고 주소창에 무언가를 입력해야 한다면, 아무리 좋은 간격 반복 알고리즘도 열리지 않는 앱 안에서 잠들어 있을 뿐이다.
+도입에서 "네이티브 앱 대신 PWA로 웹과 Android를 함께 커버한다"는 요구사항을 세운 이유가 여기에 있다.
+
+이 장에서는 배포된 웹 앱을 홈 화면에 설치되는 앱으로 만드는 두 파일, `src/app/manifest.ts`와 `public/sw.js`를 읽는다.
+11장에서 매니페스트를 TypeScript로 쓴다는 사실 자체는 이미 봤으므로, 여기서는 각 필드가 실제 설치 경험과 어떻게 이어지는지에 무게를 둔다.
+그리고 이 앱이 PWA로서 무엇을 포기했는지, 그 포기가 왜 이 앱에서는 합리적인지도 함께 적는다.
+
+## 설치되는 앱의 조건
+
+브라우저가 "이 사이트를 앱으로 설치하시겠습니까"라고 물어보게 하려면 대체로 세 가지가 필요하다.
+
+첫째, HTTPS로 서빙되어야 한다.
+16장에서 봤듯 Vercel이 인증서를 자동으로 발급하고 갱신하므로 이 조건은 저절로 충족된다.
+
+둘째, 웹 앱 매니페스트가 있어야 한다.
+앱의 이름, 아이콘, 실행 방식을 브라우저에게 알려 주는 파일이다.
+
+셋째, 서비스 워커가 등록되어 있어야 한다.
+브라우저마다 조건이 조금씩 다르지만, 설치 가능 여부를 판단할 때 서비스 워커의 존재를 요구하는 경우가 많다.
+
+::: info [용어 풀이] 서비스 워커(Service Worker)
+웹 페이지와 별개로 브라우저 뒤편에서 도는 작은 스크립트다.
+페이지가 보내는 네트워크 요청 사이에 끼어 앉아, 요청을 가로채서 캐시에 있는 응답을 대신 내주거나 네트워크로 흘려보내는 일을 한다.
+가게 앞에 선 안내원이 손님의 주문을 받아 창고에 있으면 바로 꺼내 주고 없으면 본사에 주문을 넣는 모습에 가깝다.
+페이지를 닫아도 살아 있을 수 있어서 오프라인 동작과 푸시 알림의 토대가 된다.
+:::
+
+Echo Flip은 앞의 두 조건을 `manifest.ts`로, 마지막 조건을 `sw.js`로 충족한다.
+
+## manifest.ts: 설치 화면을 결정하는 파일
+
+`src/app/manifest.ts`의 전문이다.
+
+```ts
+import type { MetadataRoute } from "next";
+
+export const dynamic = "force-static";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Echo Flip — 암기 카드",
+    short_name: "Echo Flip",
+    description: "단어·문장·숙어·개념을 카드로 뒤집으며 외우는 학습 앱",
+    lang: "ko",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#fafafa",
+    theme_color: "#2563eb",
+    icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      {
+        src: "/icons/icon-512-maskable.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
+  };
+}
+```
+
+Next.js는 이 파일을 발견하면 `/manifest.webmanifest` 경로로 매니페스트를 만들어 준다.
+`src/app/layout.tsx`가 `manifest: "/manifest.webmanifest"` 한 줄로 이를 모든 페이지의 `<head>`에 연결한다.
+
+첫 줄의 `export const dynamic = "force-static"`이 이 앱에서 반드시 필요한 선언이다.
+11장에서 본 대로 Echo Flip은 서버가 없는 정적 export로 배포된다.
+매니페스트를 요청 시점에 만들어 내는 함수로 두면 서버가 필요해지므로, 빌드 시점에 파일 하나로 구워 두라고 못 박는 것이다.
+
+필드를 하나씩 보자.
+
+`name`과 `short_name`은 쓰이는 자리가 다르다.
+설치 대화상자에는 `name`이, 홈 화면 아이콘 아래의 좁은 자리에는 `short_name`이 나타난다.
+아이콘 아래에서 줄바꿈되거나 말줄임표로 잘리는 것을 막으려면 `short_name`을 짧게 두어야 한다.
+
+`display: "standalone"`이 설치의 체감을 가장 크게 바꾼다.
+이 값을 주면 앱을 열었을 때 주소창과 브라우저 탭이 사라지고, 사용자에게는 네이티브 앱처럼 보인다.
+반대로 `browser`로 두면 설치해 봐야 그냥 브라우저 창이 하나 더 열릴 뿐이다.
+
+`start_url: "/"`은 아이콘을 눌렀을 때 열리는 주소다.
+`/`로 두었으므로 언제나 홈 화면의 "오늘 복습" 큐에서 시작한다.
+사용자가 마지막으로 보던 화면이 아니라 매번 같은 자리에서 시작하는 것이 암기 앱에는 오히려 낫다.
+
+`background_color`와 `theme_color`는 색이지만 하는 일이 다르다.
+`background_color`는 앱이 뜨는 동안 잠깐 보이는 시작 화면의 바탕색이고, `theme_color`는 상태 표시줄처럼 브라우저가 앱 주변을 칠할 때 쓰는 색이다.
+`background_color`를 실제 앱 배경과 맞춰 두면 시작 화면에서 본 화면으로 넘어갈 때 깜빡임이 줄어든다.
+
+### 아이콘 세 개와 maskable
+
+아이콘이 세 개인 데는 이유가 있다.
+
+192px와 512px는 크기가 다른 자리에 각각 쓰인다.
+그런데 세 번째 아이콘만 `purpose: "maskable"`을 달고 있다.
+
+Android는 제조사와 런처에 따라 아이콘을 원형, 둥근 사각형, 물방울 모양 등으로 잘라 낸다.
+일반 아이콘을 그대로 잘라 내면 가장자리의 글자나 그림이 함께 잘려 나간다.
+maskable 아이콘은 그 잘림을 예상하고 여백을 넉넉히 둔 그림이다.
+가운데 80% 안에만 중요한 내용을 그려 두면 어떤 모양으로 잘려도 살아남는다.
+
+일반 아이콘과 maskable 아이콘을 둘 다 제공하고 브라우저가 상황에 맞게 고르게 하는 것이 안전하다.
+`public/icons/` 아래에 `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` 세 파일이 그래서 함께 있다.
+
+## sw.js: 무엇을 캐시하고 무엇을 캐시하지 않는가
+
+`public/sw.js`의 전문이다.
+직접 쓴 서른 줄짜리 파일이고, Workbox 같은 라이브러리를 쓰지 않았다.
+
+```js
+const CACHE = "echo-flip-v1";
+
+self.addEventListener("install", () => self.skipWaiting());
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
+      )
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  const isData =
+    url.pathname.startsWith("/api/") || url.origin !== self.location.origin;
+  if (event.request.method !== "GET" || isData) return; // network only
+
+  event.respondWith(
+    caches.open(CACHE).then(async (cache) => {
+      const cached = await cache.match(event.request);
+      const network = fetch(event.request)
+        .then((res) => {
+          if (res.ok) cache.put(event.request, res.clone());
+          return res;
+        })
+        .catch(() => cached);
+      return cached || network;
+    }),
+  );
+});
+```
+
+서비스 워커는 세 가지 생애 사건에 반응한다.
+
+`install`에서 `skipWaiting()`을 부른다.
+기본 동작대로라면 새 서비스 워커는 이전 버전을 쓰는 탭이 전부 닫힐 때까지 대기실에서 기다린다.
+`skipWaiting()`은 그 대기를 건너뛰고 즉시 활성화한다.
+
+`activate`에서는 두 가지 일을 한다.
+`CACHE` 상수와 이름이 다른 옛 캐시를 전부 지우고, `clients.claim()`으로 이미 열려 있는 탭까지 새 서비스 워커의 통제 아래로 데려온다.
+`skipWaiting`과 `clients.claim`이 짝을 이루어야 배포 직후에 새 버전이 곧바로 적용된다.
+
+`fetch`가 핵심이다.
+가장 먼저 하는 일이 캐시하지 않을 요청을 걸러 내는 것이다.
+
+```js
+const isData =
+  url.pathname.startsWith("/api/") || url.origin !== self.location.origin;
+if (event.request.method !== "GET" || isData) return; // network only
+```
+
+`return`은 "내가 처리하지 않겠다"는 뜻이고, 그러면 요청은 평소대로 네트워크로 나간다.
+GET이 아닌 요청, `/api/`로 시작하는 요청, 다른 오리진으로 나가는 요청이 여기에 걸린다.
+
+이 세 줄이 이 앱의 캐시 정책 전부다.
+그리고 이것이 학습 앱에서 반드시 그래야 하는 선택이다.
+
+`/api/` 응답을 캐시하면 "오늘 복습할 카드" 목록이 낡는다.
+어제 다 외운 카드가 오늘도 큐에 남아 있거나, 방금 추가한 카드가 목록에 나타나지 않는다.
+간격 반복은 서버가 계산한 최신 상태가 곧 앱의 가치인 기능이라, 여기서 낡은 데이터를 보여 주는 것은 앱이 조금 느린 것보다 훨씬 나쁘다.
+그래서 데이터는 무조건 네트워크다.
+
+반대로 걸러지지 않은 요청, 즉 JavaScript 번들과 CSS와 아이콘 같은 정적 파일에는 캐시를 쓴다.
+
+```js
+const cached = await cache.match(event.request);
+const network = fetch(event.request)
+  .then((res) => {
+    if (res.ok) cache.put(event.request, res.clone());
+    return res;
+  })
+  .catch(() => cached);
+return cached || network;
+```
+
+캐시에 있으면 그것을 즉시 돌려주고, 없으면 네트워크 응답을 기다린다.
+어느 쪽이든 네트워크 요청은 함께 날아가서 성공하면 캐시를 갱신한다.
+캐시된 응답으로 화면을 먼저 그리고 뒤에서 조용히 최신 파일을 받아 두는 방식이라, 두 번째 실행부터는 앱 껍데기가 즉시 뜬다.
+
+`cache.put`에 `res.clone()`을 넘기는 것도 그냥 지나칠 대목이 아니다.
+응답 본문은 한 번만 읽을 수 있는 흐름이라, 캐시에 넣으면서 동시에 페이지에 돌려주려면 복제본이 필요하다.
+
+## 등록은 한 줄, 조건은 두 개
+
+서비스 워커는 저절로 켜지지 않는다.
+`src/components/Providers.tsx`가 등록한다.
+
+```tsx
+useEffect(() => {
+  if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+}, []);
+```
+
+10장에서 본 `useEffect`가 브라우저에서만 도는 코드를 격리하는 자리로 쓰였다.
+
+조건이 둘이다.
+`production`이 아니면 등록하지 않는다.
+개발 중에 서비스 워커가 옛 번들을 캐시해 두면, 코드를 고쳐도 화면이 바뀌지 않는 종류의 혼란이 생긴다.
+개발 서버의 빠른 새로고침과 캐시는 서로 싸우는 관계라, 아예 켜지 않는 편이 낫다.
+
+`"serviceWorker" in navigator`는 지원하지 않는 브라우저를 걸러 낸다.
+`.catch(() => {})`로 실패를 삼키는 것도 의도적이다.
+서비스 워커 등록에 실패해도 앱은 그냥 캐시 없이 동작할 뿐이므로, 사용자에게 보여 줄 오류가 아니다.
+
+## 캐시 버전이라는 수동 손잡이
+
+`const CACHE = "echo-flip-v1"` 한 줄에 이 구조의 약점이 숨어 있다.
+
+정적 파일의 응답을 캐시에서 먼저 돌려주므로, 새로 배포한 파일은 그다음 방문에야 반영된다.
+Next.js가 만드는 번들 파일 이름에 해시가 붙어 있어 대개는 문제가 없다.
+파일 이름이 바뀌면 캐시에 없는 새 요청이 되므로 자연히 네트워크를 탄다.
+
+문제가 생기는 것은 이름이 고정된 파일이다.
+`sw.js` 자체를 고치거나 캐시 전략을 바꿨을 때는 `CACHE` 값을 `echo-flip-v2`로 올려야 `activate` 훅이 옛 캐시를 지운다.
+버전을 올리지 않고 전략만 바꾸면, 사용자의 기기에는 옛 정책으로 캐시된 파일이 남는다.
+
+수동 손잡이라는 점을 인정하고 넘어가는 편이 정직하다.
+Workbox 같은 라이브러리는 빌드 시점에 캐시 이름과 목록을 자동으로 생성해 이 문제를 없애 준다.
+서른 줄짜리 파일 하나와 빌드 파이프라인에 의존성을 하나 더하는 것 사이의 저울질이었고, 캐시 전략을 거의 바꾸지 않는 이 앱에서는 손잡이를 남겨 두는 쪽을 골랐다.
+
+## 설치를 확인하는 법
+
+만들었으면 확인해야 한다.
+
+Chrome의 개발자 도구에는 Application 탭이 있다.
+Manifest 항목을 열면 브라우저가 해석한 매니페스트가 필드별로 보이고, 아이콘이 실제로 불러와지는지도 확인할 수 있다.
+Service Workers 항목에서는 등록 상태와 활성화 여부를 볼 수 있고, Offline 체크박스로 네트워크를 끊어 볼 수도 있다.
+
+여기서 이 앱의 정직한 모습이 드러난다.
+Offline을 켜고 새로고침하면 앱 껍데기는 뜨지만 카드 목록은 뜨지 않는다.
+`/api/` 요청이 네트워크 전용이기 때문이다.
+
+Android의 Chrome에서는 조건을 만족하면 주소창에 설치 아이콘이 나타나거나 설치 안내가 뜬다.
+iOS의 Safari에는 자동 설치 안내가 없어서, 사용자가 공유 메뉴에서 "홈 화면에 추가"를 직접 눌러야 한다.
+매니페스트의 `display: "standalone"`은 그렇게 추가된 아이콘에도 적용되므로, 설치 경로만 다르고 결과는 비슷하다.
+
+## 이 PWA가 포기한 것
+
+Echo Flip은 PWA의 일부만 쓴다.
+무엇을 안 썼는지 적어 두는 편이 정확하다.
+
+**오프라인 학습을 지원하지 않는다.**
+정적 파일만 캐시하므로 지하철에서 앱을 열면 껍데기만 뜬다.
+지원하려면 카드 데이터를 IndexedDB에 저장하고, 오프라인에서 매긴 학습 결과를 나중에 서버와 동기화해야 한다.
+동기화에는 충돌 해결이 따라온다.
+같은 카드를 두 기기에서 다르게 채점했을 때 어느 SRS 상태가 옳은가라는 질문에 답해야 하는데, 이는 앱 전체에서 가장 복잡한 코드가 될 것이 분명했다.
+매일 쓰는 기기가 하나뿐인 개인 앱에서는 그 복잡도를 살 이유가 없었다.
+
+**푸시 알림이 없다.**
+암기 앱에 "오늘 복습할 카드 12장이 있습니다" 알림만큼 어울리는 기능도 드물다.
+그런데 웹 푸시를 보내려면 알림을 발송하는 서버가 필요하고, 그 서버는 사용자의 복습 시각을 알기 위해 주기적으로 깨어나야 한다.
+요청이 있을 때만 깨어나는 서버리스 함수와는 결이 다른 요구다.
+20장에서 볼 스케줄 워크플로로 흉내 낼 수는 있지만, 사용자별 시간대와 알림 시각을 관리하는 순간 이 앱은 다른 앱이 된다.
+
+**백그라운드 동기화도 없다.**
+오프라인 학습이 없으므로 나중에 보낼 것도 없다.
+
+이 세 가지는 서로 이어져 있다.
+오프라인 학습을 하기로 하면 동기화가 필요하고, 알림을 보내기로 하면 상주하는 무언가가 필요하다.
+어느 쪽도 "무료 인프라, 서버리스, 1인 운영"이라는 제약과 편하게 어울리지 않는다.
+PWA를 고른 이유가 네이티브 앱의 배포 부담을 피하는 것이었지, 네이티브 앱의 모든 기능을 웹으로 재현하는 것은 아니었다.
+
+## 정리
+
+첫째, 설치되는 앱의 조건은 HTTPS, 매니페스트, 서비스 워커 세 가지다.
+HTTPS는 Vercel이 해결해 주므로 저장소에는 `manifest.ts`와 `sw.js` 두 파일만 있으면 된다.
+
+둘째, `manifest.ts`의 `export const dynamic = "force-static"`은 정적 export에서 필수다.
+`display: "standalone"`이 설치의 체감을 결정하고, `short_name`은 아이콘 아래의 좁은 자리를 위해 따로 존재한다.
+
+셋째, maskable 아이콘은 Android 런처가 아이콘을 임의의 모양으로 잘라 내는 것에 대비한 별도 이미지다.
+일반 아이콘과 함께 제공해 브라우저가 고르게 한다.
+
+넷째, `sw.js`는 `/api/` 요청과 GET이 아닌 요청, 외부 오리진 요청을 캐시에서 제외한다.
+간격 반복 앱에서 낡은 데이터는 느린 앱보다 나쁘기 때문이다.
+정적 파일에는 캐시를 먼저 돌려주고 뒤에서 갱신하는 전략을 써서 두 번째 실행부터 즉시 뜨게 한다.
+
+다섯째, 이 앱은 오프라인 학습과 푸시 알림을 포기했다.
+둘 다 동기화나 상주 서버를 데려오는 기능이라, 이 책의 제약과 정면으로 부딪힌다.
+
+앱이 설치까지 됐으니 남은 것은 오래 굴리는 일이다.
+다음 20장에서는 이 모든 것을 떠받치는 무료 티어의 한도를 정면으로 들여다본다.
+무엇이 가장 먼저 터지는지 계산해 보면 뜻밖의 답이 나온다.
