@@ -30,32 +30,32 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 | 장 | 제목 | 파일 | 상태 |
 |---|---|---|---|
-| 도입 | 무엇을 만드는가: Echo Flip의 요구사항 | `doc/intro.md` | 초안 완료 |
-| 도입 1장 | 기술 선택: 왜 이 조합인가 | `doc/part1/tech-choices.md` | 초안 완료 |
-| 1부 2장 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `doc/part1/database-basics.md` | 초안 완료 |
-| 1부 3장 | 데이터베이스 설계: 요구사항에서 테이블로 | `doc/part1/database.md` | 초안 완료 |
-| 1부 4장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 초안 완료 |
+| 도입 | 무엇을 만드는가: Echo Flip의 요구사항 | `doc/intro.md` | 검토 완료 |
+| 도입 1장 | 기술 선택: 왜 이 조합인가 | `doc/part1/tech-choices.md` | 검토 완료 |
+| 1부 2장 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `doc/part1/database-basics.md` | 검토 완료 |
+| 1부 3장 | 데이터베이스 설계: 요구사항에서 테이블로 | `doc/part1/database.md` | 검토 완료 |
+| 1부 4장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 검토 완료 |
 | 1부 5장 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `doc/part1/go.md` | 초안 완료 |
 | 1부 6장 | Go 테스트와 품질 도구 | `doc/part1/go-testing.md` | 초안 완료 |
-| 1부 7장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
+| 1부 7장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 검토 완료 |
 | 1부 8장 | TypeScript: 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
 | 1부 9장 | TypeScript 실전: 비동기 처리와 런타임 검증 | `doc/part1/typescript-async.md` | 초안 완료 |
 | 1부 10장 | React 기초: 컴포넌트, 상태, 훅 | `doc/part1/react.md` | 초안 완료 |
-| 1부 11장 | React 실전과 Next.js: 전역 상태와 정적 export | `doc/part1/react-next.md` | 초안 완료 |
+| 1부 11장 | React 실전과 Next.js: 전역 상태와 정적 export | `doc/part1/react-next.md` | 검토 완료 |
 | 1부 12장 | Claude Code: AI 에이전트와 개발하기 | `doc/part1/claude-code.md` | 검토 완료 |
 | 1부 13장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part1/agents-hooks.md` | 검토 완료 |
-| 1부 14장 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `doc/part1/local-dev.md` | 초안 완료 |
-| 2부 15장 | Git: 개념과 브랜치 정책 | `doc/part2/git.md` | 초안 완료 |
-| 2부 16장 | GitHub Actions: 원격 품질 게이트 | `doc/part2/github-actions.md` | 초안 완료 |
-| 2부 17장 | Vercel: 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 초안 완료 |
-| 2부 18장 | Supabase 인증: OAuth와 JWKS 검증 | `doc/part2/supabase-auth.md` | 초안 완료 |
-| 2부 19장 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `doc/part2/supabase-db.md` | 초안 완료 |
+| 1부 14장 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `doc/part1/local-dev.md` | 검토 완료 |
+| 2부 15장 | Git: 개념과 브랜치 정책 | `doc/part2/git.md` | 검토 완료 |
+| 2부 16장 | GitHub Actions: 원격 품질 게이트 | `doc/part2/github-actions.md` | 검토 완료 |
+| 2부 17장 | Vercel: 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 검토 완료 |
+| 2부 18장 | Supabase 인증: OAuth와 JWKS 검증 | `doc/part2/supabase-auth.md` | 검토 완료 |
+| 2부 19장 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `doc/part2/supabase-db.md` | 검토 완료 |
 | 2부 20장 | PWA: 설치되는 앱으로 만들기 | `doc/part2/pwa.md` | 초안 완료 |
-| 2부 21장 | 무료 티어 운영과 한도 관리 | `doc/part2/free-tier.md` | 초안 완료 |
-| 2부 22장 | 다음 단계: 여기서 더 공부할 것들 | `doc/part2/whats-next.md` | 초안 완료 |
+| 2부 21장 | 무료 티어 운영과 한도 관리 | `doc/part2/free-tier.md` | 검토 완료 |
+| 2부 22장 | 다음 단계: 여기서 더 공부할 것들 | `doc/part2/whats-next.md` | 검토 완료 |
 
 상태 값: `미착수` → `초안 작성 중` → `초안 완료` → `검토 완료`
-2026-07-11 개편에서 내용이 바뀐 장은 검토 완료였더라도 `초안 완료`로 되돌렸다(12·13장은 소폭 수정이라 유지).
+2026-07-11 개편에서 내용이 바뀐 장은 `초안 완료`로 되돌렸다가, 같은 날 병렬 통독 검토(7그룹)를 통과한 15개 장을 `검토 완료`로 승격했다. 남은 초안 완료: 5·6·8·9·10·20장(이번 개편과 무관하거나 소폭 수정).
 
 ### 장별 필수 내용 요약
 
@@ -101,7 +101,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 | 파일 | 소유 용어 |
 |---|---|
-| `intro.md` | API, 프런트엔드와 백엔드, 간격 반복(SRS), 서버리스, 콜드스타트, PWA, 무료 티어, OAuth, JWT |
+| `intro.md` | API, 프런트엔드와 백엔드, 간격 반복(SRS), 서버리스, 콜드스타트, PWA, 무료 티어, OAuth, JWT, 아키텍처, 호스팅, PostgreSQL (도입 장은 예외적으로 11개, 의도적 추가 이력) |
 | `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, 트레이드오프 |
 | `part1/database-basics.md` | 테이블·행·열, 기본 키와 외래 키, SQL, 제약, 조인, 인덱스 |
 | `part1/database.md` | 트랜잭션 |
@@ -199,7 +199,10 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
   - 내용 이동: 3장의 마이그레이션·RLS 절과 14장의 direnv·환경 변수 절 → 19장으로 이관(용어 상자 소유권 포함). 19장에 개발/운영 DB 분리 절 신설(3층 구조: 로컬 SQLite/개발 프로젝트/운영 프로젝트, 무료 활성 프로젝트 2개 한도는 2026-07-11 요금 페이지 확인). 17장에 Production Branch=release·Preview=개발 확인 절 신설. `.github/workflows/ci.yml`은 push branches [main, release]로 확장, DEPLOY.md에 release·개발 프로젝트 수동 단계 추가.
   - 검증: gofmt/go build/vet/test(litestore 12개 포함 전부 통과), tsc·vitest, 환경 변수 유무 양쪽 `npm run build`, 로컬 모드 E2E(덱→카드→복습→통계→공유), CORS 프리플라이트, next dev 무설정 기동(홈에 "로컬 모드" 렌더), 원고 발췌↔실제 코드 대조(스크립트 검증 다수), `npm run build`(doc)·`npm run pdf`.
   - 수동 단계 남음(사용자 몫): Vercel 대시보드에서 Production Branch를 release로 변경 + 환경 변수 Production/Preview 스코프 등록, 개발용 Supabase 프로젝트 생성. release 브랜치는 이번 커밋 후 생성해 푸시함.
-- [ ] 2026-07-11 개편 장 통독 검토 후 진도표를 `검토 완료`로 갱신: 도입·1장(두 모드 서사), 2·3장(SQLite), 14장(무설정 로컬 실행), 15장 Git(신규), 16·17장(브랜치 정책·배포 구분), 18장(로컬 인증 대비 절), 19장(운영 DB 통합), 21·22장(접점)
-- [ ] 이전부터 남은 통독 검토: 4·6·7·8·9·10장
+- [x] 2026-07-11 개편 장 통독 검토 (병렬 검토 에이전트 7그룹, 같은 날): 도입·1장 / 2·3장 / 14·15장 / 16·17장 / 18·19장 / 21·22장 / 4·7·11장(발췌 재검증). 15개 장 전부 통과해 `검토 완료`로 승격.
+  - 잡은 것: 17장의 개편 전 코드 발췌 2건(cmd/server, api.ts), 3장의 잘못된 실행 계획 서술(DueCards는 뷰 간접화 탓에 card_srs_user_due_idx를 못 탐, EXPLAIN 실측), 도입 그림 3 캡션 뒤 빈 줄 누락(렌더링 깨짐), 이관 잔재 참조(3장 RLS→19장, 14장 cmd/migrate·.envrc, 22장 PostgREST 귀속), 21장 "본 워크플로"→"예고한", 18장 OAuth 앱 등록 귀속 오류, Vercel 대시보드 경로 현행화(Environments), 발췌 무표시 생략 여러 건 복원.
+  - 검증 방식: 발췌 전수 실물 대조(생략 표시 제외 줄 단위), 원고 SQL을 앱과 같은 드라이버로 전량 실행(0 실패), 14장 실행 절차 실제 재현(기동 로그·CORS·복습 흐름), 무료 한도는 공식 요금 페이지 재확인(2026-07-11), git log 발췌 해시 대조.
+  - 검토 중 저장소에 루트 `CLAUDE.md`를 추가(15장이 권하는 "브랜치 정책을 프로젝트 지침에 기록"을 실재화: main=개발/release=운영, 로컬 모드 실행·검증 명령). 8장의 "Go의 인터페이스" 회고 문장은 7장 Store 인터페이스 포인터로 손봄.
+- [ ] 이전부터 남은 통독 검토: 5·6·8·9·10·20장
 - [x] 2부 장 수 보강 완료 (2026-07-10): 제안한 3개 장(GitHub Actions·무료 티어·PWA)을 모두 신설하고 Supabase를 분할해 2부가 6장 → 10장이 됐다. 1부 11장 대 2부 10장.
 - [ ] (선택) 이후 세션: 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토

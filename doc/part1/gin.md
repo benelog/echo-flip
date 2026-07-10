@@ -132,7 +132,9 @@ Vercel 쪽 진입점은 api/index.go다.
 
 ```go
 // Package handler is the Vercel serverless entrypoint. vercel.json rewrites
-// every /api/* request here; the original path is preserved.
+// every /api/* request here; the original path is preserved, so the Gin
+// router dispatches normally.
+//
 // Vercel compiles this file outside the module, so it must not import
 // internal/ packages (directly); shared code it needs lives in pkg/.
 package handler
@@ -192,6 +194,7 @@ pub := r.Group("/api", optional, func(c *gin.Context) {
 
 api := r.Group("/api", required, h.EnsureProfile())
 {
+	// ... 프로필 라우트 생략
 	api.GET("/decks", h.ListDecks)
 	api.POST("/decks", h.CreateDeck)
 	// Decks are addressed by their short Base36 slug, not the UUID.
@@ -212,7 +215,7 @@ api := r.Group("/api", required, h.EnsureProfile())
 나머지 전부는 유효한 토큰을 요구하는 `required`가 붙은 `api` 그룹이다.
 
 맨 위의 분기는 인증 방식을 설정으로 갈아 끼우는 스위치다.
-기본값은 Supabase 토큰을 검증하는 `auth.Middleware`와 `auth.OptionalMiddleware`이고, `DATABASE_URL` 없이 도는 로컬 모드에서는 두 자리 모두 검증 없이 고정 사용자를 실어 주는 `auth.LocalMiddleware`로 바뀐다.
+기본값은 Supabase 토큰을 검증하는 `auth.Middleware`와 `auth.OptionalMiddleware`이고, 로컬 모드에서는 두 자리 모두 검증 없이 고정 사용자를 실어 주는 `auth.LocalMiddleware`로 바뀐다.
 라우트 등록부는 어느 모드에서든 한 글자도 달라지지 않는다.
 
 두 그룹이 같은 `/api` 접두사를 쓴다는 점이 흥미롭다.
@@ -423,7 +426,7 @@ func badRequest(c *gin.Context, msg string) {
 ```
 
 `badRequest`는 클라이언트 잘못(400)을, `fail`은 서버 측 처리 결과를 담당한다.
-`fail`이 하는 일이 사실상 이 앱의 에러 처리 정책 전부다.
+`fail`이 하는 일이 이 앱의 에러 처리 정책의 거의 전부다.
 스토어 계층이 돌려준 에러가 `store.ErrNotFound`면 404로, 그 밖의 모든 에러는 로그에만 상세를 남기고 클라이언트에는 "internal error"라는 무정보 메시지로 500을 준다.
 DB 에러 문자열을 그대로 노출하면 내부 구조가 새어 나가므로, 상세는 서버 로그에만 남기는 것이 안전하다.
 예컨대 테이블 이름이나 SQL 조각이 담긴 에러 문장이 화면에 그대로 뜨면 공격자에게 좋은 힌트가 된다.
@@ -486,7 +489,7 @@ if len(cfg.AllowedOrigins) > 0 {
 
 허용 출처는 하드코딩하지 않고 환경 변수 `ALLOWED_ORIGINS`에서 읽으므로(internal/config/config.go), 환경마다 값만 바꾼다.
 로컬 모드에서는 이 변수를 비워 두면 기본값으로 `http://localhost:3000`이 들어가, 프런트엔드 개발 서버가 별도 설정 없이 붙는다.
-프로덕션 배포에서는 프런트엔드 정적 파일과 API가 같은 Vercel 도메인에서 서비스되어 교차 출처 자체가 발생하지 않으므로, 이 미들웨어는 사실상 로컬 개발과 예외적 구성을 위한 장치다.
+프로덕션 배포에서는 프런트엔드 정적 파일과 API가 같은 Vercel 도메인에서 서비스되어 교차 출처 자체가 발생하지 않으므로, 이 미들웨어는 로컬 개발과 예외적 구성을 위한 장치다.
 `AllowCredentials: false`인 이유는 인증에 쿠키가 아니라 Authorization 헤더를 쓰기 때문이다.
 
 ### JWT 인증 미들웨어: 컨텍스트에 사용자 ID를 싣는다
@@ -629,8 +632,9 @@ func New(pool *pgxpool.Pool) *Store {
 의존성 주입이란 부품이 필요한 쪽이 부품을 직접 만들지 않고, 밖에서 완성해 건네받는 조립 방식을 말한다.
 이 규모에서는 도구의 도움 없이 이 한 줄로 충분하다.
 핸들러가 구체 타입이 아니라 인터페이스에 의존하는 덕에, 같은 계약을 만족하는 SQLite 구현(internal/litestore)이 로컬 모드에서 그 자리에 그대로 꽂힌다.
+이 교체가 로컬의 SQLite에서 운영의 PostgreSQL로 실제로 일어나는 장면은 19장에서 확인한다.
 
-`ErrNotFound`는 센티널 에러(sentinel error)다.
+`ErrNotFound`는 5장에서 본 센티널 에러(sentinel error)다.
 특정 상황을 알리는 신호로 쓰자고 미리 약속해 둔 에러 값이라는 뜻이다.
 스토어의 모든 조회 함수가 "행 없음"을 이 에러로 통일해 반환하고, 앞서 본 핸들러의 `fail`이 이를 404로 변환한다.
 pgx의 `ErrNoRows` 같은 드라이버 세부가 핸들러까지 새어 나오지 않도록 경계에서 번역해 두는 것이다.

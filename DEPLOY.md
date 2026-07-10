@@ -64,7 +64,7 @@ git branch release && git push origin release   # 운영 배포용 브랜치 (ma
 ## 6. Vercel ✋
 
 1. https://vercel.com → Add New Project → echo-flip 저장소 import (Framework: Next.js 자동 감지, Root Directory는 저장소 루트 그대로)
-2. Settings → Git → **Production Branch**를 `main`에서 `release`로 변경
+2. Settings → Environments → Production의 Branch Tracking에서 **Production Branch**를 `main`에서 `release`로 변경
    (이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)
 3. Environment Variables 등록 — 스코프를 나눠 **Production에는 운영 Supabase 프로젝트 값, Preview에는 개발 프로젝트 값**을 넣습니다 (분리 이유는 책 19장):
    | 이름 | 값 |
