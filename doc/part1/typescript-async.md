@@ -510,5 +510,5 @@ ESLint는 타입 검사가 다루지 않는 영역을 짚는 정적 분석(stati
 셋째, `src/lib/`의 순수 로직 모듈(csv, dictionary, rules)은 React 없이 동작하므로 vitest로 값싸게 테스트된다.
 strict 모드 `tsconfig.json`과 `tsc --noEmit`, vitest가 이 프로젝트의 품질 게이트이고, ESLint는 협업 확대나 훅 복잡도 증가 시점에 도입할 후보로 남겨 두었다.
 
-다음 8장에서는 이 타입과 로직 위에서 화면을 만드는 React와 Next.js를 다룬다.
+다음 8장과 9장에서는 이 타입과 로직 위에서 화면을 만드는 React와 Next.js를 다룬다.
 `api<T>`가 TanStack Query와 만나고, `parseCsv`가 가져오기 다이얼로그와 만나는 장면을 보게 될 것이다.

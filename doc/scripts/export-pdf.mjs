@@ -29,12 +29,14 @@ const chapters = [
   { route: 'part1/gin', title: '5장 Gin으로 만드는 HTTP API' },
   { route: 'part1/typescript', title: '6장 TypeScript: 타입으로 지키는 프런트엔드' },
   { route: 'part1/typescript-async', title: '7장 TypeScript 실전: 비동기 처리와 런타임 검증' },
-  { route: 'part1/react', title: '8장 React와 Next.js로 만드는 화면' },
-  { route: 'part1/database', title: '9장 PostgreSQL 데이터베이스 설계' },
-  { route: 'part2/claude-code', title: '10장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
-  { route: 'part2/agents-hooks', title: '11장 서브에이전트와 훅으로 만드는 품질 게이트' },
-  { route: 'part2/vercel', title: '12장 Vercel: 한 플랫폼에 모두 배포하기' },
-  { route: 'part2/supabase', title: '13장 Supabase: 인증과 데이터베이스' },
+  { route: 'part1/react', title: '8장 React 기초: 컴포넌트, 상태, 훅' },
+  { route: 'part1/react-next', title: '9장 React 실전과 Next.js: 전역 상태와 정적 export' },
+  { route: 'part1/database-basics', title: '10장 데이터베이스 기초: 테이블, SQL, 인덱스' },
+  { route: 'part1/database', title: '11장 PostgreSQL 데이터베이스 설계' },
+  { route: 'part2/claude-code', title: '12장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
+  { route: 'part2/agents-hooks', title: '13장 서브에이전트와 훅으로 만드는 품질 게이트' },
+  { route: 'part2/vercel', title: '14장 Vercel: 한 플랫폼에 모두 배포하기' },
+  { route: 'part2/supabase', title: '15장 Supabase: 인증과 데이터베이스' },
 ]
 
 const FONT_LINKS = `

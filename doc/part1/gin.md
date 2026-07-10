@@ -128,7 +128,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 왜 조립 코드를 `internal`이 아닌 `pkg/app`에 두었는지는 2장에서 본 대로다.
 Vercel의 Go 빌더가 이 파일을 모듈 바깥에서 컴파일하므로 `internal/` 패키지를 직접 가져올 수 없고, 주석에도 그 답이 적혀 있다.
-이런 Vercel 함수의 제약과 배포 구성은 12장에서 자세히 다룬다.
+이런 Vercel 함수의 제약과 배포 구성은 14장에서 자세히 다룬다.
 
 정리하면, 이 구조의 이점은 두 가지다.
 첫째, 로컬과 프로덕션이 완전히 같은 라우팅·미들웨어·핸들러를 지나므로 "로컬에서는 됐는데 배포하니 다르다"류의 문제가 줄어든다.
@@ -486,7 +486,7 @@ func UserID(c *gin.Context) uuid.UUID {
 토큰은 Supabase가 발급한 JWT(JSON Web Token)다.
 위조를 막는 서명이 붙은 디지털 출입증이라, 서버는 서명이 진짜인지, 유효 기간이 지나지는 않았는지, 우리 서비스 앞으로 발급된 것인지를 확인해야 한다.
 `parseUserID`가 바로 그 서명·만료·수신자(audience)를 검증한 뒤, 토큰에 적힌 subject 항목(클레임)에서 사용자 UUID를 얻는다.
-서명 검증 키는 JWKS(JSON Web Key Set) URL에서 가져오는데, 그 상세 원리와 Supabase 인증 체계는 13장에서 다룬다.
+서명 검증 키는 JWKS(JSON Web Key Set) URL에서 가져오는데, 그 상세 원리와 Supabase 인증 체계는 15장에서 다룬다.
 이 장에서 중요한 것은 마지막 두 줄이다.
 검증에 성공하면 `c.Set(userIDKey, userID)`로 사용자 ID를 요청 컨텍스트에 저장하고 `c.Next()`로 진행한다.
 
