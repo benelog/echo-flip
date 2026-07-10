@@ -23,15 +23,18 @@ const SITE = 'benelog.github.io/echo-flip'
 const chapters = [
   { route: 'intro', title: '도입: 무엇을 만드는가' },
   { route: 'part1/tech-choices', title: '1장 기술 선택: 왜 이 조합인가', part: '1부 언어와 프레임워크로 코드 이해하기' },
-  { route: 'part1/go', title: '2장 Go: 작은 서버를 위한 백엔드 언어' },
-  { route: 'part1/gin', title: '3장 Gin으로 만드는 HTTP API' },
-  { route: 'part1/typescript', title: '4장 TypeScript: 타입으로 지키는 프런트엔드' },
-  { route: 'part1/react', title: '5장 React와 Next.js로 만드는 화면' },
-  { route: 'part1/database', title: '6장 PostgreSQL 데이터베이스 설계' },
-  { route: 'part2/claude-code', title: '7장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
-  { route: 'part2/agents-hooks', title: '8장 서브에이전트와 훅으로 만드는 품질 게이트' },
-  { route: 'part2/vercel', title: '9장 Vercel: 한 플랫폼에 모두 배포하기' },
-  { route: 'part2/supabase', title: '10장 Supabase: 인증과 데이터베이스' },
+  { route: 'part1/go-basics', title: '2장 Go 기초: 모듈, 변수, 함수' },
+  { route: 'part1/go', title: '3장 Go 코드 읽기: 구조체, 포인터, 에러 처리' },
+  { route: 'part1/go-testing', title: '4장 Go 테스트와 품질 도구' },
+  { route: 'part1/gin', title: '5장 Gin으로 만드는 HTTP API' },
+  { route: 'part1/typescript', title: '6장 TypeScript: 타입으로 지키는 프런트엔드' },
+  { route: 'part1/typescript-async', title: '7장 TypeScript 실전: 비동기 처리와 런타임 검증' },
+  { route: 'part1/react', title: '8장 React와 Next.js로 만드는 화면' },
+  { route: 'part1/database', title: '9장 PostgreSQL 데이터베이스 설계' },
+  { route: 'part2/claude-code', title: '10장 Claude Code: AI 에이전트와 개발하기', part: '2부 에이전트와 인프라로 앱 만들고 운영하기' },
+  { route: 'part2/agents-hooks', title: '11장 서브에이전트와 훅으로 만드는 품질 게이트' },
+  { route: 'part2/vercel', title: '12장 Vercel: 한 플랫폼에 모두 배포하기' },
+  { route: 'part2/supabase', title: '13장 Supabase: 인증과 데이터베이스' },
 ]
 
 const FONT_LINKS = `

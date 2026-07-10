@@ -28,33 +28,39 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 | 장 | 제목 | 파일 | 상태 |
 |---|---|---|---|
-| 도입 | 무엇을 만드는가 — Echo Flip의 요구사항 | `doc/intro.md` | 검토 완료 |
-| 1부 1장 | 기술 선택 — 왜 이 조합인가 | `doc/part1/tech-choices.md` | 검토 완료 |
-| 1부 2장 | Go — 작은 서버를 위한 백엔드 언어 | `doc/part1/go.md` | 검토 완료 |
-| 1부 3장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 검토 완료 |
-| 1부 4장 | TypeScript — 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 검토 완료 |
-| 1부 5장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 검토 완료 |
-| 1부 6장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 검토 완료 |
-| 2부 7장 | Claude Code — AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 검토 완료 |
-| 2부 8장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 검토 완료 |
-| 2부 9장 | Vercel — 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 검토 완료 |
-| 2부 10장 | Supabase — 인증과 데이터베이스 | `doc/part2/supabase.md` | 검토 완료 |
+| 도입 | 무엇을 만드는가: Echo Flip의 요구사항 | `doc/intro.md` | 검토 완료 |
+| 1부 1장 | 기술 선택: 왜 이 조합인가 | `doc/part1/tech-choices.md` | 검토 완료 |
+| 1부 2장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 초안 완료 |
+| 1부 3장 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `doc/part1/go.md` | 초안 완료 |
+| 1부 4장 | Go 테스트와 품질 도구 | `doc/part1/go-testing.md` | 초안 완료 |
+| 1부 5장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 검토 완료 |
+| 1부 6장 | TypeScript: 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
+| 1부 7장 | TypeScript 실전: 비동기 처리와 런타임 검증 | `doc/part1/typescript-async.md` | 초안 완료 |
+| 1부 8장 | React와 Next.js로 만드는 화면 | `doc/part1/react.md` | 검토 완료 |
+| 1부 9장 | PostgreSQL 데이터베이스 설계 | `doc/part1/database.md` | 검토 완료 |
+| 2부 10장 | Claude Code: AI 에이전트와 개발하기 | `doc/part2/claude-code.md` | 검토 완료 |
+| 2부 11장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part2/agents-hooks.md` | 검토 완료 |
+| 2부 12장 | Vercel: 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 검토 완료 |
+| 2부 13장 | Supabase: 인증과 데이터베이스 | `doc/part2/supabase.md` | 검토 완료 |
 
 상태 값: `미착수` → `초안 작성 중` → `초안 완료` → `검토 완료`
 
 ### 장별 필수 내용 요약
 
 - **도입**: 앱 소개(영어 암기 카드), 기능 요구사항(양방향 카드·덱·학습 흐름·SRS·스마트 덱·통계·공유·CSV·사전 API·TTS), 비기능 요구사항(무료 인프라, 운영 부담 최소화, PWA), 전체 아키텍처 개요(정적 Next + Vercel Go 함수 + Supabase), 책의 구성과 범위 안내.
-- **1장 기술 선택**: 1부 기술들의 선택 이유를 한 장에 모은 장. 공통 선택 기준(무료·관리 최소·AI 협업·서버리스 적합) → 왜 Go(vs Node/Python/JVM) → 왜 Gin(vs net/http·chi·Echo) → 왜 TypeScript(vs JS) → 왜 React·Next.js·정적 export(vs Vue/Svelte) → 왜 관계형 DB·PostgreSQL(vs SQLite/NoSQL). Vercel·Supabase 선택 이유는 9·10장 소관.
-- **2장 Go**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조, 구조체·다중 반환·에러 처리, 테이블 주도 테스트(`internal/srs/srs_test.go`), 품질 도구(gofmt, go vet, go build, staticcheck). 예제: `internal/srs/`, `internal/smartrules/`.
-- **3장 Gin**: 라우터 조립(`pkg/app/app.go`), 로컬 서버와 Vercel 함수가 같은 앱을 공유하는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS, JWT 인증 `internal/auth/jwt.go`), handlers→store 계층 분리.
-- **4장 TypeScript**: 타입 기초(`src/lib/types.ts`), 유니온·제네릭, zod 런타임 검증, 순수 로직 모듈(`csv.ts`, `dictionary.ts`), 품질 도구(tsc strict, vitest).
-- **5장 React/Next.js**: 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), PWA 매니페스트(`src/app/manifest.ts`), Tailwind 간단히.
-- **6장 DBMS 설계**: 요구사항→테이블 도출, 스키마(`internal/db/migrations/*.sql`), 키·제약·인덱스, 마이그레이션 관리(`cmd/migrate`), SRS 데이터 모델, RLS 전략(정책 0개 enable로 PostgREST 차단, Go API 전용 접근).
-- **7장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
-- **8장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
-- **9장 Vercel**: 선택 이유(무료 티어에서 정적+함수 올인원, Koyeb 상주 서버 대안과 비교), 정적 export 배포, Go 서버리스 함수(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`), `vercel.json` rewrites, 리전 iad1 고정.
-- **10장 Supabase**: 선택 이유(무료 Postgres+Auth 통합, Neon·Firebase 대안 비교), OAuth 로그인 흐름과 Go의 JWKS 검증, pgx 연결(트랜잭션 풀러 6543 + simple protocol이 필요한 이유), 리전 콜로케이션.
+- **1장 기술 선택**: 1부 기술들의 선택 이유를 한 장에 모은 장. 공통 선택 기준(무료·관리 최소·AI 협업·서버리스 적합) → 왜 Go(vs Node/Python/JVM) → 왜 Gin(vs net/http·chi·Echo) → 왜 TypeScript(vs JS) → 왜 React·Next.js·정적 export(vs Vue/Svelte) → 왜 관계형 DB·PostgreSQL(vs SQLite/NoSQL). Vercel·Supabase 선택 이유는 12·13장 소관.
+- **2장 Go 기초**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조(go.mod, api/index.go의 pkg/app 제약), 변수와 기본 타입(var/:=, 제로값), 함수와 다중 반환값, 공개 규칙(대소문자), 제어문(if 초기화문, for range, switch), 상수. 예제: `internal/config/config.go`, `cmd/server/main.go`, `internal/store/deckslug.go`.
+- **3장 Go 코드 읽기**: `internal/srs` 중심으로 구조체·제로값 설계·다중 반환·time 패키지, 포인터 기초(&·*·nil)와 리시버, 에러 처리(error 값, %w 래핑, errors.Is, 센티널), 슬라이스(append, make 용량)와 맵(comma-ok), 문자열 처리(strings), JSON 직렬화(Marshal/Unmarshal). 예제: `internal/srs/`, `internal/smartrules/`, `internal/store/`.
+- **4장 Go 테스트와 품질 도구**: go test 규칙(_test.go, Test 접두사, *testing.T)과 실행 명령(-run, -v), 테이블 주도 테스트(`internal/srs/srs_test.go`, `internal/smartrules/rules_test.go`), 전수 검사와 경계값(`internal/store/deckslug_test.go`), t.Fatalf vs t.Errorf, 화이트박스 테스트, 품질 도구(gofmt, go vet, go build, staticcheck), 테스트=AI 검증 신호.
+- **5장 Gin**: 라우터 조립(`pkg/app/app.go`), 로컬 서버와 Vercel 함수가 같은 앱을 공유하는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS, JWT 인증 `internal/auth/jwt.go`), handlers→store 계층 분리.
+- **6장 TypeScript 기초**: 기본 타입과 타입 추론(useState 초기값), 배열 표기, 리터럴·유니온 타입, 인터페이스와 구조적 타이핑, 옵셔널 프로퍼티, 제네릭(`api<T>`), interface vs type 관례, 유틸리티 타입(Record, 인덱스드 액세스), ES 모듈(import/export), 화살표 함수. 예제: `src/lib/types.ts`, `src/lib/api.ts`, `src/components/Flashcard.tsx`.
+- **7장 TypeScript 실전**: Promise(세 가지 상태, .then 체이닝), async/await와 fetch, try/catch/finally, 콜백의 Promise 래핑(`parseCsv`), 컴파일 타임과 런타임 검증의 간극(손 검증, zod, 타입 단언), 순수 로직 모듈(`csv.ts`, `dictionary.ts`, `rules.ts`), 품질 도구(tsc strict, vitest, ESLint 논의).
+- **8장 React/Next.js**: 컴포넌트·props(`Flashcard.tsx`), 훅(`useStudySession.ts`, `useTts.ts`), Context(`AuthProvider.tsx`), TanStack Query, App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite), PWA 매니페스트(`src/app/manifest.ts`), Tailwind 간단히.
+- **9장 DBMS 설계**: 요구사항→테이블 도출, 스키마(`internal/db/migrations/*.sql`), 키·제약·인덱스, 마이그레이션 관리(`cmd/migrate`), SRS 데이터 모델, RLS 전략(정책 0개 enable로 PostgREST 차단, Go API 전용 접근).
+- **10장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
+- **11장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
+- **12장 Vercel**: 선택 이유(무료 티어에서 정적+함수 올인원, Koyeb 상주 서버 대안과 비교), 정적 export 배포, Go 서버리스 함수(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`), `vercel.json` rewrites, 리전 iad1 고정.
+- **13장 Supabase**: 선택 이유(무료 Postgres+Auth 통합, Neon·Firebase 대안 비교), OAuth 로그인 흐름과 Go의 JWKS 검증, pgx 연결(트랜잭션 풀러 6543 + simple protocol이 필요한 이유), 리전 콜로케이션.
 
 ## 독자 대상 (2026-07-09 지시)
 
@@ -76,9 +82,12 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 |---|---|
 | `intro.md` | API, 프런트엔드와 백엔드, 간격 반복(SRS), 서버리스, 콜드스타트, PWA, 무료 티어, OAuth, JWT |
 | `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, 트레이드오프 |
-| `part1/go.md` | 모듈과 패키지, 구조체, 다중 반환값과 에러 처리, 순수 함수, 테이블 주도 테스트, 포매터와 정적 분석 |
+| `part1/go-basics.md` | 모듈과 패키지, 다중 반환값과 에러 처리 |
+| `part1/go.md` | 구조체, 순수 함수, 포인터 |
+| `part1/go-testing.md` | 테이블 주도 테스트, 포매터와 정적 분석 |
 | `part1/gin.md` | HTTP 요청과 응답, 라우터와 라우팅, 엔드포인트, 핸들러, JSON과 바인딩, 미들웨어, CORS |
-| `part1/typescript.md` | 컴파일(트랜스파일), 유니온 타입, 제네릭, 런타임 검증, 테스트 러너 |
+| `part1/typescript.md` | 컴파일(트랜스파일), 유니온 타입, 제네릭 |
+| `part1/typescript-async.md` | Promise, 런타임 검증, 테스트 러너 |
 | `part1/react.md` | 컴포넌트와 props, 상태와 React 훅, Context, 서버 상태와 캐시, 클라이언트 라우팅, 정적 export, 웹 앱 매니페스트 |
 | `part1/database.md` | 테이블·행·열, 기본 키와 외래 키, 제약, 인덱스, 트랜잭션, 마이그레이션, RLS |
 | `part2/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md) |
@@ -86,7 +95,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 | `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN |
 | `part2/supabase.md` | 관리형 서비스, JWKS와 서명 검증, 무상태, 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션 |
 
-**훅(Hook)은 동음이의어다.** 5장의 훅은 React의 상태 관리 함수이고, 8장의 훅은 Claude Code가 자동 실행하는 스크립트다.
+**훅(Hook)은 동음이의어다.** 8장의 훅은 React의 상태 관리 함수이고, 11장의 훅은 Claude Code가 자동 실행하는 스크립트다.
 각 장의 상자에서 서로 다른 것임을 한 문장으로 구분해 준다.
 
 ## 화면 캡처 (2026-07-09 지시)
@@ -98,7 +107,7 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - **여러 화면은 반드시 한 장으로 합성해 둔다.** 이 책은 다단 페이지 넘김 모드라 이미지를 flex로 나란히 놓으면 단 경계에서 잘린다.
 - 캡처 조건: 배포본(`https://echo-flip-delta.vercel.app`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.
-- 현재 실린 그림: 그림 1 덱 상세(intro), 그림 2 학습 3단계(intro), 그림 3 홈·복습 큐(intro), 그림 4 통계·공유(intro), 그림 5 카드 앞뒤(5장).
+- 현재 실린 그림: 그림 1 덱 상세(intro), 그림 2 학습 3단계(intro), 그림 3 홈·복습 큐(intro), 그림 4 통계·공유(intro), 그림 5 카드 앞뒤(8장 react.md).
 
 ## 문체 가이드 (모든 장 공통)
 
@@ -140,5 +149,8 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 - [x] 배포된 사이트에서 렌더링 확인 (홈·도입 장 200 OK, 2026-07-09)
 - [x] 통독 검토 후 진도표 상태를 `검토 완료`로 갱신 (2026-07-09)
 - [x] 비개발자 독자 대응 (2026-07-09, 병렬 서브에이전트 11개): 전 장에 용어 상자 70개 삽입(장별 소유 용어만, 중복 없음), 전문용어로만 굴러가던 문장 풀어쓰기, 코드 블록 앞 "이 코드가 하는 일" 문장 보강. `custom.css`에 용어 상자 스타일(화면·인쇄) 추가. 검증: 제목·코드 블록 원문과 바이트 동일, 컨테이너 펜스 짝 일치, 분량 105~115%(상한 130%), `npm run build` 통과, 렌더 결과 `custom-block` 70개 확인.
-- [x] 실제 화면 캡처 삽입 (2026-07-09): 배포본에서 데모 덱으로 캡처해 도입 장에 그림 1~4, 5장에 그림 5를 넣었다. `custom.css`에 `.ef-shots`·`.ef-caption` 스타일(화면·인쇄). 검증: `npm run build` 통과, 다단 모드에서 이미지 4장 모두 온전히 렌더(폭 758px 이내), `npm run pdf`로 PDF에 이미지 5개 포함 확인.
+- [x] 실제 화면 캡처 삽입 (2026-07-09): 배포본에서 데모 덱으로 캡처해 도입 장에 그림 1~4, React 장에 그림 5를 넣었다. `custom.css`에 `.ef-shots`·`.ef-caption` 스타일(화면·인쇄). 검증: `npm run build` 통과, 다단 모드에서 이미지 4장 모두 온전히 렌더(폭 758px 이내), `npm run pdf`로 PDF에 이미지 5개 포함 확인.
+- [x] Go·TypeScript 기초 보강 + 13장 개편 (2026-07-10 지시): benelog/jira-navigator의 `study/` 학습 자료(CH02~CH07)의 주제 구성을 참고하되, 코드 예제는 이 저장소의 실제 코드로 다시 씀. Go 장을 2장(기초: 모듈·변수·함수·제어문·상수, `go-basics.md` 신규)·3장(구조체·포인터·에러·컬렉션·문자열·JSON, 기존 `go.md` 개편)·4장(테스트·품질 도구, `go-testing.md` 신규)으로, TypeScript 장을 6장(타입 시스템, 기존 `typescript.md` 개편)·7장(비동기·런타임 검증·품질 도구, `typescript-async.md` 신규)으로 분리. 전체 10장 → 13장 재번호(상호 참조·사이드바·PDF 차례 갱신). 용어 상자 재배치 + 신규 2개(포인터→3장, Promise→7장).
+- [x] 비개발자 풀어쓰기 2차 패스 (2026-07-10 지시): 전 장에서 전문용어 연쇄 문장을 일상어로 한 번 풀고, 코드 블록 앞 예고 문장을 보강. 분량 상한 115%.
+- [ ] 새 2·3·4·6·7장 통독 검토 후 진도표를 `검토 완료`로 갱신
 - [ ] (선택) 이후 세션: 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토
