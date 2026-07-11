@@ -206,6 +206,19 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
   - 검증 방식: 발췌 전수 실물 대조(생략 표시 제외 줄 단위), 원고 SQL을 앱과 같은 드라이버로 전량 실행(0 실패), 14장 실행 절차 실제 재현(기동 로그·CORS·복습 흐름), 무료 한도는 공식 요금 페이지 재확인(2026-07-11), git log 발췌 해시 대조.
   - 검토 중 저장소에 루트 `CLAUDE.md`를 추가(15장이 권하는 "브랜치 정책을 프로젝트 지침에 기록"을 실재화: main=개발/release=운영, 로컬 모드 실행·검증 명령). 8장의 "Go의 인터페이스" 회고 문장은 7장 Store 인터페이스 포인터로 손봄.
 - [x] 부록 A 개발 도구 설치 신설 (2026-07-11 지시): Git·Go·Node.js·sqlite3 필수 4종 + 선택 도구(VS Code, Claude Code)의 OS별(macOS/윈도우/우분투) 설치 안내를 `doc/appendix/setup.md`로 추가. 위치는 도입이 아니라 부록으로 판단(도입 장은 코드 블록 금지 규칙과 충돌, 이미 도구를 갖춘 독자는 통째로 건너뛰는 참조형 내용, OS별 절차는 개정 주기가 빨라 본문과 분리). 사이드바에 "부록" 섹션과 PDF 차례 말미에 부록 항목 추가. 본문 포인터 3곳: 도입(준비물 문단), 2장(sqlite3 준비물 절), 14장(공식 사이트 안내를 부록 A 참조로 교체). 용어 상자 2개(터미널, 패키지 매니저) 신설, 배정표에 등록.
-- [ ] 이전부터 남은 통독 검토: 5·6·8·9·10·20장, 부록 A
+- [ ] 이전부터 남은 통독 검토: 5·6·8·9·10·20장, 부록 A → 8·9·10·11장은 아래 개편으로 폐기 예정이므로 검토 불필요
 - [x] 2부 장 수 보강 완료 (2026-07-10): 제안한 3개 장(GitHub Actions·무료 티어·PWA)을 모두 신설하고 Supabase를 분할해 2부가 6장 → 10장이 됐다. 1부 11장 대 2부 10장.
 - [ ] (선택) 이후 세션: 필요 시 부록(로컬 개발 환경·배포 절차) 추가 검토
+- [x] **앱 프런트엔드를 Go SSR(html/template + htmx)로 전면 전환** (2026-07-11 지시): TypeScript·React·Next.js·Tailwind·npm 빌드 체인을 앱에서 제거하고, Go 서버가 HTML을 직접 렌더링하는 구조로 재작성했다. 책에서 TS·React를 빼고 HTML을 넣기 위한 선행 작업(책은 실제 코드를 인용하므로 앱이 먼저).
+  - 새 구조: `internal/web`(페이지 핸들러 + `templates/` html/template + `static/` CSS·htmx·아이콘·PWA 자산, 전부 embed) → `pkg/app`이 기존 JSON API와 같은 Gin 엔진에 등록. Vercel은 `vercel.json`이 모든 경로를 `api/index.go` 함수 하나로 rewrite.
+  - 인증은 서버 사이드로: Go가 GoTrue REST로 OAuth PKCE 흐름을 처리(`internal/web/gotrue.go`)하고 세션은 HttpOnly 쿠키(`session.go`, 만료 시 리프레시 자동). 브라우저가 토큰을 만지지 않아 보안이 오히려 개선. supabase-js 의존 소멸. 환경 변수는 `SUPABASE_URL`+`SUPABASE_ANON_KEY`(JWKS URL은 유도).
+  - 학습 화면은 무상태 htmx: 카드 큐·라운드·점수를 hidden 필드로 왕복하고 채점마다 서버가 다음 조각을 렌더링(`study.go`). 카드 뒤집기는 체크박스+CSS만으로 동작. CSV 파싱은 Go로 이동(`csvport.go`), 사전 조회도 서버가 대행(`dictionary.go`, hx-swap-oob).
+  - 남은 브라우저 JS는 `internal/web/static/app.js` 하나(약 90줄): TTS(Web Speech)·클립보드·오프라인 배너·서비스 워커 등록·시간대 쿠키. 서비스 워커(`sw.js`)는 페이지 network-first로 조정.
+  - 삭제: `src/` 전체, next.config.ts, tsconfig.json, 루트 package.json 등. `doc/`(VitePress)만 npm을 유지. CI에서 web 잡 제거. run_local.sh는 서버 하나만 띄움(포트 8080). README·DEPLOY.md·CLAUDE.md·.env.local.example 현행화.
+  - 검증: go build/vet/test 전체 통과(웹 패키지 테스트 6개 신규: CSV 매핑·사전 매핑·템플릿 파싱/렌더링), 로컬 모드 실기동으로 전 흐름 확인(덱·카드 CRUD, CSV 가져오기/내보내기, 학습 오답→재도전 라운드→완료 통계, 공유/해제/갤러리, 스마트 덱, 설정 저장, 사전 채우기 실호출, 404, 정적 자산·manifest·sw).
+  - 수동 단계 남음(사용자 몫): Vercel 환경 변수에 `SUPABASE_URL`·`SUPABASE_ANON_KEY` 추가(`NEXT_PUBLIC_*` 3종·`SUPABASE_JWKS_URL`은 제거 가능), Supabase URL Configuration의 Redirect URL을 `/auth/callback` 그대로 유지하되 로컬은 `http://localhost:8080/auth/callback`으로 교체, Vercel 프로젝트 Framework Preset을 Other로 변경(기존 Next.js 감지 해제).
+- [ ] **책 재편: TypeScript·React를 빼고 HTML을 넣는다** (2026-07-11 지시, 다음 세션): 위 앱 전환을 반영해 1부를 재구성한다.
+  - 폐기: 8장 `typescript.md`, 9장 `typescript-async.md`, 10장 `react.md`, 11장 `react-next.md` (4개 장, 약 93KB).
+  - 신설(안): HTML·CSS 기초(문서 구조·폼·선택자·flex/grid·다크 모드, 예제는 `internal/web/templates/`·`static/app.css`) / Go로 화면 만들기: html/template(레이아웃·partial·컨텍스트 자동 이스케이프·embed, `internal/web/web.go`) / htmx: 자바스크립트 없이 동적 화면(hx-post·조각 응답·hx-swap-oob, 학습 화면 무상태 설계, "그래도 남는 JS"로 app.js 해부).
+  - 연쇄 수정: 1장 tech-choices(왜 TS·React인가 절 → 왜 서버 렌더링+htmx인가로 재작성, 브라우저 JS 생태계와의 트레이드오프 정직하게), 7장 gin(웹 라우트 언급), 12장 claude-code·13장 agents-hooks(웹 검증 명령 갱신), 14장 local-dev(터미널 하나로 축소, npm 관련 삭제), 16장 github-actions(web 잡 삭제 반영), 17장 vercel(모든 경로 rewrite, Framework Other), 18장 supabase-auth(서버 사이드 PKCE·HttpOnly 쿠키로 전면 재작성, supabase-js 삭제), 20장 pwa(sw.js network-first, 서비스 워커가 유일한 JS 파일이라는 논지), 부록 A(Node 설치는 책 빌드용으로만 축소), intro(아키텍처 개요·준비물), 용어 배정표(TS·React 소유 용어 재배치: 컴파일/트랜스파일·유니온·제네릭·Promise 등은 폐기 또는 새 장으로).
+  - 화면 캡처 5장은 UI가 거의 동일하게 재현됐지만 재배포 후 다시 찍는 것이 안전.

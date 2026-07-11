@@ -7,22 +7,26 @@ import (
 )
 
 type Config struct {
-	Driver         string // "postgres" (production) or "sqlite" (local mode)
-	DatabaseURL    string
-	SQLitePath     string
-	AuthMode       string // "supabase" (JWT validation) or "local" (fixed user)
-	JWKSURL        string
-	JWTSecret      string // legacy HS256 fallback; used when set
-	AllowedOrigins []string
-	Port           string
+	Driver          string // "postgres" (production) or "sqlite" (local mode)
+	DatabaseURL     string
+	SQLitePath      string
+	AuthMode        string // "supabase" (JWT validation) or "local" (fixed user)
+	SupabaseURL     string // https://<ref>.supabase.co — web login (GoTrue) base URL
+	SupabaseAnonKey string // GoTrue apikey for the server-side OAuth flow
+	JWKSURL         string
+	JWTSecret       string // legacy HS256 fallback; used when set
+	AllowedOrigins  []string
+	Port            string
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		JWKSURL:     os.Getenv("SUPABASE_JWKS_URL"),
-		JWTSecret:   os.Getenv("SUPABASE_JWT_SECRET"),
-		Port:        os.Getenv("PORT"),
+		DatabaseURL:     os.Getenv("DATABASE_URL"),
+		SupabaseURL:     strings.TrimRight(os.Getenv("SUPABASE_URL"), "/"),
+		SupabaseAnonKey: os.Getenv("SUPABASE_ANON_KEY"),
+		JWKSURL:         os.Getenv("SUPABASE_JWKS_URL"),
+		JWTSecret:       os.Getenv("SUPABASE_JWT_SECRET"),
+		Port:            os.Getenv("PORT"),
 	}
 	if cfg.Port == "" {
 		cfg.Port = "8080"
@@ -36,8 +40,11 @@ func Load() (*Config, error) {
 	if cfg.DatabaseURL != "" {
 		cfg.Driver = "postgres"
 		cfg.AuthMode = "supabase"
+		if cfg.SupabaseURL == "" || cfg.SupabaseAnonKey == "" {
+			return nil, fmt.Errorf("SUPABASE_URL and SUPABASE_ANON_KEY are required")
+		}
 		if cfg.JWKSURL == "" && cfg.JWTSecret == "" {
-			return nil, fmt.Errorf("SUPABASE_JWKS_URL or SUPABASE_JWT_SECRET is required")
+			cfg.JWKSURL = cfg.SupabaseURL + "/auth/v1/.well-known/jwks.json"
 		}
 		return cfg, nil
 	}
@@ -53,9 +60,6 @@ func Load() (*Config, error) {
 	cfg.SQLitePath = os.Getenv("SQLITE_PATH")
 	if cfg.SQLitePath == "" {
 		cfg.SQLitePath = "echo-flip.db"
-	}
-	if len(cfg.AllowedOrigins) == 0 {
-		cfg.AllowedOrigins = []string{"http://localhost:3000"}
 	}
 	return cfg, nil
 }

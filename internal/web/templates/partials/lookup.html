@@ -1,0 +1,8 @@
+{{/* 사전 조회 응답: 상태 메시지(직접 타깃) + 비어 있던 폼 필드를
+     hx-swap-oob로 바꿔치기한다. id는 card_form.html의 필드와 맞춘다. */}}
+{{define "lookup_result"}}
+<span>{{.Status}}</span>
+<textarea id="f-meaning" name="meaning" rows="3" placeholder="우연한 행운, 뜻밖의 발견" hx-swap-oob="true">{{.Meaning}}</textarea>
+<input id="f-phonetic" name="phonetic" placeholder="/ˌserənˈdipəti/" value="{{.Phonetic}}" hx-swap-oob="true">
+<textarea id="f-example" name="example" rows="2" hx-swap-oob="true">{{.Example}}</textarea>
+{{end}}

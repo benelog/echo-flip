@@ -19,6 +19,7 @@ import (
 	"github.com/benelog/echo-flip/internal/db"
 	"github.com/benelog/echo-flip/internal/handlers"
 	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/echo-flip/internal/web"
 )
 
 var (
@@ -128,5 +129,10 @@ func New(cfg *config.Config, s handlers.Store) *gin.Engine {
 		api.GET("/stats/daily", h.DailyStats)
 		api.GET("/stats/summary", h.StatsSummary)
 	}
+
+	// HTML pages: server-rendered templates + htmx, cookie sessions. The API
+	// above stays token-based for programmatic clients.
+	web.New(cfg, s).Register(r)
+
 	return r
 }

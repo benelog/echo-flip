@@ -1,0 +1,57 @@
+{{define "layout"}}<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="단어·문장·숙어·개념을 카드로 뒤집으며 외우는 학습 앱">
+  <title>{{.Title}}</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+{{if eq .Path "/login"}}
+  {{template "content" .}}
+{{else}}
+  <div class="frame">
+    <header class="topbar">
+      {{if .LoggedIn}}<a class="brand" href="/">{{template "logo"}} Echo Flip</a>
+      {{else}}<a class="brand" href="/shared">{{template "logo"}} Echo Flip</a>{{end}}
+      {{if .LocalMode}}
+        <span class="tiny muted">로컬 모드</span>
+      {{else if .LoggedIn}}
+        <div class="topbar-user">
+          <span class="email">{{.Email}}</span>
+          <form method="post" action="/logout">
+            <button class="btn btn-outline" style="font-size:.75rem;padding:.25rem .625rem">{{icon "logout"}} 로그아웃</button>
+          </form>
+        </div>
+      {{else}}
+        <a class="btn btn-primary" style="font-size:.75rem;padding:.375rem .75rem" href="/login">{{icon "login"}} 로그인</a>
+      {{end}}
+    </header>
+    <div id="offline-banner">오프라인 상태예요. 학습 기록이 저장되지 않습니다.</div>
+    <main{{if .LoggedIn}} class="with-nav"{{end}}>
+      {{template "content" .}}
+    </main>
+    {{if .LoggedIn}}
+    <nav class="bottomnav">
+      <div>
+        <a href="/" {{if eq .Path "/"}}class="active"{{end}}>{{icon "home"}}홈</a>
+        <a href="/decks" {{if hasPrefix .Path "/decks"}}class="active"{{end}}>{{icon "layers"}}덱</a>
+        <a href="/stats" {{if hasPrefix .Path "/stats"}}class="active"{{end}}>{{icon "chart"}}통계</a>
+        <a href="/settings" {{if hasPrefix .Path "/settings"}}class="active"{{end}}>{{icon "settings"}}설정</a>
+      </div>
+    </nav>
+    {{end}}
+  </div>
+{{end}}
+{{if .Flash}}
+  <div class="toast"><div class="{{.FlashKind}}">{{.Flash}}</div></div>
+{{end}}
+</body>
+</html>{{end}}

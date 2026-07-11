@@ -1,0 +1,68 @@
+{{define "content"}}
+{{$deck := .Data.Deck}}
+<header class="row">
+  <a class="btn btn-icon" href="/decks" aria-label="뒤로">{{icon "chev-left"}}</a>
+  <h1 class="truncate" style="flex:1;font-size:1.125rem">{{$deck.Name}}</h1>
+  <button class="btn btn-icon" aria-label="덱 삭제"
+    hx-post="/decks/{{$deck.Slug}}/delete"
+    hx-confirm="'{{$deck.Name}}' 덱과 카드를 모두 삭제할까요?">{{icon "trash"}}</button>
+</header>
+
+{{if .Data.Cards}}
+<a class="btn btn-primary btn-big" href="/study?mode=deck&deckId={{$deck.ID}}&title={{$deck.Name}}">
+  {{icon "cap"}} 이 덱 학습하기 ({{len .Data.Cards}}장)
+</a>
+{{end}}
+
+<div class="row" style="flex-wrap:wrap">
+  <a class="btn btn-outline" href="/decks/{{$deck.Slug}}/cards/new">{{icon "plus"}} 카드 추가</a>
+  <a class="btn btn-outline" href="/decks/{{$deck.Slug}}/export">{{icon "download"}} CSV 내보내기</a>
+  {{if $deck.ShareSlug}}
+    <button class="btn btn-outline btn-share-ok" data-copy="{{.Data.ShareURL}}">
+      {{icon "link"}} <span class="before">공유 링크 복사</span><span class="after">복사했어요!</span>
+    </button>
+    <form method="post" action="/decks/{{$deck.Slug}}/unshare">
+      <button class="btn btn-outline" style="color:var(--muted)">{{icon "link-off"}} 공유 해제</button>
+    </form>
+  {{else}}
+    <form method="post" action="/decks/{{$deck.Slug}}/share">
+      <button class="btn btn-outline" {{if not .Data.Cards}}disabled{{end}}>{{icon "share"}} 덱 공유하기</button>
+    </form>
+  {{end}}
+</div>
+
+{{/* CSV 업로드: details/summary로 자바스크립트 없이 여닫는다. */}}
+<details class="reveal">
+  <summary class="tile-dashed">{{icon "upload"}} CSV 파일 선택해서 가져오기</summary>
+  <form method="post" action="/decks/{{$deck.Slug}}/import" enctype="multipart/form-data"
+        class="row" style="margin-top:.5rem">
+    <input type="file" name="file" accept=".csv,text/csv" required>
+    <button class="btn btn-primary" style="flex-shrink:0">가져오기</button>
+  </form>
+  <p class="tiny faint" style="margin:.375rem 0 0">text,meaning (또는 front,back) 헤더가 있는 CSV. 태그는 | 구분.</p>
+</details>
+
+{{if $deck.ShareSlug}}
+<p class="tiny faint">이 덱은 공유 중이에요. 링크가 있거나 공유 덱 목록을 보는 누구나 미리보고 자기 덱으로 가져갈 수 있어요.</p>
+{{end}}
+
+<ul class="stack" style="list-style:none;margin:0;padding:0">
+  {{range .Data.Cards}}
+  <li class="tile row">
+    <div style="flex:1;min-width:0">
+      <p class="truncate" style="font-weight:500;margin:0">{{.Text}}</p>
+      <p class="truncate small muted" style="margin:0">{{.Meaning}}</p>
+      {{if gt .Attempts 0}}
+      <p class="tiny faint" style="margin:.125rem 0 0">시도 {{.Attempts}}회 · 오답률 {{pct100 .ErrorRate}}%</p>
+      {{end}}
+    </div>
+    <a class="btn btn-icon" href="/cards/{{.ID}}" aria-label="카드 수정">{{icon "pencil"}}</a>
+    <button class="btn btn-icon" aria-label="카드 삭제"
+      hx-post="/cards/{{.ID}}/delete" hx-target="closest li" hx-swap="outerHTML"
+      hx-confirm="이 카드를 삭제할까요?">{{icon "trash"}}</button>
+  </li>
+  {{else}}
+  <p class="empty">카드가 없어요. 직접 추가하거나 CSV로 가져와보세요.</p>
+  {{end}}
+</ul>
+{{end}}

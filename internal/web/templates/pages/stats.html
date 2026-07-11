@@ -1,0 +1,39 @@
+{{define "content"}}
+<h1>통계</h1>
+
+<section class="stat-3">
+  <div class="box"><div class="num">{{.Data.Summary.Streak}}일</div><div class="label">연속 학습</div></div>
+  <div class="box"><div class="num">{{.Data.Summary.TotalReviews}}회</div><div class="label">총 복습</div></div>
+  <div class="box"><div class="num">{{if lt .Data.Accuracy 0}}-{{else}}{{.Data.Accuracy}}%{{end}}</div><div class="label">전체 정답률</div></div>
+</section>
+
+<section class="stack">
+  <h2>최근 30일 학습량 <span style="font-weight:400">(<span style="color:var(--primary)">정답</span> · <span style="color:var(--red)">오답</span>)</span></h2>
+  <div class="tile" style="padding:1rem">
+    <div class="chart">
+      {{range .Data.Days}}
+      <div class="day" title="{{.Title}}">
+        <div class="correct" style="height:{{.CorrectPct}}%"></div>
+        <div class="wrong" style="height:{{.WrongPct}}%"></div>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="stack">
+  <h2>덱별 성취도 <span style="font-weight:400">(3주 이상 간격에 도달한 카드 비율)</span></h2>
+  {{range .Data.Summary.Decks}}
+  {{$p := pct .MatureCards .TotalCards}}
+  <div class="tile">
+    <div class="row-between small">
+      <span style="font-weight:500">{{.Name}}</span>
+      <span class="muted">{{.MatureCards}}/{{.TotalCards}}장 · {{$p}}%</span>
+    </div>
+    <div class="meter"><div style="width:{{$p}}%"></div></div>
+  </div>
+  {{else}}
+  <p class="empty">아직 데이터가 없어요.</p>
+  {{end}}
+</section>
+{{end}}

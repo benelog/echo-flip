@@ -1,0 +1,108 @@
+{{/* 학습 진행 상태를 hidden 필드로 실어 나른다. 서버는 아무것도 기억하지
+     않고, 채점 요청에 담긴 이 상태로 다음 화면을 계산한다. */}}
+{{define "study_state_fields"}}
+<input type="hidden" name="session" value="{{.State.SessionID}}">
+<input type="hidden" name="direction" value="{{.State.Direction}}">
+<input type="hidden" name="title" value="{{.State.Title}}">
+<input type="hidden" name="return_url" value="{{.State.ReturnURL}}">
+<input type="hidden" name="queue" value="{{.QueueJoined}}">
+<input type="hidden" name="missed" value="{{.MissedJoined}}">
+<input type="hidden" name="round" value="{{.State.Round}}">
+<input type="hidden" name="round_len" value="{{.State.RoundLen}}">
+<input type="hidden" name="fp_total" value="{{.State.FPTotal}}">
+<input type="hidden" name="fp_correct" value="{{.State.FPCorrect}}">
+<input type="hidden" name="tts_rate" value="{{.State.TtsRate}}">
+{{end}}
+
+{{define "study_body"}}
+{{if eq .Phase "empty"}}
+  <div class="empty stack-lg">
+    <p>학습할 카드가 없어요.</p>
+    <a class="link" href="{{.State.ReturnURL}}">돌아가기</a>
+  </div>
+
+{{else if eq .Phase "finished"}}
+  <div class="stack-lg center" style="padding:4rem 0">
+    <div class="finish-icon" style="font-size:2.5rem">{{icon "party"}}</div>
+    <h2 style="font-size:1.25rem;color:inherit">학습 완료!</h2>
+    <div class="stat-3">
+      <div class="box"><div class="num">{{.State.FPTotal}}장</div><div class="label">카드</div></div>
+      <div class="box"><div class="num">{{.Accuracy}}%</div><div class="label">1차 정답률</div></div>
+      <div class="box"><div class="num">{{.State.Round}}</div><div class="label">라운드</div></div>
+    </div>
+    <a class="btn btn-primary btn-big" href="{{.State.ReturnURL}}">완료</a>
+  </div>
+
+{{else if eq .Phase "break"}}
+  <div class="stack-lg center" style="padding:4rem 0">
+    <div class="finish-icon" style="font-size:2.5rem">{{icon "rotate"}}</div>
+    <h2 style="font-size:1.125rem;color:inherit">틀린 카드 {{len .State.Missed}}장을 다시 풀어볼까요?</h2>
+    <p class="small muted">전부 맞힐 때까지 반복해요. 재도전 결과는 오답률에 반영되지 않아요.</p>
+    <form hx-post="/study/next-round" hx-target="#study-body">
+      {{template "study_state_fields" .}}
+      <button class="btn btn-amber btn-big">다시 풀기</button>
+    </form>
+  </div>
+
+{{else}}
+  {{$textFirst := eq .State.Direction "text_to_meaning"}}
+  <div class="stack-lg">
+    <div class="study-head">
+      <form method="post" action="/study/quit">
+        {{template "study_state_fields" .}}
+        <button class="btn btn-icon" aria-label="그만하기">{{icon "x"}}</button>
+      </form>
+      <span style="font-weight:500;color:var(--fg)">{{.State.Title}}</span>
+      <span>{{if gt .State.Round 1}}{{.State.Round}}R · {{end}}{{add .Index 1}}/{{.State.RoundLen}}</span>
+    </div>
+
+    <div class="progress"><div style="width:{{.ProgressPct}}%"></div></div>
+
+    {{with .Card}}
+    <div class="stack-lg" style="position:relative">
+      {{/* 뒤집기 상태는 이 체크박스 하나. CSS 형제 선택자가 카드 회전과
+           채점 버튼 표시를 모두 처리한다 — 자바스크립트가 필요 없다. */}}
+      <input type="checkbox" id="reveal" class="reveal-toggle">
+
+      <label for="reveal" class="flip-scene">
+        <div class="flip-inner">
+          <div class="flip-face">
+            <div class="row-between">
+              <span class="pill pill-muted">{{typeLabel .CardType}}</span>
+              {{if $textFirst}}<button type="button" class="tts" data-tts="{{$.TextTTS}}" data-tts-rate="{{$.State.TtsRate}}" aria-label="영어 읽어주기">{{icon "volume"}}</button>{{end}}
+            </div>
+            <div class="face-center">
+              <p class="question">{{if $textFirst}}{{.Text}}{{else}}{{.Meaning}}{{end}}</p>
+              {{if and $textFirst .Phonetic}}<p class="small muted">{{deref .Phonetic}}</p>{{end}}
+            </div>
+            <p class="tiny faint center hint">탭해서 정답 보기</p>
+          </div>
+          <div class="flip-face flip-back">
+            <div class="row-between">
+              <span class="tiny" style="color:var(--primary)">정답</span>
+              <button type="button" class="tts" data-tts="{{$.BackTTS}}" data-tts-rate="{{$.State.TtsRate}}" aria-label="영어 읽어주기">{{icon "volume"}}</button>
+            </div>
+            <div class="face-center">
+              <p class="answer">{{if $textFirst}}{{.Meaning}}{{else}}{{.Text}}{{end}}</p>
+              {{if and (not $textFirst) .Phonetic}}<p class="small muted">{{deref .Phonetic}}</p>{{end}}
+              {{if .Example}}<p class="example">{{deref .Example}}</p>{{end}}
+              {{if .Notes}}<p class="tiny muted">{{deref .Notes}}</p>{{end}}
+            </div>
+          </div>
+        </div>
+      </label>
+
+      <label for="reveal" class="btn btn-primary btn-big reveal-btn">정답 보기</label>
+
+      <form class="grade-grid" hx-post="/study/grade" hx-target="#study-body">
+        {{template "study_state_fields" $}}
+        <button class="btn btn-red btn-big" name="correct" value="false">{{icon "x"}} 틀렸어요</button>
+        <button class="btn btn-green btn-big" name="correct" value="true">{{icon "check"}} 맞았어요</button>
+      </form>
+    </div>
+    {{end}}
+  </div>
+{{end}}
+{{end}}
+
+{{define "saved_badge"}}<span class="pill pill-muted" style="align-self:flex-end">{{icon "check"}} 스마트 덱으로 저장했어요</span>{{end}}

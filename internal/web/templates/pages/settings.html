@@ -1,0 +1,36 @@
+{{define "content"}}
+<h1>설정</h1>
+
+<form method="post" action="/settings" class="tile stack-lg" style="padding:1rem">
+  <div class="small muted">{{if .LocalMode}}로컬 모드{{else}}{{.Email}}{{end}}</div>
+
+  <label class="field">
+    <span>이름</span>
+    <input name="display_name" value="{{deref .Data.Profile.DisplayName}}">
+  </label>
+
+  <label class="field">
+    <span>읽기 속도: <output id="rate-out">{{printf "%.1f" .Data.Settings.TtsRate}}</output>x
+      <button type="button" class="link" style="border:none;background:none;cursor:pointer;margin-left:.5rem;text-decoration:underline"
+        data-tts-test="f-rate">들어보기</button>
+    </span>
+    <input id="f-rate" type="range" name="tts_rate" min="0.5" max="1.5" step="0.1"
+      value="{{.Data.Settings.TtsRate}}" data-range-out="rate-out">
+  </label>
+
+  <label class="field">
+    <span>하루 복습 목표 (카드 수)</span>
+    <input type="number" name="daily_goal" min="5" max="200" value="{{.Data.Settings.DailyGoal}}">
+  </label>
+
+  <button class="btn btn-primary btn-big">저장</button>
+</form>
+
+{{if not .LocalMode}}
+<form method="post" action="/logout">
+  <button class="btn btn-danger-outline btn-big">{{icon "logout"}} 로그아웃</button>
+</form>
+{{end}}
+
+<p class="tiny faint center">Echo Flip v0.2.0</p>
+{{end}}

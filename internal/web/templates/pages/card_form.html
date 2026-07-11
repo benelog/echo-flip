@@ -1,0 +1,56 @@
+{{define "content"}}
+{{$f := .Data}}
+<header class="row">
+  <a class="btn btn-icon" href="{{$f.BackURL}}" aria-label="뒤로">{{icon "chev-left"}}</a>
+  <h1 style="font-size:1.125rem">{{if $f.Editing}}카드 수정{{else}}새 카드{{end}}</h1>
+</header>
+
+<form method="post" action="{{$f.Action}}" class="stack-lg">
+  <div class="type-pills">
+    <label><input type="radio" name="card_type" value="word" {{if eq $f.CardType "word"}}checked{{end}}><span>단어</span></label>
+    <label><input type="radio" name="card_type" value="sentence" {{if eq $f.CardType "sentence"}}checked{{end}}><span>문장</span></label>
+    <label><input type="radio" name="card_type" value="idiom" {{if eq $f.CardType "idiom"}}checked{{end}}><span>숙어</span></label>
+    <label><input type="radio" name="card_type" value="concept" {{if eq $f.CardType "concept"}}checked{{end}}><span>개념</span></label>
+  </div>
+
+  <label class="field">
+    <span class="row-between">원문 (영어 · 용어)
+      <span class="row">
+        <button type="button" class="tts" data-tts-from="f-text" aria-label="영어 읽어주기">{{icon "volume"}}</button>
+        <button type="button" class="btn pill pill-blue"
+          hx-post="/cards/lookup" hx-include="closest form"
+          hx-target="#lookup-status" hx-swap="innerHTML">{{icon "book"}} 사전에서 채우기</button>
+        <span id="lookup-status" class="tiny muted"></span>
+      </span>
+    </span>
+    <textarea id="f-text" name="text" rows="2" placeholder="serendipity / hit the sack / idempotency">{{$f.Text}}</textarea>
+  </label>
+
+  <label class="field">
+    <span>뜻 (설명)</span>
+    <textarea id="f-meaning" name="meaning" rows="3" placeholder="우연한 행운, 뜻밖의 발견">{{$f.Meaning}}</textarea>
+  </label>
+
+  <label class="field">
+    <span>발음 기호</span>
+    <input id="f-phonetic" name="phonetic" placeholder="/ˌserənˈdipəti/" value="{{$f.Phonetic}}">
+  </label>
+
+  <label class="field">
+    <span>예문</span>
+    <textarea id="f-example" name="example" rows="2">{{$f.Example}}</textarea>
+  </label>
+
+  <label class="field">
+    <span>태그 (쉼표로 구분)</span>
+    <input name="tags" placeholder="토익, 동사" value="{{$f.Tags}}">
+  </label>
+
+  <label class="field">
+    <span>메모</span>
+    <input name="notes" value="{{$f.Notes}}">
+  </label>
+
+  <button class="btn btn-primary btn-big">{{if $f.Editing}}수정하기{{else}}카드 추가{{end}}</button>
+</form>
+{{end}}

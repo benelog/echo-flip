@@ -1,0 +1,100 @@
+package web
+
+import (
+	"net/http"
+	"net/url"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/benelog/echo-flip/internal/auth"
+)
+
+// loginPage shows the OAuth buttons. Signed-in visitors (and local mode,
+// which has no login) go straight through.
+func (w *Web) loginPage(c *gin.Context) {
+	next := safeNext(c.Query("next"))
+	if w.cfg.AuthMode == "local" || auth.OptionalUserID(c) != nilUUID {
+		c.Redirect(http.StatusSeeOther, next)
+		return
+	}
+	w.render(c, http.StatusOK, "login", "로그인", gin.H{"Next": next})
+}
+
+// startOAuth kicks off the server-side PKCE flow: remember the verifier and
+// destination in short-lived cookies, then hand the visitor to GoTrue.
+func (w *Web) startOAuth(c *gin.Context) {
+	provider := c.Param("provider")
+	if provider != "google" && provider != "github" {
+		w.renderError(c, http.StatusNotFound, "지원하지 않는 로그인 방식이에요.")
+		return
+	}
+	if w.gt == nil {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	verifier := newPKCEVerifier()
+	setCookie(c, pkceCookie, verifier, 300)
+	setCookie(c, nextCookie, safeNext(c.Query("next")), 300)
+	redirectTo := origin(c) + "/auth/callback"
+	c.Redirect(http.StatusSeeOther, w.gt.authorizeURL(provider, redirectTo, pkceChallenge(verifier)))
+}
+
+// oauthCallback finishes the flow: trade the code for tokens and store them
+// in HttpOnly cookies. The browser never sees an access token.
+func (w *Web) oauthCallback(c *gin.Context) {
+	next := safeNext(cookieValue(c, nextCookie))
+	verifier := cookieValue(c, pkceCookie)
+	clearCookie(c, pkceCookie)
+	clearCookie(c, nextCookie)
+
+	code := c.Query("code")
+	if w.gt == nil || code == "" || verifier == "" {
+		setFlash(c, "error", "로그인에 실패했어요. 다시 시도해주세요.")
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+	tok, err := w.gt.exchangeCode(c.Request.Context(), code, verifier)
+	if err != nil {
+		setFlash(c, "error", "로그인에 실패했어요. 다시 시도해주세요.")
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+	w.setAuthCookies(c, tok)
+	c.Redirect(http.StatusSeeOther, next)
+}
+
+func (w *Web) logout(c *gin.Context) {
+	if w.gt != nil {
+		if at := cookieValue(c, accessCookie); at != "" {
+			// Best-effort revocation; clearing cookies signs the browser out
+			// regardless.
+			_ = w.gt.logout(c.Request.Context(), at)
+		}
+	}
+	w.clearAuthCookies(c)
+	c.Redirect(http.StatusSeeOther, "/login")
+}
+
+// origin rebuilds the request's external base URL, proxy-aware.
+func origin(c *gin.Context) string {
+	scheme := "http"
+	if isHTTPS(c) {
+		scheme = "https"
+	}
+	return scheme + "://" + c.Request.Host
+}
+
+// redirectBack sends a plain form post back where it came from (PRG pattern).
+func redirectBack(c *gin.Context, fallback string) {
+	ref := c.Request.Referer()
+	if ref == "" {
+		c.Redirect(http.StatusSeeOther, fallback)
+		return
+	}
+	u, err := url.Parse(ref)
+	if err != nil || u.Host != c.Request.Host {
+		c.Redirect(http.StatusSeeOther, fallback)
+		return
+	}
+	c.Redirect(http.StatusSeeOther, u.RequestURI())
+}

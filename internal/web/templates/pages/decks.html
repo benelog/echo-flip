@@ -1,0 +1,53 @@
+{{define "content"}}
+<header class="row-between">
+  <h1>덱</h1>
+</header>
+
+{{/* 새 덱 폼: summary를 누르면 열린다. 자바스크립트 없이 details만으로. */}}
+<details class="reveal">
+  <summary class="tile-dashed">{{icon "plus"}} 새 덱 만들기</summary>
+  <form method="post" action="/decks" class="row" style="margin-top:.5rem">
+    <input name="name" placeholder="덱 이름 (예: 토익 필수 단어)" autofocus required>
+    <button class="btn btn-primary" style="flex-shrink:0">만들기</button>
+  </form>
+</details>
+
+<a class="tile tile-blue row-between" href="/shared">
+  <span class="row" style="font-weight:500">{{icon "globe"}} 공유 덱 둘러보기</span>
+  <span class="faint">{{icon "chev-right"}}</span>
+</a>
+
+<section class="stack">
+  {{range .Data.Decks}}
+  <a class="tile" href="/decks/{{.Slug}}">
+    <div class="row-between">
+      <span style="font-weight:500">{{.Name}}</span>
+      <span class="small muted">{{.CardCount}}장</span>
+    </div>
+    {{if .Description}}<p class="small muted" style="margin:.25rem 0 0">{{deref .Description}}</p>{{end}}
+  </a>
+  {{else}}
+  <p class="empty">아직 덱이 없어요. 첫 덱을 만들어보세요!</p>
+  {{end}}
+</section>
+
+{{if .Data.SmartDecks}}
+<section class="stack">
+  <h2>스마트 덱</h2>
+  {{range .Data.SmartDecks}}
+  <div class="tile tile-amber row">
+    <a class="row" style="flex:1;min-width:0" href="/study?mode=smart&rule={{ruleRaw .Rule}}&title={{.Name}}&saved=1">
+      <span style="color:var(--amber)">{{icon "sparkles"}}</span>
+      <span style="min-width:0">
+        <span class="truncate" style="font-weight:500;display:block">{{.Name}}</span>
+        <span class="tiny muted">{{ruleLabel .Rule}}</span>
+      </span>
+    </a>
+    <button class="btn btn-icon" aria-label="스마트 덱 삭제"
+      hx-post="/smart-decks/{{.ID}}/delete" hx-target="closest .tile" hx-swap="outerHTML"
+      hx-confirm="'{{.Name}}' 스마트 덱을 삭제할까요?">{{icon "trash"}}</button>
+  </div>
+  {{end}}
+</section>
+{{end}}
+{{end}}

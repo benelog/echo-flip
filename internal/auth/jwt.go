@@ -60,6 +60,35 @@ func parseUserID(raw string, kf jwt.Keyfunc) (uuid.UUID, error) {
 	return uuid.Parse(sub)
 }
 
+// ParseUser validates a Supabase access token and returns its subject and
+// email claim. Used by the web layer, which carries the token in a cookie
+// instead of the Authorization header.
+func ParseUser(raw, jwksURL, secret string) (uuid.UUID, string, error) {
+	kf, err := keyfuncFor(jwksURL, secret)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+	claims := jwt.MapClaims{}
+	if _, err := jwt.ParseWithClaims(raw, claims, kf,
+		jwt.WithValidMethods([]string{"HS256", "RS256", "ES256"}),
+		jwt.WithAudience("authenticated"),
+		jwt.WithExpirationRequired(),
+	); err != nil {
+		return uuid.Nil, "", err
+	}
+	sub, _ := claims["sub"].(string)
+	email, _ := claims["email"].(string)
+	id, err := uuid.Parse(sub)
+	return id, email, err
+}
+
+// SetUserID stores the authenticated user id on the request context, under
+// the same key the API middleware uses, so handlers and EnsureProfile work
+// identically for cookie-authenticated web requests.
+func SetUserID(c *gin.Context, id uuid.UUID) {
+	c.Set(userIDKey, id)
+}
+
 // Middleware validates the Supabase access token and stores the user id.
 func Middleware(jwksURL, secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {

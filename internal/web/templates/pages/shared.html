@@ -1,0 +1,28 @@
+{{define "content"}}
+<header class="row">
+  {{if .LoggedIn}}<a class="btn btn-icon" href="/decks" aria-label="뒤로">{{icon "chev-left"}}</a>{{end}}
+  <h1 style="font-size:1.125rem">공유 덱 둘러보기</h1>
+</header>
+
+<div class="stack">
+  {{range .Data.Decks}}
+  <a class="tile" href="/shared/{{.ShareSlug}}">
+    <div class="row-between">
+      <span class="row" style="min-width:0;font-weight:500">
+        <span style="color:var(--primary)">{{icon "globe"}}</span>
+        <span class="truncate">{{.Name}}</span>
+        {{if .IsMine}}<span class="pill pill-muted">내 덱</span>{{end}}
+      </span>
+      <span class="small muted" style="flex-shrink:0">{{.CardCount}}장</span>
+    </div>
+    <p class="tiny muted" style="margin:.25rem 0 0">{{if .OwnerName}}{{deref .OwnerName}}{{else}}익명{{end}} · {{koDate .SharedAt}}</p>
+    {{if .Description}}<p class="truncate small muted" style="margin:.25rem 0 0">{{deref .Description}}</p>{{end}}
+  </a>
+  {{else}}
+  <p class="empty">아직 공유된 덱이 없어요.<br>
+    {{if .LoggedIn}}내 덱 상세 화면에서 "덱 공유하기"를 눌러 첫 공유 덱을 만들어보세요.
+    {{else}}로그인하면 내 덱을 공유해 첫 공유 덱을 만들 수 있어요.{{end}}
+  </p>
+  {{end}}
+</div>
+{{end}}
