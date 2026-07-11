@@ -6,7 +6,7 @@ export default defineConfig({
   description:
     'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
   base: '/echo-flip/',
-  srcExclude: ['book-plan.md'],
+  srcExclude: ['CLAUDE.md'],
   cleanUrls: true,
   markdown: {
     config(md) {
