@@ -82,7 +82,7 @@ SQL 문장은 역할에 따라 크게 두 갈래로 나뉜다.
 ### 준비물은 sqlite3 하나다
 
 용어 상자에서 말했듯 SQL 문법은 어느 관계형 데이터베이스에서나 대부분 통하고, 그중 SQLite는 서버 설치도 계정도 필요 없이 파일 하나로 돌아 실습 준비가 가장 가볍다.
-명령줄 도구 sqlite3는 macOS에 기본으로 들어 있고, 리눅스는 `sudo apt install sqlite3` 한 줄, 윈도우는 sqlite.org에서 내려받으면 된다.
+명령줄 도구 sqlite3는 macOS에 기본으로 들어 있고, 리눅스는 `sudo apt install sqlite3` 한 줄, 윈도우는 sqlite.org에서 내려받으면 된다(자세한 설치 방법은 부록 A에 있다).
 연습용 파일을 열어 시작해 보자.
 
 ```text

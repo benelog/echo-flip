@@ -64,6 +64,10 @@ export default defineConfig({
           { text: '22장 다음 단계: 여기서 더 공부할 것들', link: '/part2/whats-next' },
         ],
       },
+      {
+        text: '부록',
+        items: [{ text: '부록 A 개발 도구 설치', link: '/appendix/setup' }],
+      },
     ],
     outline: false,
     docFooter: { prev: '이전 장', next: '다음 장' },

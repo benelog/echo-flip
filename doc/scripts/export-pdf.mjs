@@ -44,6 +44,7 @@ const chapters = [
   { route: 'part2/pwa', title: '20장 PWA: 설치되는 앱으로 만들기' },
   { route: 'part2/free-tier', title: '21장 무료 티어 운영과 한도 관리' },
   { route: 'part2/whats-next', title: '22장 다음 단계: 여기서 더 공부할 것들' },
+  { route: 'appendix/setup', title: '부록 A 개발 도구 설치', part: '부록' },
 ]
 
 const FONT_LINKS = `
