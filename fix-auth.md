@@ -65,8 +65,8 @@ GitHub deployments 기록(Vercel이 남긴 것)이 설정값을 증언한다:
 
 ## 해결 순서 요약
 
-1. (대시보드) Production Branch를 `release`로 → 브랜치-환경 정렬 복구
-2. (대시보드) Deployment Protection의 Vercel Authentication 해제 → preview 접근 가능
-3. (대시보드) preview가 개발용 Supabase 프로젝트를 쓰는지 확인: Preview 스코프 환경 변수, 개발 프로젝트의 Redirect URL 허용 목록(`https://echo-flip-git-main-….vercel.app/auth/callback`)
-4. (증거) 실패 재현 → 방문 기록의 콜백 URL 확보 → 원인 확정
+1. ~~(대시보드) Production Branch를 `release`로~~ → **완료·검증됨** (2026-07-11 12:46 재배포에서 main 푸시 → Preview, release 푸시 → Production으로 정렬 확인)
+2. ~~(대시보드) Deployment Protection의 Vercel Authentication 해제~~ → **완료·검증됨** (preview가 SSO 대신 앱의 `/login`으로 응답)
+3. (대시보드) preview의 Supabase 배선: **미완**. 재배포 후에도 preview가 운영 프로젝트(`kncwqneczvkugkflqwpe`)로 authorize를 보낸다. Preview 스코프에 개발용 프로젝트의 `SUPABASE_URL`·`SUPABASE_ANON_KEY`·`DATABASE_URL`이 등록되어 있지 않다는 뜻(개발용 프로젝트 미생성 가능성, DEPLOY.md 1단계-4). 임시로 preview 로그인을 살리려면 운영 프로젝트의 Redirect URL 허용 목록에 `https://echo-flip-git-main-….vercel.app/auth/callback`을 추가하는 방법도 있으나, 개발 트래픽이 운영 DB로 가는 상태는 그대로다.
+4. (증거) production 실패 재현 → 방문 기록의 콜백 URL 확보 → 원인 확정: **대기 중**
 5. (코드) 진단 패치 적용 후, 원인에 맞는 수정
