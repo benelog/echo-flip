@@ -27,23 +27,23 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 
 ## 목차와 파일 매핑
 
-부 제목: 1부 **내 컴퓨터에서 웹 앱 완성하기** (2~14장, SQLite 로컬 모드로 내 컴퓨터에서 완결) / 2부 **세상에 공개하고 오래 운영하기** (15~22장, 버전 관리와 개발·운영 환경 분리 위에서 배포·운영). 1장 기술 선택은 도입 섹션 소속이다. (2026-07-11 개편)
+부 제목: 1부 **내 컴퓨터에서 웹 앱 완성하기** (1~13장, SQLite 로컬 모드로 내 컴퓨터에서 완결) / 2부 **세상에 공개하고 오래 운영하기** (14~21장, 버전 관리와 개발·운영 환경 분리 위에서 배포·운영). 도입은 기능 요구사항만 다루고, 비기능 요구사항·아키텍처는 1장으로 통합했다. (2026-07-11 AI 비중 확대 개편: Claude Code를 2장으로 전진 배치, 3장 '에이전트에게 지시하기' 신설, 옛 12장 훅·서브에이전트를 8장으로 통합, 기술 장마다 '에이전트 활용 아이디어' 절 추가)
 
 | 장 | 제목 | 파일 | 상태 |
 |---|---|---|---|
-| 도입 | 무엇을 만드는가: Echo Flip의 요구사항 | `doc/intro.md` | 검토 완료 |
-| 도입 1장 | 기술 선택: 왜 이 조합인가 | `doc/part1/tech-choices.md` | 검토 완료 |
-| 1부 2장 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `doc/part1/database-basics.md` | 검토 완료 |
-| 1부 3장 | 데이터베이스 설계: 요구사항에서 테이블로 | `doc/part1/database.md` | 검토 완료 |
-| 1부 4장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 검토 완료 |
-| 1부 5장 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `doc/part1/go.md` | 초안 완료 |
-| 1부 6장 | Go 테스트와 품질 도구 | `doc/part1/go-testing.md` | 초안 완료 |
-| 1부 7장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
-| 1부 8장 | HTML과 CSS: 화면을 이루는 문서와 스타일 | `doc/part1/html-css.md` | 초안 완료 |
-| 1부 9장 | html/template으로 만드는 화면 | `doc/part1/go-templates.md` | 초안 완료 |
-| 1부 10장 | htmx: 자바스크립트 없이 만드는 동적 화면 | `doc/part1/htmx.md` | 초안 완료 |
-| 1부 11장 | Claude Code: AI 에이전트와 개발하기 | `doc/part1/claude-code.md` | 초안 완료 |
-| 1부 12장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part1/agents-hooks.md` | 초안 완료 |
+| 도입 | 무엇을 만드는가: Echo Flip의 기능 요구사항 | `doc/intro.md` | 초안 완료 |
+| 1부 1장 | 기술 선택: 요구사항에서 아키텍처까지 | `doc/part1/tech-choices.md` | 초안 완료 |
+| 1부 2장 | Claude Code: AI 에이전트와 개발하기 | `doc/part1/claude-code.md` | 초안 완료 |
+| 1부 3장 | 에이전트에게 지시하기: Plan 모드 활용 | `doc/part1/instructing.md` | 초안 완료 |
+| 1부 4장 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `doc/part1/database-basics.md` | 검토 완료 |
+| 1부 5장 | 데이터베이스 설계: 요구사항에서 테이블로 | `doc/part1/database.md` | 검토 완료 |
+| 1부 6장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 검토 완료 |
+| 1부 7장 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `doc/part1/go.md` | 초안 완료 |
+| 1부 8장 | Go 테스트와 품질 게이트: 도구, 훅, 서브에이전트 | `doc/part1/go-testing.md` | 초안 완료 |
+| 1부 9장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
+| 1부 10장 | HTML과 CSS: 화면을 이루는 문서와 스타일 | `doc/part1/html-css.md` | 초안 완료 |
+| 1부 11장 | html/template으로 만드는 화면 | `doc/part1/go-templates.md` | 초안 완료 |
+| 1부 12장 | htmx: 자바스크립트 없이 만드는 동적 화면 | `doc/part1/htmx.md` | 초안 완료 |
 | 1부 13장 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `doc/part1/local-dev.md` | 초안 완료 |
 | 2부 14장 | Git: 개념과 브랜치 정책 | `doc/part2/git.md` | 검토 완료 |
 | 2부 15장 | GitHub Actions: 원격 품질 게이트 | `doc/part2/github-actions.md` | 초안 완료 |
