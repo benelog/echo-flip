@@ -12,7 +12,7 @@ sidebar: false
     <ul class="ef-book-pitch">
       <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
       <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>
-      <li>수십 MB로 도는 가벼운 서버, 무료 티어와 꼭 맞다</li>
+      <li>무료 티어에 유리하게 수십 MB 메모리만 사용하는 서버</li>
     </ul>
     <p class="ef-book-author">benelog 지음</p>
     <div class="ef-book-zero">&#8361;0</div>
