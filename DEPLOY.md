@@ -77,7 +77,8 @@ git branch release && git push origin release   # 운영 배포용 브랜치 (ma
 
 ## 6. Vercel ✋
 
-1. https://vercel.com → Add New Project → echo-flip 저장소 import (Framework: **Other**, Root Directory는 저장소 루트 그대로)
+1. https://vercel.com → Add New Project → echo-flip 저장소 import (Root Directory는 저장소 루트 그대로.
+   Framework Preset은 `vercel.json`의 `"framework": null`이 덮어쓰므로 무엇으로 감지되든 상관없음)
 2. Settings → Environments → Production의 Branch Tracking에서 **Production Branch**를 `main`에서 `release`로 변경
    (이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)
 3. Environment Variables 등록 — 스코프를 나눠 **Production에는 운영 Supabase 프로젝트 값, Preview에는 개발 프로젝트 값**을 넣습니다 (분리 이유는 책 18장):
@@ -99,6 +100,7 @@ git branch release && git push origin release   # 운영 배포용 브랜치 (ma
 
 ## 문제 해결
 
+- **빌드가 `next build`를 실행하다 "Couldn't find any pages or app directory"로 실패**: 저장소가 Next.js였던 시절 import되어 Framework Preset에 Next.js가 남아 있는 경우. `vercel.json`의 `"framework": null`이 프리셋을 덮어쓰므로, 이 설정이 포함된 커밋을 다시 배포하면 된다.
 - **로그인 후 다시 로그인 페이지로**: Supabase URL Configuration의 Redirect URL에 배포 URL의 `/auth/callback`이 없는 경우.
 - **서버가 500 "jwks unavailable"**: `SUPABASE_URL` 오타(JWKS URL은 여기서 유도). 구형 프로젝트(HS256)라면 대신 `SUPABASE_JWT_SECRET`(Settings → API → JWT Secret)을 설정해도 됩니다.
 - **첫 요청이 느림**: 서버리스 콜드스타트 + JWKS 첫 조회. 이후 요청은 빠릅니다.
