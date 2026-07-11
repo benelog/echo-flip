@@ -7,8 +7,8 @@ sidebar: false
   <a class="ef-book" href="/echo-flip/preface" aria-label="읽기 시작">
     <div class="ef-book-cards" aria-hidden="true"><span>A</span><span>가</span></div>
     <div class="ef-book-rule"></div>
-    <h1>월 <span class="ef-zero">0원</span>으로 운영하는<br>나의 웹 앱</h1>
-    <p class="ef-book-subtitle">혼자 만들고, 무료로 배포하고,<br>AI와 함께 개발한다</p>
+    <h1>월 <span class="ef-zero">0원</span>으로 운영하는<br>나만의 웹 앱</h1>
+    <p class="ef-book-subtitle">AI에게 지시해 Go로 만들고,<br>무료 한도 안에서 운영한다</p>
     <ul class="ef-book-pitch">
       <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
       <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>

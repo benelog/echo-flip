@@ -14,8 +14,8 @@ const docRoot = fileURLToPath(new URL('..', import.meta.url))
 const dist = join(docRoot, '.vitepress/dist')
 const BASE = '/echo-flip/'
 
-const TITLE = '월 0원으로 운영하는 나의 웹 앱'
-const SUBTITLE = '혼자 만들고, 무료로 배포하고, AI와 함께 개발한다'
+const TITLE = '월 0원으로 운영하는 나만의 웹 앱'
+const SUBTITLE = 'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다'
 const AUTHOR = 'benelog'
 const SITE = 'benelog.github.io/echo-flip'
 
@@ -89,7 +89,7 @@ function coverHtml() {
     <div class="frame"></div>
     <div class="cards"><span class="front">A</span><span class="back">가</span></div>
     <div class="rule"></div>
-    <h1>월 <span class="gold">0원</span>으로 운영하는<br>나의 웹 앱</h1>
+    <h1>월 <span class="gold">0원</span>으로 운영하는<br>나만의 웹 앱</h1>
     <p class="subtitle">${SUBTITLE}</p>
     <ul class="pitch">
       <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
