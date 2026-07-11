@@ -21,6 +21,7 @@ const SITE = 'benelog.github.io/echo-flip'
 
 // 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.
 const chapters = [
+  { route: 'preface', title: '저자 서문', part: '서문' },
   { route: 'intro', title: '도입: 무엇을 만드는가', part: '도입' },
   { route: 'part1/tech-choices', title: '1장 기술 선택: 왜 이 조합인가' },
   { route: 'part1/database-basics', title: '2장 데이터베이스 기초: 테이블, SQL, 인덱스', part: '1부 내 컴퓨터에서 웹 앱 완성하기' },
@@ -77,6 +78,8 @@ function coverHtml() {
     .cards .front { top: 0; right: 15mm; border: 0.4mm solid rgba(255,255,255,.38); background: rgba(255,255,255,.04); color: rgba(255,255,255,.75); transform: rotate(-8deg); }
     .cards .back { top: 8mm; right: 0; background: #8ea2d8; color: #1d2747; transform: rotate(7deg); }
     .subtitle { font-family: 'Noto Sans KR', sans-serif; font-size: 13.5pt; font-weight: 400; color: rgba(255,255,255,.82); margin: 0; line-height: 1.8; word-break: keep-all; }
+    .pitch { margin: 12mm 0 0; padding: 0; list-style: none; font-family: 'Noto Sans KR', sans-serif; font-size: 10.5pt; line-height: 2.1; color: rgba(255,255,255,.68); word-break: keep-all; }
+    .pitch li::before { content: '✓'; margin-right: 2.5mm; color: #f6c453; font-weight: 700; }
     .bottom { margin-top: auto; font-family: 'Noto Sans KR', sans-serif; }
     .author { font-size: 13pt; font-weight: 500; margin: 0 0 2.5mm; }
     .site { font-size: 9.5pt; color: rgba(255,255,255,.55); margin: 0; }
@@ -88,6 +91,11 @@ function coverHtml() {
     <div class="rule"></div>
     <h1>월 <span class="gold">0원</span>으로 운영하는<br>나의 웹 앱</h1>
     <p class="subtitle">${SUBTITLE}</p>
+    <ul class="pitch">
+      <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
+      <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>
+      <li>수십 MB로 도는 가벼운 서버, 무료 티어와 꼭 맞다</li>
+    </ul>
     <div class="bottom">
       <p class="author">${AUTHOR} 지음</p>
       <p class="site">${SITE}</p>

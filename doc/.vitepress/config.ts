@@ -32,13 +32,14 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '홈', link: '/' },
-      { text: '읽기 시작', link: '/intro' },
+      { text: '읽기 시작', link: '/preface' },
       { text: 'PDF 다운로드', link: 'https://benelog.github.io/echo-flip/echo-flip-book.pdf' },
     ],
     sidebar: [
       {
         text: '도입',
         items: [
+          { text: '저자 서문', link: '/preface' },
           { text: '무엇을 만드는가: Echo Flip의 요구사항', link: '/intro' },
           { text: '1장 기술 선택: 왜 이 조합인가', link: '/part1/tech-choices' },
         ],
