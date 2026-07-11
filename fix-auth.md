@@ -3,6 +3,7 @@
 > **결론 (2026-07-11 확정)**: production 로그인 실패의 근본 원인은 Vercel에 등록된 `SUPABASE_ANON_KEY` 값 끝에 딸려 들어간 **개행 문자**였다.
 > 진단 패치 배포 후 Vercel Logs에 `net/http: invalid header field value for "Apikey"`가 찍혔다. Go의 HTTP 클라이언트는 헤더 값에 제어 문자가 있으면 요청을 보내지 않고 거부하므로, 토큰 교환 요청이 GoTrue에 도달조차 못 했다(flow state가 소비되지 않고 살아 있던 증거와 일치).
 > 수정: `internal/config`가 모든 환경 변수를 `strings.TrimSpace`로 읽도록 방어를 추가하고 회귀 테스트를 붙였다. 대시보드 값을 다시 입력할 필요는 없다.
+> **추가 확정 (같은 날)**: TrimSpace 배포 후에도 같은 에러가 재발했다. 개행이 값의 가장자리가 아니라 **중간**에 있다는 뜻이다(긴 키를 터미널 등에서 복사할 때 줄바꿈이 섞여 들어간 형태로 추정). API 키에는 공백이 있을 수 없으므로 `SUPABASE_ANON_KEY`·`SUPABASE_JWT_SECRET`은 내부 공백까지 전부 제거하는 `envKey`로 읽도록 강화했다. 근본적으로는 대시보드 값을 한 줄로 재입력하는 것이 깨끗하다.
 > preview의 Vercel 배포 보호, Production Branch 뒤바뀜(main↔release)도 같은 날 함께 발견해 해결했다. 상세는 아래.
 
 2026-07-11, 배포 정상화(환경 변수 등록·`framework: null`) 직후 preview·production 양쪽에서 로그인 실패가 보고되어 조사한 기록이다.

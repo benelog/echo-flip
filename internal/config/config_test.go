@@ -9,7 +9,9 @@ import "testing"
 func TestLoadTrimsWhitespace(t *testing.T) {
 	t.Setenv("DATABASE_URL", " postgres://example/db \n")
 	t.Setenv("SUPABASE_URL", "https://ref.supabase.co/\n")
-	t.Setenv("SUPABASE_ANON_KEY", "sb_publishable_key\n")
+	// Long keys copied from a terminal arrive line-wrapped: whitespace in
+	// the middle must be removed too, not just trimmed at the edges.
+	t.Setenv("SUPABASE_ANON_KEY", "sb_publish\nable_key\n")
 	t.Setenv("SUPABASE_JWKS_URL", "")
 	t.Setenv("SUPABASE_JWT_SECRET", "")
 	t.Setenv("PORT", "")
@@ -24,7 +26,7 @@ func TestLoadTrimsWhitespace(t *testing.T) {
 	if cfg.SupabaseURL != "https://ref.supabase.co" {
 		t.Errorf("SupabaseURL = %q", cfg.SupabaseURL)
 	}
-	if cfg.SupabaseAnonKey != "sb_publishable_key" {
+	if cfg.SupabaseAnonKey != "sb_publishable_key" { // interior newline removed
 		t.Errorf("SupabaseAnonKey = %q", cfg.SupabaseAnonKey)
 	}
 }

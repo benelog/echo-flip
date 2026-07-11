@@ -13,6 +13,14 @@ func env(name string) string {
 	return strings.TrimSpace(os.Getenv(name))
 }
 
+// envKey reads an API key with every whitespace character removed, not just
+// the edges. Long keys copied from a terminal arrive line-wrapped, and a
+// newline in the middle of a header value also makes net/http refuse the
+// request. Keys never contain whitespace, so removal is lossless.
+func envKey(name string) string {
+	return strings.Join(strings.Fields(os.Getenv(name)), "")
+}
+
 type Config struct {
 	Driver          string // "postgres" (production) or "sqlite" (local mode)
 	DatabaseURL     string
@@ -30,9 +38,9 @@ func Load() (*Config, error) {
 	cfg := &Config{
 		DatabaseURL:     env("DATABASE_URL"),
 		SupabaseURL:     strings.TrimRight(env("SUPABASE_URL"), "/"),
-		SupabaseAnonKey: env("SUPABASE_ANON_KEY"),
+		SupabaseAnonKey: envKey("SUPABASE_ANON_KEY"),
 		JWKSURL:         env("SUPABASE_JWKS_URL"),
-		JWTSecret:       env("SUPABASE_JWT_SECRET"),
+		JWTSecret:       envKey("SUPABASE_JWT_SECRET"),
 		Port:            env("PORT"),
 	}
 	if cfg.Port == "" {
