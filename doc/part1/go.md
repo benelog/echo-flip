@@ -153,7 +153,7 @@ Go는 숫자 타입 간 암묵적 변환을 허용하지 않으므로, `float64`
 
 `Grade`는 실패할 일이 없는 순수 계산이라 에러를 반환하지 않는다.
 실패할 수 있는 함수의 모양은 internal/smartrules/rules.go에서 볼 수 있다.
-이 패키지는 "오답률 높은 카드", "오래 안 본 카드" 같은 조건으로 카드를 골라 주는 가상의 스마트 덱 규칙을 다룬다.
+이 패키지는 스마트 덱, 즉 카드를 직접 담아 두는 대신 "오답률 높은 카드", "오래 안 본 카드" 같은 조건에 맞는 카드를 학습할 때마다 골라 모으는 가상 덱의 규칙을 다룬다.
 아래 `Parse`는 규칙을 적은 JSON 텍스트를 해석해 `Rule` 값으로 바꾸는 함수다.
 
 ```go
@@ -169,7 +169,7 @@ func Parse(raw []byte) (Rule, error) {
 6장에서 본 관례가 그대로 나온다.
 실패할 수 있는 함수는 마지막 반환값으로 `error` 타입을 돌려주고, 호출자는 그 값이 `nil`인지 즉시 검사한다.
 `if err := json.Unmarshal(raw, &r); err != nil { ... }`는 이 관례의 표준형으로, `if` 문 안에서 변수 선언과 조건 검사를 한 번에 한다.
-`fmt.Errorf`의 `%w` 동사는 원인 에러를 감싸(wrap) 맥락을 덧붙이면서도 원인을 보존하는 새 에러를 만든다.
+`fmt.Errorf`에 쓴 `%w`는 원인 에러를 감싸(wrap) 맥락을 덧붙이면서도 원인을 보존하는 새 에러를 만든다.
 
 미리 정의해 두고 재사용하는 센티널 에러(Sentinel Error) 패턴도 있다.
 internal/store/store.go에서 발췌했다.
@@ -230,6 +230,7 @@ Go에서 함수의 인자는 복사되어 전달된다.
 
 앞서 `Grade`는 `State`를 값으로 받았다.
 반면 rules.go의 `Validate`는 포인터로 받는다.
+방금 본 `Parse`가 마지막에 호출하던, 스마트 덱 규칙이 올바른지 검사하는 메서드다.
 
 ```go
 func (r *Rule) Validate() error {
@@ -261,7 +262,7 @@ func (r *Rule) Validate() error {
 ### 값의 부재를 나타내는 포인터
 
 포인터의 또 다른 용도는 "값이 없음"의 표현이다.
-internal/store/decks.go의 `Deck` 구조체를 보자.
+internal/store/decks.go에서 덱 하나의 정보를 담는 `Deck` 구조체를 보자.
 
 ```go
 type Deck struct {
@@ -284,6 +285,7 @@ type Deck struct {
 
 Go에서 일상적으로 쓰는 컬렉션 타입은 슬라이스(Slice)와 맵(Map) 둘이다.
 슬라이스는 가변 길이 배열인데, internal/store/decks.go의 `ListDecks`가 전형적인 사용 패턴을 보여 준다.
+한 사용자의 덱 목록을 DB에서 한 행씩 읽어 슬라이스에 담아 돌려주는 함수다.
 
 ```go
 func (s *Store) ListDecks(ctx context.Context, userID uuid.UUID) ([]Deck, error) {

@@ -212,6 +212,7 @@ base 복제본에 `home.html`을 얹으면 그 안에서 `content`는 홈 화면
 ### render: 실행 시작점은 언제나 layout
 
 파싱해 둔 템플릿을 실제로 그리는 함수는 `render`다.
+핸들러가 페이지 이름을 건네면, 준비해 둔 맵에서 그 페이지의 템플릿 집합을 찾아 브라우저로 보낼 HTML 응답을 써 낸다.
 
 `internal/web/web.go`:
 
