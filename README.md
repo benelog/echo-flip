@@ -20,6 +20,19 @@
 - 무료 사전 API로 발음기호·뜻·예문 자동 채우기 (서버가 조회해 htmx로 폼에 채움)
 - 음성(TTS) 버튼: Web Speech API로 영어 읽어주기
 
+## 환경
+
+local, preview, production 세 환경이 있다. 브랜치가 배포 환경을 정한다: `main` 푸시 → preview, `release` 푸시(= `./release.sh`의 main → release 병합) → production.
+
+| 환경 | URL | DB / 인증 | 배포 계기 |
+|---|---|---|---|
+| **local** | http://localhost:8080 | SQLite 파일(`echo-flip.db`), 로그인 없음 | `./run_local.sh` |
+| **preview** (개발) | https://echo-flip-git-main-sanghyuk-jungs-projects.vercel.app | 개발용 Supabase 프로젝트 | `main` 푸시 |
+| **production** (운영) | https://echo-flip-delta.vercel.app | 운영용 Supabase 프로젝트 | `release` 푸시 |
+
+preview URL은 main 브랜치의 최신 배포를 가리키는 고정 별칭이다(배포마다 새로 생기는 고유 URL과 별개).
+환경 변수는 Vercel의 Production/Preview 스코프에 따로 등록한다. 상세 배선은 [DEPLOY.md](./DEPLOY.md) 참고.
+
 ## 로컬 개발
 
 ```bash
