@@ -55,6 +55,15 @@ GitHub deployments 기록(Vercel이 남긴 것)이 설정값을 증언한다:
 - `?error=...`가 붙어 있으면 → GoTrue 쪽 실패. `error_description`이 원인 문장이다. "Unable to exchange external code"면 Supabase 대시보드 → Authentication → Sign In / Providers → Google의 Client Secret을 재확인·재입력한다.
 - `?code=...`만 있으면 → 앱 쪽 실패(쿠키 소실 또는 교환 실패). 이 둘을 구분하려면 아래 진단 패치가 필요하다.
 
+### 증거 확보 결과 (2026-07-11)
+
+실패한 시도의 콜백 URL은 `?code=09ac2382-…`였고 `error` 파라미터가 없었다. GoTrue와 구글 쪽은 성공했다는 뜻이다(Client Secret 가설 기각).
+이어서 그 코드로 운영 GoTrue의 토큰 엔드포인트를 직접 호출하자 `bad_code_verifier`("code challenge does not match previously saved code verifier")가 반환됐다.
+flow state가 소비되지 않고 살아 있다는 것은 **서버가 이 코드를 한 번도 성공적으로 교환하지 못했다**는 증거다.
+따라서 원인은 콜백 시점의 PKCE 쿠키 문제로 확정된다: 쿠키가 만료됐거나(Max-Age 300초), 다른 로그인 시도가 쿠키를 덮어써 verifier와 challenge가 어긋난 경우다.
+간헐적 성공/실패와도 부합한다.
+어느 쪽인지는 아래 진단 패치가 배포된 뒤의 플래시 메시지(또는 Vercel Logs)로 판별한다: "로그인 확인 정보가 만료됐어요"면 쿠키 소실, "로그인에 실패했어요"면 교환 거부(로그에 GoTrue 응답 본문이 남는다).
+
 ## 앱 진단 공백 (패치 권고)
 
 이번 조사에서 원인 추적을 막은 두 곳. 원인 확정과 별개로 고쳐 둘 가치가 있다.

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 
@@ -47,14 +48,32 @@ func (w *Web) oauthCallback(c *gin.Context) {
 	clearCookie(c, pkceCookie)
 	clearCookie(c, nextCookie)
 
-	code := c.Query("code")
-	if w.gt == nil || code == "" || verifier == "" {
+	// GoTrue reports its own failures (provider errors, misconfigured
+	// secrets) as ?error= instead of ?code=; surface them in the logs.
+	if errCode := c.Query("error"); errCode != "" {
+		log.Printf("oauth callback: gotrue error %q: %s", errCode, c.Query("error_description"))
 		setFlash(c, "error", "로그인에 실패했어요. 다시 시도해주세요.")
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+	code := c.Query("code")
+	if w.gt == nil || code == "" {
+		log.Printf("oauth callback: no code in callback")
+		setFlash(c, "error", "로그인에 실패했어요. 다시 시도해주세요.")
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+	if verifier == "" {
+		// The 5-minute PKCE cookie is gone: the visitor lingered on the
+		// provider screen, or a newer login attempt replaced it.
+		log.Printf("oauth callback: pkce cookie missing or expired")
+		setFlash(c, "error", "로그인 확인 정보가 만료됐어요. 처음부터 다시 시도해주세요.")
 		c.Redirect(http.StatusSeeOther, "/login")
 		return
 	}
 	tok, err := w.gt.exchangeCode(c.Request.Context(), code, verifier)
 	if err != nil {
+		log.Printf("oauth callback: code exchange failed: %v", err)
 		setFlash(c, "error", "로그인에 실패했어요. 다시 시도해주세요.")
 		c.Redirect(http.StatusSeeOther, "/login")
 		return

@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -82,7 +83,8 @@ func (g *goTrue) token(ctx context.Context, grantType string, body any) (tokenRe
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return tok, fmt.Errorf("gotrue %s: status %d", grantType, res.StatusCode)
+		body, _ := io.ReadAll(io.LimitReader(res.Body, 512))
+		return tok, fmt.Errorf("gotrue %s: status %d: %s", grantType, res.StatusCode, body)
 	}
 	if err := json.NewDecoder(res.Body).Decode(&tok); err != nil {
 		return tok, err
