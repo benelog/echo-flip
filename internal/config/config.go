@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+// env reads a variable with surrounding whitespace stripped. A trailing
+// newline pasted into a dashboard field otherwise survives into HTTP
+// headers, where net/http rejects the value and requests never leave.
+func env(name string) string {
+	return strings.TrimSpace(os.Getenv(name))
+}
+
 type Config struct {
 	Driver          string // "postgres" (production) or "sqlite" (local mode)
 	DatabaseURL     string
@@ -21,12 +28,12 @@ type Config struct {
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		DatabaseURL:     os.Getenv("DATABASE_URL"),
-		SupabaseURL:     strings.TrimRight(os.Getenv("SUPABASE_URL"), "/"),
-		SupabaseAnonKey: os.Getenv("SUPABASE_ANON_KEY"),
-		JWKSURL:         os.Getenv("SUPABASE_JWKS_URL"),
-		JWTSecret:       os.Getenv("SUPABASE_JWT_SECRET"),
-		Port:            os.Getenv("PORT"),
+		DatabaseURL:     env("DATABASE_URL"),
+		SupabaseURL:     strings.TrimRight(env("SUPABASE_URL"), "/"),
+		SupabaseAnonKey: env("SUPABASE_ANON_KEY"),
+		JWKSURL:         env("SUPABASE_JWKS_URL"),
+		JWTSecret:       env("SUPABASE_JWT_SECRET"),
+		Port:            env("PORT"),
 	}
 	if cfg.Port == "" {
 		cfg.Port = "8080"
@@ -57,7 +64,7 @@ func Load() (*Config, error) {
 	}
 	cfg.Driver = "sqlite"
 	cfg.AuthMode = "local"
-	cfg.SQLitePath = os.Getenv("SQLITE_PATH")
+	cfg.SQLitePath = env("SQLITE_PATH")
 	if cfg.SQLitePath == "" {
 		cfg.SQLitePath = "echo-flip.db"
 	}
