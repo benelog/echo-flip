@@ -37,52 +37,50 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 | 1부 4장 | Go 기초: 모듈, 변수, 함수 | `doc/part1/go-basics.md` | 검토 완료 |
 | 1부 5장 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `doc/part1/go.md` | 초안 완료 |
 | 1부 6장 | Go 테스트와 품질 도구 | `doc/part1/go-testing.md` | 초안 완료 |
-| 1부 7장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 검토 완료 |
-| 1부 8장 | TypeScript: 타입으로 지키는 프런트엔드 | `doc/part1/typescript.md` | 초안 완료 |
-| 1부 9장 | TypeScript 실전: 비동기 처리와 런타임 검증 | `doc/part1/typescript-async.md` | 초안 완료 |
-| 1부 10장 | React 기초: 컴포넌트, 상태, 훅 | `doc/part1/react.md` | 초안 완료 |
-| 1부 11장 | React 실전과 Next.js: 전역 상태와 정적 export | `doc/part1/react-next.md` | 검토 완료 |
-| 1부 12장 | Claude Code: AI 에이전트와 개발하기 | `doc/part1/claude-code.md` | 검토 완료 |
-| 1부 13장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part1/agents-hooks.md` | 검토 완료 |
-| 1부 14장 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `doc/part1/local-dev.md` | 검토 완료 |
-| 2부 15장 | Git: 개념과 브랜치 정책 | `doc/part2/git.md` | 검토 완료 |
-| 2부 16장 | GitHub Actions: 원격 품질 게이트 | `doc/part2/github-actions.md` | 검토 완료 |
-| 2부 17장 | Vercel: 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 검토 완료 |
-| 2부 18장 | Supabase 인증: OAuth와 JWKS 검증 | `doc/part2/supabase-auth.md` | 검토 완료 |
-| 2부 19장 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `doc/part2/supabase-db.md` | 검토 완료 |
-| 2부 20장 | PWA: 설치되는 앱으로 만들기 | `doc/part2/pwa.md` | 초안 완료 |
-| 2부 21장 | 무료 티어 운영과 한도 관리 | `doc/part2/free-tier.md` | 검토 완료 |
-| 2부 22장 | 다음 단계: 여기서 더 공부할 것들 | `doc/part2/whats-next.md` | 검토 완료 |
+| 1부 7장 | Gin으로 만드는 HTTP API | `doc/part1/gin.md` | 초안 완료 |
+| 1부 8장 | HTML과 CSS: 화면을 이루는 문서와 스타일 | `doc/part1/html-css.md` | 초안 완료 |
+| 1부 9장 | html/template으로 만드는 화면 | `doc/part1/go-templates.md` | 초안 완료 |
+| 1부 10장 | htmx: 자바스크립트 없이 만드는 동적 화면 | `doc/part1/htmx.md` | 초안 완료 |
+| 1부 11장 | Claude Code: AI 에이전트와 개발하기 | `doc/part1/claude-code.md` | 초안 완료 |
+| 1부 12장 | 서브에이전트와 훅으로 만드는 품질 게이트 | `doc/part1/agents-hooks.md` | 초안 완료 |
+| 1부 13장 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `doc/part1/local-dev.md` | 초안 완료 |
+| 2부 14장 | Git: 개념과 브랜치 정책 | `doc/part2/git.md` | 검토 완료 |
+| 2부 15장 | GitHub Actions: 원격 품질 게이트 | `doc/part2/github-actions.md` | 초안 완료 |
+| 2부 16장 | Vercel: 한 플랫폼에 모두 배포하기 | `doc/part2/vercel.md` | 초안 완료 |
+| 2부 17장 | Supabase 인증: OAuth와 JWKS 검증 | `doc/part2/supabase-auth.md` | 초안 완료 |
+| 2부 18장 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `doc/part2/supabase-db.md` | 초안 완료 |
+| 2부 19장 | PWA: 설치되는 앱으로 만들기 | `doc/part2/pwa.md` | 초안 완료 |
+| 2부 20장 | 무료 티어 운영과 한도 관리 | `doc/part2/free-tier.md` | 초안 완료 |
+| 2부 21장 | 다음 단계: 여기서 더 공부할 것들 | `doc/part2/whats-next.md` | 초안 완료 |
 | 부록 A | 개발 도구 설치 | `doc/appendix/setup.md` | 초안 완료 |
 
 상태 값: `미착수` → `초안 작성 중` → `초안 완료` → `검토 완료`
-2026-07-11 개편에서 내용이 바뀐 장은 `초안 완료`로 되돌렸다가, 같은 날 병렬 통독 검토(7그룹)를 통과한 15개 장을 `검토 완료`로 승격했다. 남은 초안 완료: 5·6·8·9·10·20장(이번 개편과 무관하거나 소폭 수정).
+2026-07-11 Go SSR 전환 재편(아래 로드맵 참조)에서 신설·재작성·수정된 장은 전부 `초안 완료`로 두었다. 통독 검토를 통과하면 `검토 완료`로 승격한다. 이번 재편에서 안 바뀐 장: 2·3·5·6·14장(재번호만).
 
 ### 장별 필수 내용 요약
 
-- **도입**: 앱 소개(암기 카드), 기능 요구사항(양방향 카드·덱·학습 흐름·SRS·스마트 덱·통계·공유·CSV·사전 API·TTS), 비기능 요구사항(무료 인프라, 운영 부담 최소화, PWA), 전체 아키텍처 개요(정적 Next + Vercel Go 함수 + Supabase, 이 그림은 2부에서 완성되는 운영 모드이고 1부에서는 같은 코드가 SQLite 로컬 모드로 돈다는 두 모드 관점), 책의 구성(1부 로컬 완성 / 2부 공개·운영, 준비물은 Go·Node뿐이고 Supabase·Vercel 계정은 2부부터).
-- **1장 기술 선택** (도입 섹션 소속): 각 기술의 선택 이유를 한 장에 모은 장. 공통 선택 기준(무료·관리 최소·AI 협업·서버리스 적합) → 왜 관계형 DB인가: SQLite로 시작해 PostgreSQL로 옮긴다(SQLite=1부 로컬 모드의 선택, 서버리스 복제·휘발 탓에 운영은 PostgreSQL, 스토어 인터페이스 덕에 교체는 배포 대상 선택, vs 문서형 NoSQL) → 왜 Go(vs Node/Python/JVM) → 왜 Gin(vs net/http·chi·Echo) → 왜 TypeScript(vs JS) → 왜 React·Next.js·정적 export(vs Vue/Svelte). Vercel·Supabase 선택 이유는 17·18장 소관.
-- **2장 데이터베이스 기초**: 테이블·행·열과 표 나누기(정규화), 기본 키·외래 키, SQL 선언형 언어와 DDL/DML 구분, sqlite3로 직접 실습(준비물은 sqlite3 하나, 14장의 echo-flip.db 예고), DDL(create/alter, SQLite의 자료형 현실과 check·앱 규약, 제약), DML(insert 자리표시자 `?`와 SQL 인젝션, `$1`은 드라이버 차이, select·집계·조인, update/delete와 where·RowsAffected), 인덱스(B-tree, 복합 인덱스 열 순서, 쓰기 비용). 예제: `internal/litestore/schema.sql`, `internal/litestore/decks.go`, `internal/litestore/cards.go`.
-- **3장 데이터베이스 설계**: 요구사항→테이블 도출(사용자·덱·카드, 카드/SRS 분리, 세션·리뷰 로그, 스마트 덱·통계 뷰), 스키마 원전은 `internal/litestore/schema.sql`(서버 시작 시 통째 멱등 적용), 전용 자료형이 적은 SQLite에 설계 의도를 담는 법(uuid는 Go 생성+text, 고정 폭 UTC 텍스트는 문자열 비교=시간 순서, JSON text, text+check, seq는 max+1), 외래 키 프래그마 함정, SRS 데이터 모델(단일 작성자라 잠금 불필요 vs 운영 for update 대비), 덱 slug 설계. 마이그레이션·RLS는 19장으로 이관(다리 문단만).
-- **4장 Go 기초**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조(go.mod 직접 의존성 여덟 개, api/index.go의 pkg/app 제약, litestore 포함 트리), 변수와 기본 타입(var/:=, 제로값), 함수와 다중 반환값, 공개 규칙(대소문자), 제어문(if 초기화문, for range, switch), 상수. 예제: `internal/config/config.go`(DATABASE_URL 유무로 두 모드 분기 + Vercel 가드), `cmd/server/main.go`(드라이버 분기), `internal/store/deckslug.go`.
+- **도입**: 앱 소개(암기 카드), 기능 요구사항(양방향 카드·덱·학습 흐름·SRS·스마트 덱·통계·공유·CSV·사전 API·TTS), 비기능 요구사항(무료 인프라, 운영 부담 최소화, PWA), 전체 아키텍처 개요(Vercel의 Go 함수 하나가 HTML 렌더링·정적 자산·JSON API를 모두 서빙 + Supabase, 이 그림은 2부에서 완성되는 운영 모드이고 1부에서는 같은 코드가 SQLite 로컬 모드로 돈다는 두 모드 관점), 책의 구성(1부 로컬 완성 / 2부 공개·운영, 준비물은 Go뿐이고 Supabase·Vercel 계정은 2부부터).
+- **1장 기술 선택** (도입 섹션 소속): 각 기술의 선택 이유를 한 장에 모은 장. 공통 선택 기준(무료·관리 최소·AI 협업·서버리스 적합) → 왜 관계형 DB인가: SQLite로 시작해 PostgreSQL로 옮긴다(SQLite=1부 로컬 모드의 선택, 서버리스 복제·휘발 탓에 운영은 PostgreSQL, 스토어 인터페이스 덕에 교체는 배포 대상 선택, vs 문서형 NoSQL) → 왜 Go(vs Node/Python/JVM) → 왜 Gin(vs net/http·chi·Echo) → 왜 서버 렌더링과 htmx인가(vs React·Vue 같은 SPA+TypeScript 생태계, 언제 SPA가 나은지 정직하게, 남는 JS는 app.js 하나). Vercel·Supabase 선택 이유는 16·17장 소관.
+- **2장 데이터베이스 기초**: 테이블·행·열과 표 나누기(정규화), 기본 키·외래 키, SQL 선언형 언어와 DDL/DML 구분, sqlite3로 직접 실습(준비물은 sqlite3 하나, 13장의 echo-flip.db 예고), DDL(create/alter, SQLite의 자료형 현실과 check·앱 규약, 제약), DML(insert 자리표시자 `?`와 SQL 인젝션, `$1`은 드라이버 차이, select·집계·조인, update/delete와 where·RowsAffected), 인덱스(B-tree, 복합 인덱스 열 순서, 쓰기 비용). 예제: `internal/litestore/schema.sql`, `internal/litestore/decks.go`, `internal/litestore/cards.go`.
+- **3장 데이터베이스 설계**: 요구사항→테이블 도출(사용자·덱·카드, 카드/SRS 분리, 세션·리뷰 로그, 스마트 덱·통계 뷰), 스키마 원전은 `internal/litestore/schema.sql`(서버 시작 시 통째 멱등 적용), 전용 자료형이 적은 SQLite에 설계 의도를 담는 법(uuid는 Go 생성+text, 고정 폭 UTC 텍스트는 문자열 비교=시간 순서, JSON text, text+check, seq는 max+1), 외래 키 프래그마 함정, SRS 데이터 모델(단일 작성자라 잠금 불필요 vs 운영 for update 대비), 덱 slug 설계. 마이그레이션·RLS는 18장으로 이관(다리 문단만).
+- **4장 Go 기초**: 모듈·패키지·`cmd`/`internal`/`pkg` 구조(go.mod 직접 의존성 여덟 개, api/index.go의 pkg/app 제약, litestore 포함 트리), 변수와 기본 타입(var/:=, 제로값), 함수와 다중 반환값, 공개 규칙(대소문자), 제어문(if 초기화문, for range, switch), 상수. 예제: `internal/config/config.go`(DATABASE_URL 유무로 두 모드 분기 + SUPABASE_URL·ANON_KEY 검증 + Vercel 가드), `cmd/server/main.go`(드라이버 분기), `internal/store/deckslug.go`.
 - **5장 Go 코드 읽기**: `internal/srs` 중심으로 구조체·제로값 설계·다중 반환·time 패키지, 포인터 기초(&·*·nil)와 리시버, 에러 처리(error 값, %w 래핑, errors.Is, 센티널), 슬라이스(append, make 용량)와 맵(comma-ok), 문자열 처리(strings), JSON 직렬화(Marshal/Unmarshal). 예제: `internal/srs/`, `internal/smartrules/`, `internal/store/`.
 - **6장 Go 테스트와 품질 도구**: go test 규칙(_test.go, Test 접두사, *testing.T)과 실행 명령(-run, -v), 테이블 주도 테스트(`internal/srs/srs_test.go`, `internal/smartrules/rules_test.go`), 전수 검사와 경계값(`internal/store/deckslug_test.go`), t.Fatalf vs t.Errorf, 화이트박스 테스트, 품질 도구(gofmt, go vet, go build, staticcheck), gofmt의 세로 정렬(선언부 강제·문장은 해제, diff 확대라는 대가, 빈 줄로 그룹 분리, 룬 기준 폭 계산과 한글 어긋남, 메모리 정렬과의 용어 구분), 테스트=AI 검증 신호.
-- **7장 Gin**: 라우터 조립(`pkg/app/app.go`의 New/Engine 분리: New는 순수 조립, Engine은 Vercel용 싱글턴+postgres 가드), 로컬 서버와 Vercel 함수가 같은 New 위에서 도는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS와 로컬 기본 오리진, JWT 인증 `internal/auth/jwt.go`와 로컬 모드의 LocalMiddleware 교체), handlers→store 계층 분리(`Store` 인터페이스를 pgx·litestore 이중 구현이 만족).
-- **8장 TypeScript 기초**: 기본 타입과 타입 추론(useState 초기값), 배열 표기, 리터럴·유니온 타입, 인터페이스와 구조적 타이핑, 옵셔널 프로퍼티, 제네릭(`api<T>`), interface vs type 관례, 유틸리티 타입(Record, 인덱스드 액세스), ES 모듈(import/export), 화살표 함수. 예제: `src/lib/types.ts`, `src/lib/api.ts`, `src/components/Flashcard.tsx`.
-- **9장 TypeScript 실전**: Promise(세 가지 상태, .then 체이닝), async/await와 fetch, try/catch/finally, 콜백의 Promise 래핑(`parseCsv`), 컴파일 타임과 런타임 검증의 간극(손 검증, zod, 타입 단언), 순수 로직 모듈(`csv.ts`, `dictionary.ts`, `rules.ts`), 품질 도구(tsc strict, vitest, ESLint 논의).
-- **10장 React 기초**: DOM과 선언형 렌더링, 컴포넌트·props·JSX(`Flashcard.tsx`), 조건부·목록 렌더링(key), useState와 이벤트·제어 입력(덱 생성 폼), useEffect(정리 함수), useCallback(useMemo를 안 쓴 이유), 커스텀 훅(`useStudySession.ts` 상태 기계, `useTts.ts` 브라우저 API 격리).
-- **11장 React 실전/Next.js**: Context(`AuthProvider.tsx`와 localMode 스텁 세션, RequireAuth 가드), TanStack Query(useQuery·useMutation·캐시 무효화, `Providers.tsx` 전역 설정, 세션 생성 응용), App Router와 정적 export(쿼리 파라미터 라우팅 + vercel.json rewrite, 'use client'), PWA 매니페스트(`src/app/manifest.ts`, 타입 안전한 선언까지만. 서비스 워커와 설치 경험은 20장), Tailwind 간단히.
-- **12장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
-- **13장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
-- **14장 로컬 개발 환경** (1부 피날레): 준비물은 Go·Node뿐, 터미널 두 개(`go run ./cmd/server` 로컬 모드 기동 로그 + `npm run dev`)로 로그인 없이 앱 완성, 무설정 실행의 동작 원리(config.go 분기, LocalMiddleware, supabase.ts localMode, api.ts의 8080 기본값, CORS 기본값), 내 데이터는 파일 하나(litestore.Open의 스키마 자동 적용, sqlite3 실습, 백업=파일 복사), `.vscode/` 네 파일 해부(extensions/settings/tasks/launch, launch.json은 환경 변수 없이 F5), 사람의 입구와 에이전트의 입구, 환경 변수라는 손잡이(SQLITE_PATH·PORT, 운영 연결·direnv는 19장), 1부 마무리와 2부 예고.
-- **15장 Git** (2부 개막, 2026-07-11 신설): 개념 위주(명령어는 12장의 에이전트가 실행하니 외울 필요 없고, 사람은 diff·이력을 읽고 판단), 버전 관리가 필요한 이유(되돌릴 수 있는 역사, 에이전트 시대에 더 필요한 안전망), 핵심 개념(커밋·브랜치·병합·PR·원격), 실제 git log 발췌, 브랜치 정책은 사람이 정하는 정책(GitHub flow/git flow/GitLab flow 트레이드오프 비교), Echo Flip의 선택=GitLab flow 단순화: main(개발)·release(운영), 브랜치↔환경 대응(17·19장 예고), 정책의 대가.
-- **16장 GitHub Actions**: 로컬 게이트(훅·태스크)가 새는 세 곳, 15장 브랜치 정책 위에 얹는 원격 게이트, Actions 구조(워크플로·잡·러너·스텝), `.github/workflows/ci.yml` 해부(on push branches [main, release]와 pull_request 중복 방지, release 푸시=운영 배포 직전 마지막 관문, concurrency cancel-in-progress, setup-go의 go-version-file, `gofmt -l`로 고치지 않고 고발하기, `api/`가 `internal/`을 import하지 않는지 grep 검사, web 잡의 `npm ci`), 세 게이트가 같은 명령을 쓴다는 원칙과 대응표, Vercel 자동 배포("만들 수 있는가")와 CI("옳은가")의 차이, staticcheck·E2E를 뺀 이유, 21장의 스케줄 워크플로 예고.
-- **17장 Vercel**: 선택 이유(무료 티어에서 정적+함수 올인원, Koyeb 상주 서버 대안과 비교), 정적 export 배포, Go 서버리스 함수(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`), `vercel.json` rewrites, 개발 배포와 운영 배포를 가른다(Production/Preview 두 종류, Production Branch=release 설정, main 푸시=개발 확인 URL, 환경 변수의 Production/Preview 스코프, 상세 배선은 19장), 리전 iad1 고정. 무료 티어 한도 절은 21장으로 이관하고 포인터만 남김.
-- **18장 Supabase 인증**: 로컬 인증에서 운영 인증으로(1부 LocalMiddleware의 고정 사용자 → 공개하는 순간 위조 불가한 확인이 필요, 로컬 모드가 운영에 새지 않는 가드), 선택 이유(무료 Postgres+Auth 통합, Neon·Firebase 대안 비교, 인증 직접 구현의 부담), Supabase의 전부를 쓰지 않는 절제(PostgREST·Realtime·Storage 미사용 → 벤더 종속 축소), 인증 아키텍처(브라우저 전용 supabase-js와 localMode 상수, signInWithOAuth, 콜백과 열린 리다이렉트 방지, AuthProvider, API 호출에 토큰 싣기, 무상태 구조), Go의 JWT 검증(JWKS 공개키, 공유 시크릿이 아닌 이유, 클레임 검증, 필수/선택 미들웨어).
-- **19장 Supabase 데이터베이스**: SQLite에서 PostgreSQL로(DATABASE_URL이 모드를 가른다, 스토어 교체는 Store 인터페이스 한 장 뒤에), 같은 설계 더 풍부한 타입(uuid/identity·timestamptz·배열·GIN 대응표), pgx와 서버리스 커넥션 폭증, 트랜잭션 풀러(6543)와 simple protocol, 마이그레이션(로컬은 통째로, 운영은 순서대로: golang-migrate·direct 5432·사례 3건), 리전 콜로케이션, RLS 전략(정책 0개로 잠근다, 18장 접점), 개발 DB와 운영 DB 분리(3층 구조: 로컬 SQLite/개발 프로젝트/운영 프로젝트, 브랜치·배포 스코프 배선, 마이그레이션은 개발 먼저, 무료 활성 프로젝트 2개 한도), 환경 변수 구성(값이 두 벌, .env.local·NEXT_PUBLIC_ 경계, direnv와 .envrc). 마이그레이션·RLS·환경 변수 용어 상자를 이 장이 소유.
-- **20장 PWA**: 설치 조건 3가지(HTTPS·매니페스트·서비스 워커), `manifest.ts`(force-static이 정적 export에 필수, display standalone, short_name, start_url, background/theme color), 아이콘 3개와 maskable(Android 런처 잘림 대비), `public/sw.js` 전문 해부(skipWaiting+clients.claim 짝, `/api/`·비GET·외부 오리진은 network only, 정적 파일은 cached||network 후 백그라운드 갱신, res.clone()), `Providers.tsx`의 production 조건부 등록, `CACHE = "echo-flip-v1"`이라는 수동 손잡이와 Workbox를 안 쓴 이유, 포기한 것(오프라인 학습·푸시 알림·백그라운드 동기화가 서로 이어져 있다는 논증), DevTools Application 탭으로 확인.
-- **21장 무료 티어 운영**: 무료 티어는 "한도 안에서 살겠다"는 계약. Vercel Hobby 한도·초과 시 차단(과금 아님)·비상업 약관, Supabase Free 한도(활성 프로젝트 2개: 개발+운영으로 꽉 참, 일시정지는 수에 불포함), Echo Flip 규모 대입 → 가장 먼저 터지는 것은 트래픽·용량이 아니라 **미사용 프로젝트 일시정지**(가장 먼저 잠드는 것은 개발 프로젝트이며 무해), 핑 워크플로(DB를 실제로 건드려야 함), pg_dump 백업(90일 복원 기한), 무료의 대가(콜드스타트·SLA 없음·로그 1시간), 유료 전환 신호 3가지, 운영자 체크리스트, 수치는 2026년 7월 기준이며 반드시 요금 페이지 확인.
-- **22장 다음 단계**: 책이 일부러 비워 둔 자리를 "왜 지금은 없어도 됐는지 / 언제 필요해지는지"의 짝으로 정리. 무엇을 안 만들지 고르는 세 질문(지금 아픈가·되돌릴 수 있나·나중이 더 어려운가), E2E(로컬 태스크와 같은 명령을 쓰라는 요령), 관측성(slog·에러 집계·요청 추적), 보안(비밀 회전, gitleaks, Dependabot), 성능·무료 티어 한도(explain analyze는 데이터가 쌓인 뒤에), 언어 심화(Go 동시성·인터페이스와 mock 테스트, 서버 컴포넌트·a11y·i18n, 트랜잭션 격리), 에이전트 심화(MCP, 평가), 이 그릇을 넘칠 때의 이전 경로(`pkg/app` 덕분에 상주 서버 이전은 배포 대상 변경, Store 인터페이스+litestore 실증 덕분에 DB 이전 비용 낮음), 책 전체 마무리(2부 요약에 15장 Git 포함).
+- **7장 Gin**: 라우터 조립(`pkg/app/app.go`의 New/Engine 분리: New는 순수 조립 + 끝에서 web.New 등록, Engine은 Vercel용 싱글턴+postgres 가드), 로컬 서버와 Vercel 함수가 같은 New 위에서 도는 구조, 핸들러·JSON 바인딩, 미들웨어(CORS는 별도 오리진 클라이언트용 옵션, JWT 인증 `internal/auth/jwt.go`와 로컬 모드의 LocalMiddleware 교체), handlers→store 계층 분리(`Store` 인터페이스를 pgx·litestore 이중 구현이 만족), JSON API는 프로그램용으로 남고 화면은 8~10장의 HTML이 담당.
+- **8장 HTML과 CSS** (2026-07-11 신설): HTML 문서 뼈대(doctype·head·body, layout.html), 시맨틱 태그, 폼(input·textarea·라디오 알약·파일 업로드·details/summary), CSS 선택자·캐스케이드·변수 토큰, 박스 모델, 플렉스박스·그리드 배치, prefers-color-scheme 다크 모드, 하이라이트: 자바스크립트 없는 카드 뒤집기(체크박스 + :checked ~ 형제 선택자 + 3D 변환). 예제: `internal/web/templates/`, `internal/web/static/app.css`.
+- **9장 html/template** (2026-07-11 신설): 문자열 조립의 위험 → 템플릿 엔진, 액션 문법(점·if/range/with·$), 레이아웃/페이지/partial과 base Clone 패턴(`internal/web/web.go` parseTemplates·render), FuncMap(icon·pct·koDate), 컨텍스트 자동 이스케이프와 XSS(URL 문맥 이스케이프에 맡긴 ruleRaw 사례), //go:embed로 자산을 바이너리에, view 구조체와 폼 처리(PostForm)·PRG 패턴·플래시 쿠키, 템플릿 테스트(templates_test.go).
+- **10장 htmx** (2026-07-11 신설): 전체 새로고침의 한계 → HTML 속성으로 선언하는 부분 갱신, hx-post/hx-target/hx-swap/hx-confirm, HX-Request 분기와 조각 응답(renderPartial), 중심 절: 무상태 학습 화면(카드 큐·라운드·점수를 hidden 필드로 왕복, 서버리스 논증, `internal/web/study.go`), hx-swap-oob(사전 채우기), HX-Redirect, "그래도 남는 자바스크립트" app.js 해부(TTS·클립보드·오프라인·서비스 워커 등록·tz 쿠키, data-* 이벤트 위임).
+- **11장 Claude Code**: 에이전트 동작 원리(도구 호출 루프), CLAUDE.md·권한·세션 개념, 이 프로젝트에서의 개발 흐름(지시→생성→검증), 사람의 역할.
+- **12장 서브에이전트와 훅**: 훅 개념과 `settings.json`, `go-check.sh` 해부(gofmt 자동 적용, go vet 실패 시 exit 2 피드백, 성공 시 무음=토큰 0), 서브에이전트 개념(별도 컨텍스트·모델 지정), `go-quality.md` 해부(Vercel 호환 빌드 검사 포함, 요약만 반환), 설계 의도(결정적 검사는 훅, 종합 검증은 서브에이전트).
+- **13장 로컬 개발 환경** (1부 피날레): 준비물은 Go뿐, 명령 하나(`go run ./cmd/server`, :8080)로 로그인 없이 앱 완성, 무설정 실행의 동작 원리(config.go 분기, LocalMiddleware, 로컬 모드에선 로그인 화면 자체가 안 뜸), 내 데이터는 파일 하나(litestore.Open의 스키마 자동 적용, sqlite3 실습, 백업=파일 복사), `.vscode/` 네 파일 해부(extensions/settings/tasks/launch, launch.json은 환경 변수 없이 F5), 사람의 입구와 에이전트의 입구, 환경 변수라는 손잡이(SQLITE_PATH·PORT, 운영 연결·direnv는 18장), 1부 마무리와 2부 예고.
+- **14장 Git** (2부 개막): 개념 위주(명령어는 11장의 에이전트가 실행하니 외울 필요 없고, 사람은 diff·이력을 읽고 판단), 버전 관리가 필요한 이유, 핵심 개념(커밋·브랜치·병합·PR·원격), 실제 git log 발췌, 브랜치 정책 트레이드오프 비교, Echo Flip의 선택=GitLab flow 단순화: main(개발)·release(운영), 브랜치↔환경 대응(16·18장 예고), 정책의 대가.
+- **15장 GitHub Actions**: 로컬 게이트(훅·태스크)가 새는 세 곳, 14장 브랜치 정책 위에 얹는 원격 게이트, Actions 구조, `.github/workflows/ci.yml` 해부(on push branches [main, release], concurrency, setup-go, `gofmt -l`로 고발하기, api/→internal/ import 금지 grep; web 잡은 2026-07-11 전환으로 삭제되어 Go 잡 하나), 세 게이트가 같은 명령을 쓴다는 원칙과 대응표, Vercel 자동 배포와 CI의 차이, staticcheck·E2E를 뺀 이유, 20장의 스케줄 워크플로 예고.
+- **16장 Vercel**: 선택 이유(무료 티어 올인원, Koyeb 상주 서버 대안과 비교), Go 서버리스 함수 하나가 전부 서빙(`api/index.go` catch-all, internal import 불가 제약 → `pkg/app`, 정적 자산은 embed + Cache-Control), `vercel.json`의 전체 경로 rewrite, Framework Preset=Other, 개발 배포와 운영 배포를 가른다(Production/Preview, Production Branch=release, 환경 변수 스코프, 상세 배선은 18장), 리전 iad1 고정. 무료 티어 한도 절은 20장 소관.
+- **17장 Supabase 인증** (2026-07-11 서버 사이드로 재작성): 로컬 인증에서 운영 인증으로(가드 유지), 선택 이유(대안 비교), 절제(PostgREST·Realtime·Storage에 더해 supabase-js도 미사용), 서버 사이드 OAuth: 리다이렉트 여행(`internal/web/authpages.go`), PKCE(`gotrue.go`), HttpOnly 쿠키 세션(`session.go`, HttpOnly·Secure·SameSite=Lax가 각각 막는 것, localStorage 방식과 비교), 자동 리프레시·requireUser·safeNext(열린 리다이렉트 방지), 로그아웃, 페이지=쿠키/API=Bearer 이중 경로(auth.SetUserID로 컨텍스트 공유), JWKS 검증(ParseUser 포함), 환경 변수(SUPABASE_URL·SUPABASE_ANON_KEY).
+- **18장 Supabase 데이터베이스**: SQLite에서 PostgreSQL로(DATABASE_URL이 모드를 가른다), 같은 설계 더 풍부한 타입, pgx와 서버리스 커넥션 폭증, 트랜잭션 풀러(6543)와 simple protocol, 마이그레이션, 리전 콜로케이션, RLS 전략(정책 0개, 17장 접점), 개발 DB와 운영 DB 분리(3층 구조, 브랜치·배포 스코프 배선, 무료 활성 프로젝트 2개 한도), 환경 변수 구성(값이 두 벌, anon key가 비밀이 아닌 이유, direnv와 .envrc). 마이그레이션·RLS·환경 변수 용어 상자를 이 장이 소유.
+- **19장 PWA**: 설치 조건 3가지(HTTPS·매니페스트·서비스 워커), 정적 `internal/web/static/manifest.webmanifest`(display standalone, start_url 등), 아이콘 3개와 maskable, `sw.js`(v2) 해부: 페이지 HTML은 서버 렌더링이라 network-first(오프라인일 때만 캐시), 정적 자산은 stale-while-revalidate, `/api/`·비GET·외부 오리진은 network only, skipWaiting+clients.claim, `CACHE = "echo-flip-v2"` 수동 손잡이와 Workbox를 안 쓴 이유, 등록은 app.js(10장), 포기한 것(오프라인 학습·푸시·백그라운드 동기화), DevTools Application 탭 확인.
+- **20장 무료 티어 운영**: 무료 티어는 "한도 안에서 살겠다"는 계약. Vercel Hobby 한도·초과 시 차단·비상업 약관, Supabase Free 한도(활성 프로젝트 2개), Echo Flip 규모 대입 → 가장 먼저 터지는 것은 **미사용 프로젝트 일시정지**, 핑 워크플로, pg_dump 백업(90일 복원 기한), 무료의 대가, 유료 전환 신호 3가지, 운영자 체크리스트, 수치는 2026년 7월 기준.
+- **21장 다음 단계**: 책이 일부러 비워 둔 자리를 "왜 지금은 없어도 됐는지 / 언제 필요해지는지"의 짝으로 정리. 세 질문(지금 아픈가·되돌릴 수 있나·나중이 더 어려운가), E2E, 관측성, 보안(비밀 회전, gitleaks, Dependabot), 성능·한도, 심화(Go 동시성·인터페이스와 mock, HTML/CSS/JS 심화와 "화면 요구가 복잡해지면 React 같은 SPA로 가는 시점", 접근성, 트랜잭션 격리), 에이전트 심화(MCP, 평가), 이전 경로(`pkg/app`·Store 인터페이스 덕에 이전 비용 낮음), 책 전체 마무리.
 
 ## 독자 대상 (2026-07-09 지시)
 
@@ -110,24 +108,23 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
 | `part1/go.md` | 구조체, 순수 함수, 포인터 |
 | `part1/go-testing.md` | 테이블 주도 테스트, 포매터와 정적 분석, 세로 정렬 |
 | `part1/gin.md` | HTTP 요청과 응답, 라우터와 라우팅, 엔드포인트, 핸들러, JSON과 바인딩, 미들웨어, CORS |
-| `part1/typescript.md` | 컴파일(트랜스파일), 유니온 타입, 제네릭 |
-| `part1/typescript-async.md` | Promise, 런타임 검증, 테스트 러너 |
-| `part1/react.md` | DOM, 컴포넌트와 props, 상태와 React 훅 |
-| `part1/react-next.md` | Context, 서버 상태와 캐시, 클라이언트 라우팅, 정적 export, 웹 앱 매니페스트 |
+| `part1/html-css.md` | HTML 태그와 요소, 시맨틱 마크업, CSS 선택자, 박스 모델, 플렉스박스와 그리드, CSS 변수(커스텀 프로퍼티), 미디어 쿼리 |
+| `part1/go-templates.md` | 템플릿 엔진, 이스케이프와 XSS, embed(Go) |
+| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), 이벤트 위임, Web API(브라우저) |
 | `part1/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md) |
 | `part1/agents-hooks.md` | 훅(Claude Code), 종료 코드, 서브에이전트, 품질 게이트 |
 | `part1/local-dev.md` | 언어 서버(Language Server) |
 | `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 기본 브랜치 |
 | `part2/github-actions.md` | 지속적 통합(CI, Continuous Integration) |
-| `part2/pwa.md` | 서비스 워커(Service Worker) |
+| `part2/pwa.md` | 서비스 워커(Service Worker), 웹 앱 매니페스트(구 react-next에서 이관) |
 | `part2/free-tier.md` | 한도(Quota)와 스로틀링(Throttling) |
 | `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN, 프리뷰 배포 |
-| `part2/supabase-auth.md` | 관리형 서비스, JWKS와 서명 검증, 무상태 |
-| `part2/supabase-db.md` | 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션, 마이그레이션(3장에서 이관), RLS(3장에서 이관), 환경 변수(14장에서 이관) |
+| `part2/supabase-auth.md` | 관리형 서비스, JWKS와 서명 검증, 무상태, 쿠키(Cookie), PKCE |
+| `part2/supabase-db.md` | 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션, 마이그레이션(3장에서 이관), RLS(3장에서 이관), 환경 변수(13장에서 이관) |
 | `appendix/setup.md` | 터미널, 패키지 매니저 |
 
-**훅(Hook)은 동음이의어다.** 10장의 훅은 React의 상태 관리 함수이고, 13장의 훅은 Claude Code가 자동 실행하는 스크립트다.
-각 장의 상자에서 서로 다른 것임을 한 문장으로 구분해 준다.
+**훅(Hook)은 동음이의어다.** 12장의 훅은 Claude Code가 자동 실행하는 스크립트이고, React 같은 프런트엔드 프레임워크의 훅(상태 관리 함수)과는 다른 것이다.
+12장의 상자에서 이 구분을 한 문장으로 짚는다. "세션"도 동음이의어다: 11장의 세션은 Claude Code의 대화 단위, 17장의 로그인 세션은 인증 상태다(17장 쿠키 상자에서 구분).
 
 ## 화면 캡처 (2026-07-09 지시)
 
@@ -217,8 +214,11 @@ Echo Flip 앱을 소재로 한 기술서를 `doc/` 아래에 VitePress로 집필
   - 삭제: `src/` 전체, next.config.ts, tsconfig.json, 루트 package.json 등. `doc/`(VitePress)만 npm을 유지. CI에서 web 잡 제거. run_local.sh는 서버 하나만 띄움(포트 8080). README·DEPLOY.md·CLAUDE.md·.env.local.example 현행화.
   - 검증: go build/vet/test 전체 통과(웹 패키지 테스트 6개 신규: CSV 매핑·사전 매핑·템플릿 파싱/렌더링), 로컬 모드 실기동으로 전 흐름 확인(덱·카드 CRUD, CSV 가져오기/내보내기, 학습 오답→재도전 라운드→완료 통계, 공유/해제/갤러리, 스마트 덱, 설정 저장, 사전 채우기 실호출, 404, 정적 자산·manifest·sw).
   - 수동 단계 남음(사용자 몫): Vercel 환경 변수에 `SUPABASE_URL`·`SUPABASE_ANON_KEY` 추가(`NEXT_PUBLIC_*` 3종·`SUPABASE_JWKS_URL`은 제거 가능), Supabase URL Configuration의 Redirect URL을 `/auth/callback` 그대로 유지하되 로컬은 `http://localhost:8080/auth/callback`으로 교체, Vercel 프로젝트 Framework Preset을 Other로 변경(기존 Next.js 감지 해제).
-- [ ] **책 재편: TypeScript·React를 빼고 HTML을 넣는다** (2026-07-11 지시, 다음 세션): 위 앱 전환을 반영해 1부를 재구성한다.
-  - 폐기: 8장 `typescript.md`, 9장 `typescript-async.md`, 10장 `react.md`, 11장 `react-next.md` (4개 장, 약 93KB).
-  - 신설(안): HTML·CSS 기초(문서 구조·폼·선택자·flex/grid·다크 모드, 예제는 `internal/web/templates/`·`static/app.css`) / Go로 화면 만들기: html/template(레이아웃·partial·컨텍스트 자동 이스케이프·embed, `internal/web/web.go`) / htmx: 자바스크립트 없이 동적 화면(hx-post·조각 응답·hx-swap-oob, 학습 화면 무상태 설계, "그래도 남는 JS"로 app.js 해부).
-  - 연쇄 수정: 1장 tech-choices(왜 TS·React인가 절 → 왜 서버 렌더링+htmx인가로 재작성, 브라우저 JS 생태계와의 트레이드오프 정직하게), 7장 gin(웹 라우트 언급), 12장 claude-code·13장 agents-hooks(웹 검증 명령 갱신), 14장 local-dev(터미널 하나로 축소, npm 관련 삭제), 16장 github-actions(web 잡 삭제 반영), 17장 vercel(모든 경로 rewrite, Framework Other), 18장 supabase-auth(서버 사이드 PKCE·HttpOnly 쿠키로 전면 재작성, supabase-js 삭제), 20장 pwa(sw.js network-first, 서비스 워커가 유일한 JS 파일이라는 논지), 부록 A(Node 설치는 책 빌드용으로만 축소), intro(아키텍처 개요·준비물), 용어 배정표(TS·React 소유 용어 재배치: 컴파일/트랜스파일·유니온·제네릭·Promise 등은 폐기 또는 새 장으로).
-  - 화면 캡처 5장은 UI가 거의 동일하게 재현됐지만 재배포 후 다시 찍는 것이 안전.
+- [x] **책 재편: TypeScript·React를 빼고 HTML을 넣는다** (2026-07-11 지시, 같은 날 완료. 병렬 집필 에이전트 9개):
+  - 폐기: 구 8~11장(typescript.md, typescript-async.md, react.md, react-next.md, 약 93KB). 전체 22장 → 21장 재번호(구 12~22장이 −1씩).
+  - 신설: 8장 `html-css.md`(문서 뼈대·시맨틱·폼·선택자·박스 모델·flex/grid·다크 모드·CSS만으로 카드 뒤집기, 33KB), 9장 `go-templates.md`(액션 문법·레이아웃/조각과 base Clone·FuncMap·컨텍스트 자동 이스케이프와 XSS·embed·PRG와 플래시, 30KB), 10장 `htmx.md`(hx-속성·조각 응답·무상태 학습 화면·hx-swap-oob·HX-Redirect·app.js 해부, 33KB).
+  - 전면 재작성: 17장 supabase-auth(서버 사이드 OAuth PKCE·HttpOnly 쿠키·자동 리프레시·safeNext·쿠키/Bearer 이중 경로, supabase-js는 "절제" 목록으로 이동, 49KB).
+  - 연쇄 수정: 1장(왜 서버 렌더링+htmx인가 절 신설, 네 계층, 정적 타입 논의를 Go 문맥으로 이관), intro·index(아키텍처·준비물 Go 하나·로드맵), 4장(config.go 발췌 갱신), 7장(web.New 등록·CORS 재작성·JSON API의 자리), 11·12장(Go 전용 검증), 13장(명령 하나·새 .vscode 해부), 15장(web 잡 삭제), 16장(함수 하나가 전부 서빙·정적 자산 절 신설·Framework Other), 18장(환경 변수 절 재작성: SUPABASE_URL·ANON_KEY, NEXT_PUBLIC 소멸), 19장(정적 manifest·sw.js v2 network-first 논증·웹 앱 매니페스트 상자 이관), 20·21장·부록 A(Node 절 삭제) 갱신. 사이드바·PDF 차례·config description·DEPLOY.md 장 번호 정합.
+  - 인프라 수정: VitePress가 인라인 코드의 `{{ }}`를 Vue 보간으로 해석해 빌드가 깨지는 문제를 `.vitepress/config.ts`의 markdown.config에서 code_inline에 v-pre를 붙여 전역 해결(9장부터 Go 템플릿 표기가 본문에 흔해서 필수).
+  - 검증: 삭제 파일 링크 잔재 0건, H1 1~21 연속, 스택 잔재 grep 전수(남은 것은 전부 대안 비교·절제 서술·git log 원문), `npm run build` 통과.
+  - 남은 일: 재편 장 통독 검토(진도표의 `초안 완료` 장들), 화면 캡처 재촬영(UI가 거의 동일하게 재현됐지만 재배포 후 다시 찍는 것이 안전).

@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Go API (cmd/server)",
+      "name": "서버 (cmd/server)",
       "type": "go",
       "request": "launch",
       "mode": "debug",
@@ -14,24 +14,6 @@
       "request": "launch",
       "mode": "test",
       "program": "${fileDirname}"
-    },
-    {
-      "name": "Next dev",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "npm run dev",
-      "serverReadyAction": {
-        "pattern": "- Local:.+(https?://.+)",
-        "uriFormat": "%s",
-        "action": "debugWithChrome"
-      }
-    }
-  ],
-  "compounds": [
-    {
-      "name": "풀스택 (Go API + Next dev)",
-      "configurations": ["Go API (cmd/server)", "Next dev"],
-      "stopAll": true
     }
   ]
 }

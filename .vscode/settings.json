@@ -12,19 +12,8 @@
   "go.vetOnSave": "package",
   "go.testFlags": ["-count=1"],
 
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-
   "search.exclude": {
     "**/node_modules": true,
-    "out": true,
-    ".next": true,
     "doc/.vitepress/dist": true
   },
 

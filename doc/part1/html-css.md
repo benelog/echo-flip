@@ -1,0 +1,550 @@
+# 8장 HTML과 CSS: 화면을 이루는 문서와 스타일
+
+7장까지 우리는 화면 뒤편을 만들었다.
+데이터베이스에 카드와 덱을 담는 표를 설계했고, Go로 그 데이터를 다루는 코드를 읽었으며, Gin으로 요청을 받아 응답하는 서버를 세웠다.
+그런데 지금까지의 응답은 기계가 읽기 좋은 JSON이었고, 사람이 브라우저에서 보는 화면은 아직 등장하지 않았다.
+
+이번 장부터 세 개 장에 걸쳐 그 화면을 만든다.
+이 장에서는 화면의 재료인 HTML(HyperText Markup Language)과 CSS(Cascading Style Sheets)를, 9장에서는 Go 서버가 html/template으로 HTML을 데이터에 맞춰 찍어 내는 방법을, 10장에서는 htmx로 화면 일부만 갈아 끼우는 방법을 다룬다.
+
+먼저 큰 그림 하나만 잡고 시작하자.
+웹 브라우저가 화면에 그리는 것은 전부 HTML 문서다.
+뉴스 기사도, 쇼핑몰 장바구니도, Echo Flip의 학습 화면도 브라우저 입장에서는 태그가 달린 긴 텍스트 문서 하나다.
+Echo Flip에서 이 문서는 Go 서버가 만든다.
+브라우저가 주소를 요청하면 서버가 `internal/web/templates/` 아래의 템플릿 파일에 데이터를 채워 완성된 HTML 문서를 응답으로 보내며, 채워 넣는 과정은 9장의 주제다.
+이 장의 목표는 그 결과물인 HTML과 CSS를 읽는 눈을 만드는 것이다.
+문서의 뼈대와 시맨틱 태그, 폼을 실제 화면 파일로 읽고, 이어서 CSS의 선택자와 변수, 플렉스박스와 그리드 배치, 변수 교체만으로 처리하는 다크 모드를 짚은 뒤, 이 앱의 간판 장면인 카드 뒤집기가 자바스크립트 한 줄 없이 도는 원리를 뜯어 보겠다.
+
+## HTML 문서의 뼈대: doctype, head, body
+
+HTML 문서에는 정해진 뼈대가 있다.
+맨 위에 "이것은 HTML 문서다"라고 선언하는 `<!doctype html>`이 오고, 그 아래 `<html>`이 문서 전체를 감싼다.
+`<html>` 안은 둘로 나뉘어, `<head>`에는 화면에 직접 보이지 않는 문서 정보가, `<body>`에는 화면에 보이는 내용이 들어간다.
+
+다음은 Echo Flip의 모든 화면이 공유하는 겉틀인 internal/web/templates/layout.html에서 문서 선언부터 `<head>`까지를 발췌한 것이다.
+
+```html
+{{define "layout"}}<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="단어·문장·숙어·개념을 카드로 뒤집으며 외우는 학습 앱">
+  <title>{{.Title}}</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <!-- ... 아이콘 링크 생략 ... -->
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<!-- ... 본문은 다음 절에서 ... -->
+</body>
+</html>{{end}}
+```
+
+`{{define "layout"}}`이나 `{{.Title}}`처럼 중괄호 두 겹으로 감싼 부분은 9장에서 다룰 서버 템플릿 문법이므로, 이 장에서는 "서버가 값을 채워 넣는 자리" 정도로만 읽고 넘어가면 된다.
+
+`<html lang="ko">`는 이 문서가 한국어라고 밝혀서 브라우저의 자동 번역이나 화면 낭독기(시각 장애인용 프로그램)가 참고하게 한다.
+`<meta>` 태그들은 문서에 대한 정보, 이른바 메타데이터다.
+`charset="utf-8"`은 글자 인코딩을 지정해 한글이 깨지지 않게 하고, `description`은 검색 엔진과 링크 미리보기가 보여 주는 소개 문장이다.
+`viewport`는 모바일 브라우저에게 "화면 폭에 맞춰 그리고, 임의로 축소하지 말라"고 알리는데, 이 한 줄이 없으면 스마트폰에서 페이지가 데스크톱 크기로 그려진 뒤 축소되어 글자가 깨알만 해진다.
+
+`<title>`은 브라우저 탭에 표시되는 제목이고, `<link rel="stylesheet">`는 이 장 후반의 주인공인 CSS 파일을, `<link rel="manifest">`는 19장 PWA에서 다룰 웹 앱 매니페스트를 불러온다.
+`<script>` 두 줄은 htmx 라이브러리(10장)와 이 앱의 유일한 자바스크립트 파일을 불러오고, `defer`는 "문서를 다 읽은 뒤에 실행하라"는 뜻이라 스크립트가 화면 그리기를 막지 않는다.
+
+::: info [용어 풀이] HTML 태그와 요소(tag, element)
+태그는 `<p>`처럼 꺾쇠로 감싼 표식이고, 요소는 여는 태그부터 닫는 태그까지의 한 덩어리(`<p>안녕</p>`)다.
+문서에 "여기까지는 문단", "이것은 버튼"이라고 이름표를 붙이는 문법인 셈이며, `charset="utf-8"`처럼 태그 안에 붙는 추가 정보는 속성(attribute)이라고 부른다.
+:::
+
+## 의미를 담은 태그: 시맨틱 마크업
+
+`<body>` 안으로 들어가 보자.
+layout.html의 본문 구조로, 모든 화면에 공통인 틀(상단 바, 본문 영역, 하단 탭)을 만드는 코드다.
+
+```html
+  <div class="frame">
+    <header class="topbar">
+      {{if .LoggedIn}}<a class="brand" href="/">{{template "logo"}} Echo Flip</a>
+      {{else}}<a class="brand" href="/shared">{{template "logo"}} Echo Flip</a>{{end}}
+      <!-- ... 로그인 상태 표시 생략 ... -->
+    </header>
+    <!-- ... 오프라인 안내 배너 생략 ... -->
+    <main{{if .LoggedIn}} class="with-nav"{{end}}>
+      {{template "content" .}}
+    </main>
+    {{if .LoggedIn}}
+    <nav class="bottomnav">
+      <div>
+        <a href="/" {{if eq .Path "/"}}class="active"{{end}}>{{icon "home"}}홈</a>
+        <a href="/decks" {{if hasPrefix .Path "/decks"}}class="active"{{end}}>{{icon "layers"}}덱</a>
+        <!-- ... 통계·설정 탭 생략 ... -->
+      </div>
+    </nav>
+    {{end}}
+  </div>
+```
+
+눈여겨볼 것은 태그의 이름이다.
+상단 바는 `<header>`, 본문은 `<main>`, 하단 탭은 `<nav>`다.
+셋 다 `<div>`(의미 없는 상자)로 만들어도 화면은 똑같이 나오지만, 이름 있는 태그를 쓰면 화면 낭독기는 `<nav>`를 만나 "여기는 이동 메뉴"라고 알려 줄 수 있고, 검색 엔진은 `<main>` 안의 내용을 본문으로 대접하며, 사람에게도 코드가 목차처럼 읽힌다.
+이렇게 태그로 구조의 의미까지 표현하는 것을 시맨틱 마크업이라고 부른다.
+
+::: info [용어 풀이] 시맨틱 마크업(semantic markup)
+"이 부분은 제목, 여기는 메뉴, 여기가 본문"처럼 문서의 각 부분이 무엇인지를 그 의미에 맞는 태그로 표시하는 습관이다.
+모든 것을 `<div>`로 만들어도 겉모습은 같지만, 같은 내용의 책이라도 목차와 장 제목이 있는 쪽이 읽기 쉬운 것과 같은 이치로 낭독기·검색 엔진·동료 개발자가 의미를 얻는다.
+:::
+
+페이지마다 다른 내용은 `{{template "content" .}}` 자리에 끼워진다.
+홈 화면인 internal/web/templates/pages/home.html에서 "내 덱" 목록 부분을 발췌했다.
+덱 하나마다 이름과 카드 수를 담은 타일을 그리고, 덱이 없으면 안내 문구를 대신 보여 주는 코드다.
+
+```html
+<section class="stack">
+  <div class="row-between">
+    <h2>내 덱</h2>
+    <a class="link" href="/decks">전체 보기</a>
+  </div>
+  {{range .Data.Decks}}
+  <a class="tile row-between" href="/decks/{{.Slug}}">
+    <span style="font-weight:500">{{.Name}}</span>
+    <span class="small muted">{{.CardCount}}장</span>
+  </a>
+  {{else}}
+  <a class="tile-dashed" href="/decks">{{icon "plus"}} 첫 덱 만들기</a>
+  {{end}}
+</section>
+```
+
+`<section>`은 관련 내용을 하나로 묶는 구획이고, `<h2>`는 그 구획의 제목이다.
+제목 태그는 `<h1>`부터 `<h6>`까지 있고 숫자가 문서의 계층을 나타낸다.
+목록을 표현하는 태그도 있어서, 덱 상세 화면(templates/pages/deck.html)의 카드 목록은 `<ul>`(순서 없는 목록)과 그 항목 `<li>`로 짜여 있다.
+
+그리고 `<a>`, 링크다.
+`href` 속성에 적힌 주소로 사용자를 데려가서, 덱 타일을 누르면 `/decks/{{.Slug}}`, 즉 그 덱의 상세 화면으로 이동한다.
+Echo Flip에서 화면 사이의 이동은 이 링크가 거의 전부다.
+브라우저가 새 주소를 요청하고 서버가 새 문서를 보내 주는, 웹이 처음부터 갖고 있던 이동 방식이다.
+자바스크립트로 화면 전환을 직접 구현하는 단일 페이지 앱(SPA) 방식과의 비교는 1장에서 다뤘고, 이 방식의 빈틈(전체 새로고침이 어색한 장면)을 메우는 htmx는 10장에서 만난다.
+
+## 폼: 화면에서 서버로 데이터를 보낸다
+
+지금까지는 서버가 브라우저로 보내는 방향이었다.
+반대 방향, 즉 사용자가 입력한 것을 서버로 보내는 표준 도구가 폼(form)이다.
+새 덱 만들기 화면인 internal/web/templates/pages/decks.html의 폼을 보자.
+덱 이름을 입력받아 서버의 `/decks` 주소로 보내는 코드다.
+
+```html
+{{/* 새 덱 폼: summary를 누르면 열린다. 자바스크립트 없이 details만으로. */}}
+<details class="reveal">
+  <summary class="tile-dashed">{{icon "plus"}} 새 덱 만들기</summary>
+  <form method="post" action="/decks" class="row" style="margin-top:.5rem">
+    <input name="name" placeholder="덱 이름 (예: 토익 필수 단어)" autofocus required>
+    <button class="btn btn-primary" style="flex-shrink:0">만들기</button>
+  </form>
+</details>
+```
+
+`<form>`의 두 속성이 핵심이다.
+`action`은 어디로 보낼지(주소), `method`는 어떻게 보낼지(HTTP 메서드)다.
+`method="post"`는 7장에서 본 POST, 즉 "새로 만들어 달라"는 요청이라, "만들기" 버튼을 누르면 브라우저가 입력 값을 모아 `POST /decks` 요청을 보내고 서버가 덱을 만든 뒤 새 화면으로 안내한다.
+
+`<input>`은 한 줄 입력 칸이다.
+`name="name"` 속성이 중요한데, 서버는 이 이름표로 값을 찾는다.
+`placeholder`는 비어 있을 때 흐리게 보이는 안내 문구, `required`는 비워 두면 제출을 막는 검사, `autofocus`는 화면이 열리면 커서를 이 칸에 두라는 지시로, 셋 다 자바스크립트 없이 브라우저가 처리한다.
+
+폼을 감싼 `<details>`와 `<summary>`도 눈여겨보자.
+`<summary>`(요약)를 누르면 `<details>`(자세히)의 나머지 내용이 열리고 다시 누르면 닫힌다.
+예전에는 자바스크립트로 짜는 것이 당연했던 여닫기 상호작용을 태그 두 개가 공짜로 제공한다.
+
+카드 입력 화면인 internal/web/templates/pages/card_form.html에는 폼 부품이 몇 가지 더 있다.
+카드 종류(단어·문장·숙어·개념) 중 하나만 고르게 하는 라디오 버튼이다.
+
+```html
+  <div class="type-pills">
+    <label><input type="radio" name="card_type" value="word" {{if eq $f.CardType "word"}}checked{{end}}><span>단어</span></label>
+    <label><input type="radio" name="card_type" value="sentence" {{if eq $f.CardType "sentence"}}checked{{end}}><span>문장</span></label>
+    <!-- ... 숙어·개념 선택지 생략 ... -->
+  </div>
+```
+
+`type="radio"`인 `<input>`은 같은 `name`끼리 한 묶음이 되어 그중 하나만 선택된다(옛날 라디오의 채널 버튼에서 온 이름이다).
+그런데 실제 화면에서는 동그란 라디오 버튼 대신 알약 모양의 선택 버튼만 보인다.
+라디오 버튼 자체는 CSS로 투명하게 숨기고, 함께 묶인 `<span>`을 알약처럼 꾸민 뒤 선택된 것만 파랗게 칠하기 때문인데, 어떻게 그러는지는 CSS 선택자를 배운 뒤 다시 보겠다.
+
+`<label>`은 입력 칸의 이름표로, 위 코드처럼 `<input>`을 감싸면 자동으로 연결되어 라벨을 눌러도 입력 칸이 선택된다.
+좁은 화면에서 누를 수 있는 영역이 넓어지는 이점이 있고, 같은 파일에서 뜻과 예문을 받는 `<textarea>`(여러 줄 입력 칸)도 이렇게 라벨로 감싸여 있다.
+
+파일을 보내는 폼도 있다.
+deck.html의 CSV 가져오기로, CSV 파일을 골라 서버로 올려보내는 폼을 details로 감싸 평소에는 접어 두는 코드다.
+
+```html
+{{/* CSV 업로드: details/summary로 자바스크립트 없이 여닫는다. */}}
+<details class="reveal">
+  <summary class="tile-dashed">{{icon "upload"}} CSV 파일 선택해서 가져오기</summary>
+  <form method="post" action="/decks/{{$deck.Slug}}/import" enctype="multipart/form-data"
+        class="row" style="margin-top:.5rem">
+    <input type="file" name="file" accept=".csv,text/csv" required>
+    <button class="btn btn-primary" style="flex-shrink:0">가져오기</button>
+  </form>
+  <!-- ... CSV 형식 안내 문구 생략 ... -->
+</details>
+```
+
+`type="file"`인 `<input>`은 파일 선택 창을 띄우고, `accept`는 고를 수 있는 파일 종류를 CSV로 좁힌다.
+폼에 붙은 `enctype="multipart/form-data"`는 "파일이 실려 있으니 여러 부분으로 나눠 포장해 보내라"는 지시로, 파일 업로드 폼에는 꼭 필요하다.
+서버가 이 파일을 받아 카드로 바꾸는 Go 코드(encoding/csv)는 9장에서 다룬다.
+
+## CSS: 문서에 입히는 스타일
+
+HTML이 문서의 구조와 의미라면, CSS는 그 문서의 겉모습이다.
+색, 크기, 여백, 배치, 애니메이션이 모두 CSS 담당이다.
+Echo Flip의 스타일은 internal/web/static/app.css 한 파일, 800줄 남짓이 전부다.
+CSS 규칙의 생김새는 "누구에게(선택자) 무엇을(속성: 값)"로 단순하다.
+
+app.css의 맨 앞부분을 보자.
+앱 전체에서 쓸 색과 둥근 정도를 이름 붙은 값, 즉 CSS 변수로 선언하는 코드다.
+
+```css
+/* Echo Flip 스타일시트. 빌드 도구 없이 이 파일 하나로 끝난다.
+   색·둥근 정도 같은 디자인 토큰은 CSS 변수로 두고, 다크 모드는
+   prefers-color-scheme에서 변수만 바꾼다. */
+
+:root {
+  --bg: #fafafa;
+  --fg: #171717;
+  --surface: #ffffff;
+  --border: #e5e5e5;
+  --muted: #737373;
+  --faint: #a3a3a3;
+  --primary: #2563eb;
+  --primary-fg: #ffffff;
+  /* ... 강조색(호박색·초록·빨강) 변수 생략 ... */
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+}
+```
+
+`:root`는 문서의 뿌리, 즉 `<html>` 요소를 가리키는 선택자이고, `--bg`처럼 두 개의 붙임표로 시작하는 것이 CSS 변수다.
+`#fafafa`는 색의 16진수 표기(여기서는 아주 옅은 회색)이고, 한번 선언한 변수는 아래 어디서든 `var(--bg)`로 꺼내 쓴다.
+이렇게 이름 붙여 둔 색과 치수를 디자인 토큰(design token)이라고 부른다.
+주 색상을 바꾸고 싶으면 `--primary` 한 줄만 고치면 버튼, 링크, 진행 막대가 한꺼번에 바뀌고, 잠시 뒤에 보겠지만 다크 모드도 이 변수 덕분에 거저 얻는다.
+
+::: info [용어 풀이] CSS 변수(커스텀 프로퍼티, custom property)
+`--primary: #2563eb`처럼 값에 이름을 붙여 두고 `var(--primary)`로 꺼내 쓰는 CSS 기능이다.
+공식 명칭은 커스텀 프로퍼티이지만 흔히 CSS 변수라고 부른다.
+"우리 브랜드 파랑"을 물감 통 하나에 담아 두고 여기저기서 찍어 쓰는 것과 같아서, 색을 바꿀 때 물감 통 하나만 갈면 된다.
+:::
+
+이제 선택자를 종류별로 보자.
+가장 기본은 태그 이름 그대로 고르는 것으로, app.css는 `input, textarea, select`처럼 태그를 쉼표로 이어 모든 입력 칸의 겉모습을 한 규칙으로 통일한다.
+
+두 번째는 클래스 선택자다.
+HTML 쪽에서 `class="btn btn-primary"`처럼 이름표를 달아 두면, CSS에서 `.btn`(모든 버튼 공통)과 `.btn-primary`(파란 주 버튼)처럼 점을 붙여 고른다.
+태그 선택자가 "모든 `<a>`" 식의 넓은 그물이라면, 클래스는 원하는 요소에만 붙이는 이름표라서 실무 CSS의 주력이다.
+
+세 번째는 조합이다.
+`.bottomnav a`처럼 띄어 쓰면 자손 선택자로, "`.bottomnav` 안에 들어 있는 모든 `<a>`"를 고른다.
+하단 탭이 이 조합을 써서, `.bottomnav a`가 탭 전체를 회색(`color: var(--muted)`)으로 깔고 `.bottomnav a.active`("그중 `active` 클래스가 붙은 것")가 현재 화면의 탭에만 파란색을 덧입힌다.
+
+네 번째는 상태 선택자다.
+콜론으로 시작하는 `:focus`, `:checked`, `:hover` 같은 것들로, 요소의 지금 상태에 따라 스타일을 바꾼다.
+app.css의 `input:focus` 규칙은 커서가 들어온 입력 칸의 테두리를 파랗게 바꾼다.
+
+마지막으로 형제 선택자가 있다.
+`+`는 바로 다음 형제, `~`는 뒤에 오는 형제들을 고른다.
+아까 미뤄 둔 알약 라디오 버튼의 비밀이 여기 있다.
+라디오 버튼을 시야에서 숨기고, 선택된 버튼 바로 뒤의 `<span>`만 파란 알약으로 칠하는 코드다.
+
+```css
+.type-pills input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+}
+
+.type-pills span {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.375rem 1rem;
+  /* ... 글자 크기·바탕색 속성 생략 ... */
+  cursor: pointer;
+}
+
+.type-pills input:checked + span {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+```
+
+`input:checked + span`을 우리말로 풀면 "선택된 라디오 버튼의 바로 다음 형제인 `<span>`"이다.
+라디오 버튼은 투명해도 여전히 동작하므로, 사용자가 알약(`<span>`을 감싼 `<label>`)을 누르면 뒤에 숨은 라디오 버튼이 선택되고, 그 순간 이 규칙이 발동해 알약이 파랗게 변한다.
+상태는 HTML(라디오 버튼)이 들고, 겉모습은 CSS가 바꾼다.
+이 분업이 장 끝의 카드 뒤집기에서 다시 등장한다.
+
+::: info [용어 풀이] CSS 선택자(selector)
+CSS 규칙을 문서의 어느 요소에 적용할지 고르는 문법이다.
+태그 이름(`input`), 클래스(`.btn`), 상태(`:checked`), 관계(자손·형제)를 조합해 "하단 탭 안의 링크 중 활성인 것"처럼 꽤 정밀하게 짚을 수 있다.
+문서 전체에서 조건에 맞는 요소를 찾아 주는 검색어인 셈이다.
+:::
+
+CSS라는 이름의 첫 단어 캐스케이드(cascade)는 "폭포처럼 흘러내린다"는 뜻이다.
+한 요소에 여러 규칙이 겹치면 더 구체적인 선택자가 이기고, 구체성이 같으면 나중에 적힌 규칙이 이긴다.
+`.bottomnav a`(자손)보다 `.bottomnav a.active`(자손 + 클래스)가 구체적이므로 활성 탭은 파란색이 된다.
+우선순위 계산을 다 외울 필요는 없고, "넓은 규칙을 앞에, 좁은 예외를 뒤에"라는 감각이면 이 파일을 읽는 데 충분하다.
+
+여기서 트레이드오프 하나를 짚고 가자.
+CSS를 맨손으로 쓰는 대신 변수와 중첩 문법을 보태 주는 전처리기 Sass, 미리 만든 유틸리티 클래스를 조립하는 Tailwind CSS, 완성된 부품을 주는 Bootstrap 같은 도구를 얹는 선택지도 있고, 팀이 크고 화면이 수백 개면 이런 도구가 일관성을 지키는 데 낫다.
+하지만 이들은 빌드 도구와 의존성 관리를 요구하고, 현대 CSS에는 변수(방금 봤다)와 중첩이 이미 들어와 전처리기의 이유가 예전만 못하다.
+화면이 열두어 개인 1인 프로젝트 Echo Flip은 빌드 없이 파일 하나로 끝나는 순수 CSS를 골랐고, 이 선택의 전체 그림은 1장에서 정리했다.
+
+## 배치: 박스 모델, 플렉스박스, 그리드
+
+브라우저가 보기에 모든 요소는 네모난 상자다.
+글자가 들어가는 내용(content)이 있고, 그 둘레에 안쪽 여백(padding), 테두리(border), 바깥 여백(margin)이 겹겹이 둘러싼다.
+이 구조를 박스 모델이라고 한다.
+
+app.css의 맨 위에는 이런 규칙이 있다.
+
+```css
+* {
+  box-sizing: border-box;
+}
+```
+
+`*`는 모든 요소를 고르는 선택자다.
+`box-sizing: border-box`는 "너비를 잴 때 테두리와 안쪽 여백까지 포함하라"는 뜻으로, 기본값대로라면 패딩만큼 상자가 부모 밖으로 삐져나오기 때문에 현대 CSS는 거의 관습처럼 첫 줄에 이 규칙을 둔다.
+
+::: info [용어 풀이] 박스 모델(box model)
+모든 HTML 요소를 내용, 안쪽 여백(padding), 테두리(border), 바깥 여백(margin)의 네 겹 상자로 보는 CSS의 기본 모형이다.
+택배 상자에 비유하면 물건(내용), 완충재(패딩), 상자 벽(테두리), 상자 사이 간격(마진)이고, 요소의 크기와 간격 문제는 대부분 이 네 겹 중 어디를 조절할지의 문제다.
+:::
+
+상자들을 어떻게 늘어놓을지가 배치(layout)다.
+현대 CSS의 배치 도구는 크게 둘, 플렉스박스(Flexbox)와 그리드(Grid)다.
+플렉스박스는 한 방향(가로 아니면 세로)으로 줄 세우기, 그리드는 행과 열이 있는 격자 배치에 알맞다.
+
+Echo Flip에서 가장 많이 쓰는 배치 부품은 가로 줄 세우기 `.row`다.
+
+```css
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+```
+
+`display: flex`로 자식들을 가로로 나란히 세우고, `align-items: center`로 세로 가운데를 맞추고, `gap`으로 사이 간격을 준다.
+앞서 layout.html에서 본 하단 탭 `.bottomnav`도 플렉스박스여서, 안쪽 `<div>`에 `display: flex`와 `justify-content: space-around`를 주어 탭 네 개(홈·덱·통계·설정)를 같은 간격으로 벌려 놓는다.
+탭이 다섯 개가 되어도 규칙을 고칠 필요 없이 알아서 다시 벌어지는 이 유연함(flexible)이 이름의 유래다.
+
+격자가 필요한 곳에서는 그리드를 쓴다.
+채점 버튼 두 개를 반반으로 놓는 `.grade-grid`가 그 예다.
+
+```css
+.grade-grid {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+```
+
+`grid-template-columns: 1fr 1fr`은 "같은 폭(1fr)의 열 두 개"라는 선언이다.
+학습 완료 화면의 통계 세 칸을 그리는 `.stat-3`도 같은 방식으로 `repeat(3, 1fr)`, 즉 같은 폭의 열 세 개를 편다.
+행과 열 양쪽으로 칸이 생기는 표 모양 배치는 그리드가, 한 줄로 흘러가는 배치는 플렉스박스가 편하다.
+(`.grade-grid`의 `display: none`, 즉 "숨겨 두라"는 지시는 카드 뒤집기 절에서 사연이 밝혀진다.)
+
+::: info [용어 풀이] 플렉스박스와 그리드(Flexbox, Grid)
+CSS의 두 가지 현대적 배치 도구다.
+플렉스박스는 상자들을 한 방향으로 줄 세우고 간격과 정렬을 조절하는 데(예: 아이콘과 글자를 나란히), 그리드는 행과 열이 있는 격자에 상자들을 앉히는 데(예: 통계 3칸) 알맞다.
+이 둘이 나오기 전에는 표 태그나 float 같은 우회 기법으로 배치를 흉내 냈다.
+:::
+
+마지막으로 화면 전체의 틀이다.
+Echo Flip은 스마트폰으로 단어를 외우는 앱이라 모바일 화면을 기본으로 설계했고, 큰 모니터에서는 옆으로 퍼지는 대신 가운데 좁은 기둥으로 선다.
+
+```css
+.frame {
+  max-width: 32rem;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+```
+
+`max-width: 32rem`이 폭을 512픽셀 언저리로 묶고, `margin: 0 auto`가 남는 좌우 공간을 균등하게 나눠 가운데 정렬한다.
+`flex-direction: column`은 플렉스박스를 세로 방향으로 돌린 것으로, 상단 바·본문·하단 탭이 위에서 아래로 쌓인다.
+작은 화면을 기본으로 두고 큰 화면을 예외로 다루는 이 접근을 모바일 우선(mobile first)이라고 부르며, 이 앱의 쓰임(이동 중에 한 손으로 카드 넘기기)에는 컬럼 수를 늘리는 정교한 반응형보다 한 컬럼 고정이 맞는 옷이다.
+
+## 다크 모드: 변수만 바꾼다
+
+사용자는 운영체제에서 고른 밝은 테마나 어두운 테마를 앱이 따라 주기를 기대하고, CSS는 이 설정을 미디어 쿼리로 읽는다.
+다음은 app.css에서 `:root` 변수 선언 바로 아래, 어두운 테마일 때만 변수 값을 갈아 끼우는 코드다.
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0a0a;
+    --fg: #f5f5f5;
+    --surface: #171717;
+    --border: #262626;
+    --muted: #a3a3a3;
+    --faint: #737373;
+    /* ... 강조색·정답 카드 배경 변수 생략 ... */
+  }
+}
+```
+
+`@media (...)`는 "괄호 안 조건이 참일 때만 이 안의 규칙을 적용하라"는 문법이고, `prefers-color-scheme: dark`가 "사용자가 어두운 테마를 선호한다"는 조건이다.
+미디어 쿼리의 원래 용도는 "폭이 768픽셀 이상이면 두 컬럼으로"처럼 화면 크기에 따라 배치를 바꾸는 반응형(responsive) 디자인이지만, 한 컬럼 고정인 Echo Flip은 테마 감지에만 쓴다.
+
+전략에 주목하자.
+바뀌는 것은 변수 값뿐이다.
+배경색과 글자색이 통째로 뒤집히지만, `background: var(--bg)`라고 적어 둔 800줄의 규칙들은 한 줄도 손대지 않는다.
+디자인 토큰을 변수로 모아 둔 보상이 여기서 돌아온다.
+변수 없이 다크 모드를 만들려면 색을 쓰는 규칙마다 어두운 버전을 겹쳐 써야 하고, 색 하나를 빠뜨리면 어두운 배경에 검은 글자 같은 사고가 난다.
+
+::: info [용어 풀이] 미디어 쿼리(media query)
+"화면 폭이 이만큼 이상이면", "사용자가 어두운 테마를 켰으면"처럼 보는 환경에 대한 조건을 걸고, 참일 때만 안쪽 CSS 규칙을 적용하는 문법이다.
+같은 문서가 스마트폰, 태블릿, 어두운 방의 모니터에서 각각 알맞게 보이도록 하는 스위치다.
+:::
+
+## 자바스크립트 없이 카드 뒤집기
+
+이 앱의 핵심 장면을 뜯어 볼 차례다.
+학습 화면에서 카드를 탭하면 카드가 옆으로 회전하며 뒷면의 정답이 나타나고, 그제야 아래에 채점 버튼 두 개가 나타난다.
+전형적인 자바스크립트의 일처럼 보이지만, 이 뒤집기에는 자바스크립트가 한 줄도 없다.
+이 장면의 상태는 단 하나 "정답을 봤는가"이고, 알약 라디오 버튼이 "무엇이 선택됐는가"를 들었듯 여기서는 체크박스 하나가 그 상태를 든다.
+
+학습 화면 조각인 internal/web/templates/partials/study.html의 구조다.
+숨긴 체크박스 하나와, 그것을 누르게 해 주는 라벨 두 개(카드 자체와 "정답 보기" 버튼), 그리고 채점 폼을 차례로 놓는 코드다.
+
+```html
+      {{/* 뒤집기 상태는 이 체크박스 하나. CSS 형제 선택자가 카드 회전과
+           채점 버튼 표시를 모두 처리한다 — 자바스크립트가 필요 없다. */}}
+      <input type="checkbox" id="reveal" class="reveal-toggle">
+
+      <label for="reveal" class="flip-scene">
+        <div class="flip-inner">
+          <div class="flip-face">
+            <!-- ... 앞면: 카드 종류 표시와 문제 텍스트 생략 ... -->
+            <p class="tiny faint center hint">탭해서 정답 보기</p>
+          </div>
+          <div class="flip-face flip-back">
+            <!-- ... 뒷면: 정답·발음·예문 생략 ... -->
+          </div>
+        </div>
+      </label>
+
+      <label for="reveal" class="btn btn-primary btn-big reveal-btn">정답 보기</label>
+
+      <form class="grade-grid" hx-post="/study/grade" hx-target="#study-body">
+        {{template "study_state_fields" $}}
+        <button class="btn btn-red btn-big" name="correct" value="false">{{icon "x"}} 틀렸어요</button>
+        <button class="btn btn-green btn-big" name="correct" value="true">{{icon "check"}} 맞았어요</button>
+      </form>
+```
+
+채점 폼에 붙은 `hx-`로 시작하는 속성들은 10장에서 다룰 htmx의 문법이니 지금은 접어 두자.
+
+`<label for="reveal">`은 라벨과 입력 칸의 연결을 `for` 속성으로 맺는 방식으로, 카드(첫 라벨)를 탭하든 "정답 보기" 버튼(둘째 라벨)을 누르든 `id="reveal"`인 체크박스가 켜진다.
+체크박스 자체는 `.reveal-toggle` 규칙(`opacity: 0`)으로 투명하게 숨겨져 있다.
+
+이제 CSS가 이 상태 변화를 받아 세 가지 일을 벌인다.
+첫째, 카드를 3차원으로 회전시킨다.
+
+```css
+.flip-scene {
+  display: block;
+  perspective: 1200px;
+  min-height: 18rem;
+  cursor: pointer;
+  /* ... 탭 강조·글자 선택 방지 속성 생략 ... */
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  min-height: 18rem;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal-toggle:checked ~ .flip-scene .flip-inner {
+  transform: rotateY(180deg);
+}
+```
+
+핵심 선택자는 `.reveal-toggle:checked ~ .flip-scene .flip-inner`, 우리말로 "체크박스가 켜져 있으면, 그 뒤 형제인 카드 무대 안의 회전판"이다.
+알약 라디오에서 본 `+`(바로 다음 형제) 대신 `~`(뒤에 오는 형제 아무나)를 썼는데, 체크박스와 카드 사이에 다른 요소가 끼어도 되게 하기 위함이다.
+
+회전 자체는 `transform: rotateY(180deg)`, 세로축 기준 반 바퀴다.
+`perspective: 1200px`은 관찰자가 1200픽셀 거리에서 본다고 치고 그리라는 원근감 선언으로, 없으면 회전이 입체감 없이 납작하게 보인다.
+`transform-style: preserve-3d`는 자식들(앞면과 뒷면)을 같은 3차원 공간에 두라는 지시이고, `transition`은 상태가 바뀔 때 0.45초에 걸쳐 부드럽게 움직이라는 애니메이션 선언이다.
+
+둘째, 앞면과 뒷면을 겹쳐 두고 뒤통수를 숨긴다.
+
+```css
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* ... 테두리·바탕색·그림자 속성 생략 ... */
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+  border-color: var(--answer-border);
+  background: var(--answer-bg);
+}
+```
+
+두 면은 `position: absolute`와 `inset: 0`으로 같은 자리에 포개져 있고, 뒷면(`.flip-back`)은 처음부터 180도 돌려 둔다.
+그래서 회전판이 돌면 앞면이 뒤로 가고 뒷면이 정면을 향한다.
+`backface-visibility: hidden`은 "뒤집힌 면은 보이지 않게 하라"는 속성으로, 이것이 없으면 앞면의 글자가 거울상으로 비쳐 보인다.
+
+셋째, 채점 버튼과 "정답 보기" 버튼을 맞바꾼다.
+
+```css
+.reveal-toggle:checked ~ .grade-grid {
+  display: grid;
+}
+
+.reveal-btn {
+  display: block;
+}
+
+.reveal-toggle:checked ~ .reveal-btn {
+  display: none;
+}
+```
+
+배치 절에서 봤듯 `.grade-grid`는 평소 `display: none`으로 숨겨져 있다.
+체크박스가 켜지면 이 규칙이 그리드로 살려 내고 반대로 "정답 보기" 버튼은 숨겨서, 정답을 보기 전에 채점부터 하는 실수를 구조적으로 막는다.
+
+정리하면 상태는 체크박스가 들고, 상태 전환은 라벨이 맡고, 상태에 따른 화면 변화는 `:checked ~` 선택자가 맡는다.
+같은 일을 자바스크립트로 짜는 것이 더 일반적이고, 상태가 여러 개로 늘거나 뒤집힐 때 소리를 내는 등 화면 밖의 동작이 필요하면 자바스크립트 없이는 안 된다.
+하지만 "표시 상태 하나에 겉모습이 따라오는" 정도라면 브라우저 내장 동작만으로 충분하고, 코드가 줄어드는 만큼 깨질 곳도 준다.
+카드를 뒤집은 다음 단계, 즉 채점 결과를 서버에 보내고 다음 카드를 받아 오는 일은 CSS만으로는 안 되므로 10장의 htmx가 이어받는다.
+
+## 정리
+
+이번 장에서는 Echo Flip의 화면을 이루는 두 재료, HTML과 CSS를 실제 파일로 읽었다.
+
+HTML은 구조다.
+doctype과 head, body로 뼈대를 잡고(layout.html), header·main·nav·section 같은 시맨틱 태그로 각 부분의 의미를 드러내고, a 링크로 화면 사이를 잇는다.
+사용자 입력은 form이 맡아서, 라디오 버튼과 파일 업로드, details/summary 여닫기까지 자바스크립트 없이 브라우저 내장 기능으로 해결했다.
+
+CSS는 겉모습이다.
+선택자로 요소를 고르고(태그·클래스·자손·상태·형제), 색과 치수는 :root의 변수로 모아 디자인 토큰을 만들었다.
+배치는 박스 모델 위에서 플렉스박스(.row, .bottomnav)와 그리드(.grade-grid, .stat-3)가 나눠 맡고, max-width 프레임이 모바일 우선 한 컬럼을 지키며, 다크 모드는 prefers-color-scheme 미디어 쿼리에서 변수 값만 갈아 끼우는 것으로 끝냈다.
+마지막으로 숨긴 체크박스, 라벨, `:checked ~` 형제 선택자, 3차원 변환을 엮은 자바스크립트 없는 카드 뒤집기까지, 상태를 HTML이 들고 겉모습을 CSS가 따라가게 하는 분업을 봤다.
+
+다만 이 장에서 읽은 템플릿 파일들에는 아직 설명하지 않은 구멍이 있다.
+`{{.Title}}`, `{{range .Data.Decks}}` 같은 중괄호 자리들이다.
+다음 장에서는 Go의 html/template이 이 자리에 데이터를 채워 완성된 문서를 만드는 과정을 살펴보겠다.

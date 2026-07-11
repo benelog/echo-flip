@@ -22,21 +22,8 @@
       "problemMatcher": ["$go"]
     },
     {
-      "label": "ts: typecheck",
-      "type": "shell",
-      "command": "npx tsc --noEmit",
-      "group": "build",
-      "problemMatcher": ["$tsc"]
-    },
-    {
-      "label": "web: test",
-      "type": "shell",
-      "command": "npm test",
-      "group": "test"
-    },
-    {
       "label": "전체 검증",
-      "dependsOn": ["go: build", "go: vet", "go: test", "ts: typecheck", "web: test"],
+      "dependsOn": ["go: build", "go: vet", "go: test"],
       "dependsOrder": "sequence",
       "group": { "kind": "test", "isDefault": true },
       "problemMatcher": []

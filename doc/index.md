@@ -12,7 +12,7 @@ sidebar: false
     <p class="ef-book-author">benelog 지음</p>
     <div class="ef-book-zero">&#8361;0</div>
   </a>
-  <p class="ef-home-desc">암기 카드 앱의 실제 코드로 Go, Gin, TypeScript, React, PostgreSQL을 익히고, Claude Code와 함께 개발해 Vercel·Supabase 무료 티어로 서버 비용 없이 배포·운영하는 과정을 배운다.</p>
+  <p class="ef-home-desc">암기 카드 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고, Claude Code와 함께 개발해 Vercel·Supabase 무료 티어로 서버 비용 없이 배포·운영하는 과정을 배운다.</p>
   <div class="ef-home-actions">
     <a class="ef-btn brand" href="/echo-flip/intro">읽기 시작</a>
     <a class="ef-btn" href="https://benelog.github.io/echo-flip/echo-flip-book.pdf">PDF 다운로드</a>
