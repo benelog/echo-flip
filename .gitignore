@@ -13,9 +13,7 @@
 /bin/
 
 # local mode sqlite database
-echo-flip.db
-*.db-wal
-*.db-shm
+local-db/
 
 # vercel
 .vercel

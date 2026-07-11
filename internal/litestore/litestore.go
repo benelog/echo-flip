@@ -8,6 +8,8 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -30,6 +32,11 @@ type Store struct {
 // schema, which is idempotent. A single connection is enough for one local
 // user and keeps writes serialized.
 func Open(path string) (*Store, error) {
+	if dir := filepath.Dir(path); dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return nil, fmt.Errorf("create sqlite dir: %w", err)
+		}
+	}
 	db, err := sql.Open("sqlite",
 		path+"?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)&_pragma=journal_mode(wal)")
 	if err != nil {
