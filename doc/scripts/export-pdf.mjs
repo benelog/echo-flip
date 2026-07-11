@@ -16,7 +16,7 @@ const BASE = '/echo-flip/'
 
 const TITLE = '월 0원으로 운영하는 나만의 웹 앱'
 const SUBTITLE = 'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다'
-const AUTHOR = 'benelog'
+const AUTHOR = '정상혁'
 const SITE = 'benelog.github.io/echo-flip'
 
 // 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.

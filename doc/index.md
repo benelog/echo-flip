@@ -14,7 +14,7 @@ sidebar: false
       <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>
       <li>무료 티어에 유리하게 수십 MB 메모리만 사용하는 서버</li>
     </ul>
-    <p class="ef-book-author">benelog 지음</p>
+    <p class="ef-book-author">정상혁 지음</p>
     <div class="ef-book-zero">&#8361;0</div>
   </a>
   <p class="ef-home-desc">암기 카드 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고, Claude Code와 함께 개발해 Vercel·Supabase 무료 티어로 서버 비용 없이 배포·운영하는 과정을 배운다.</p>

@@ -272,7 +272,7 @@ func insertCard(ctx context.Context, tx *sql.Tx, userID uuid.UUID, in store.Card
 
 ### 외래 키와 ON DELETE 정책
 
-모든 관계에는 외래 키가 걸려 있고, 삭제 정책은 두 가지로 갈린다.
+모든 관계에는 외래 키가 걸려 있고, 삭제 정책은 두 가지로 나뉜다.
 
 소유 관계는 `on delete cascade`다.
 사용자를 지우면 덱·카드·SRS 상태·세션·로그가 연쇄 삭제되고, 덱을 지우면 카드가, 카드를 지우면 SRS 상태와 리뷰 로그가 따라 지워진다.
