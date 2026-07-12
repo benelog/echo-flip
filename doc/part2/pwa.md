@@ -184,6 +184,14 @@ self.addEventListener("fetch", (event) => {
 요청을 데이터(API), 페이지 HTML, 정적 자원의 세 갈래로 나누고, 갈래마다 다른 캐시 전략을 쓴다.
 왜 세 갈래인지가 이 절의 이야기다.
 
+::: info [용어 풀이] 캐시 전략(Caching Strategy)
+같은 요청에 대해 캐시에 있는 사본과 네트워크의 최신 응답 중 무엇을 먼저 쓸지 미리 정해 둔 규칙이다.
+network-first는 네트워크를 먼저 시도하고 실패했을 때만 사본을 꺼내는 방식, cache-first는 사본이 있으면 네트워크에 아예 묻지 않는 방식, stale-while-revalidate는 낡은(stale) 사본을 즉시 돌려주는 동안(while) 뒤에서 새 응답을 받아 캐시를 갱신(revalidate)하는 방식이다.
+network only는 캐시를 건드리지 않고 언제나 네트워크로 나간다.
+무엇을 고를지는 그 응답이 낡았을 때 사용자가 무엇을 손해 보는지에 달렸다.
+빨리 보여 주는 값과 정확하게 보여 주는 값 중 어느 쪽이 큰지를 요청의 종류마다 따로 답한 것이 캐시 전략이다.
+:::
+
 서비스 워커는 세 가지 생애 사건, 곧 설치(`install`), 활성화(`activate`), 요청 가로채기(`fetch`)에 반응한다.
 
 `install`에서 `skipWaiting()`을 부른다.
@@ -249,7 +257,7 @@ if (event.request.mode === "navigate") {
 ### 정적 자원: 일단 캐시로 보여 주고 뒤에서 갱신한다(stale-while-revalidate)
 
 마지막 갈래는 두 필터를 다 통과한 요청, 즉 `app.css`와 `htmx.min.js`, 아이콘 같은 정적 파일이다.
-여기에는 낡은(stale) 사본으로 먼저 그리고 뒤에서 재검증(revalidate)한다고 해서 stale-while-revalidate라 부르는 전략을 쓴다.
+여기에는 stale-while-revalidate를 쓴다.
 
 ```js
 const cached = await cache.match(event.request);
@@ -294,8 +302,14 @@ if ("serviceWorker" in navigator) {
 로컬에서도 켜 두는 것은 의도적이다.
 페이지가 network-first라 코드를 고치고 새로고침하면 바로 반영되므로, 캐시가 개발을 방해하는 일이 크게 줄었다.
 그래도 CSS 같은 정적 자원은 stale-while-revalidate 탓에 새로고침 한 번 늦게 보일 수 있다.
-이때 쓰는 개발자 도구(DevTools)는 브라우저에 내장된 점검 창으로, Chrome에서 F12를 누르거나(macOS는 ⌥⌘I), 화면에서 오른쪽 클릭 후 "검사"를 고르면 열린다.
-그 개발자 도구의 Application 탭에서 "Update on reload"를 켜 두면 이 어긋남도 사라진다.
+개발자 도구(DevTools)의 Application 탭에서 "Update on reload"를 켜 두면 이 어긋남도 사라진다.
+
+::: info [용어 풀이] 개발자 도구(DevTools)
+브라우저에 내장된 점검 창이다.
+지금 열려 있는 페이지의 HTML과 CSS, 오간 네트워크 요청, 브라우저에 저장된 캐시와 서비스 워커를 들여다보고 그 자리에서 바꿔 볼 수도 있다.
+Chrome에서는 F12를 누르거나(macOS는 ⌥⌘I), 화면에서 오른쪽 클릭 후 "검사"를 고르면 열린다.
+화면에 나온 결과만으로는 원인을 알 수 없을 때 자동차의 보닛을 열어 엔진을 확인하는 일에 해당하고, 이 장에서 설치와 캐시를 확인하는 절차도 전부 이 창에서 이루어진다.
+:::
 
 `.catch(() => {})`로 실패를 삼키는 것도 의도적이다.
 서비스 워커 등록에 실패해도 앱은 그냥 캐시 없이 동작할 뿐이므로, 사용자에게 보여 줄 오류가 아니다.

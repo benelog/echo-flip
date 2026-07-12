@@ -75,27 +75,28 @@
 
 | 파일 | 소유 용어 |
 |---|---|
-| `intro.md` | API, 서버(클라이언트 포함) |
-| `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, 호스팅, 무료 티어, PostgreSQL, 프런트엔드와 백엔드, PWA, 서버리스, 콜드스타트, 아키텍처, OAuth, JWT |
-| `part1/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md) |
-| `part1/database-basics.md` | 테이블·행·열, 기본 키와 외래 키, SQL, 스키마, 제약, 조인, 인덱스, JSON (NULL은 상자 없이 제약 절 본문에서 도입한다) |
-| `part1/database.md` | 트랜잭션 |
-| `part1/go-basics.md` | 모듈과 패키지, 다중 반환값과 에러 처리 |
-| `part1/go.md` | 구조체, 순수 함수, 포인터 |
-| `part1/go-testing.md` | 테이블 주도 테스트, 포매터와 정적 분석, 품질 게이트, 훅(Claude Code), 종료 코드, 서브에이전트 (세로 정렬은 상자 없이 본문 절로 다룬다) |
-| `part1/gin.md` | HTTP 요청과 응답, 인터페이스, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 미들웨어, CORS |
-| `part1/html-css.md` | HTML 태그와 요소, 시맨틱 마크업, CSS 선택자, 박스 모델, 플렉스박스와 그리드, CSS 변수(커스텀 프로퍼티), 미디어 쿼리 |
-| `part1/go-templates.md` | 템플릿 엔진, 이스케이프와 XSS, embed(Go) |
-| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), hidden 필드, 이벤트 위임, Web API(브라우저) |
-| `part1/local-dev.md` | localhost와 포트, 디버거와 중단점, 언어 서버(Language Server) |
-| `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 기본 브랜치 |
-| `part2/github-actions.md` | 지속적 통합(CI, Continuous Integration), 러너(Runner) |
-| `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN, HTTPS, 프리뷰 배포 |
-| `part2/supabase-auth.md` | 관리형 서비스, 리다이렉트와 콜백, JWKS와 서명 검증, 무상태, 쿠키(Cookie), PKCE |
-| `part2/supabase-db.md` | 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션, 마이그레이션, RLS, 환경 변수 |
-| `part2/pwa.md` | 서비스 워커(Service Worker), 웹 앱 매니페스트 |
-| `part2/free-tier.md` | 한도(Quota)와 스로틀링(Throttling), 대역폭과 전송량 |
-| `appendix/setup.md` | 터미널, 패키지 매니저, PATH와 셸 설정 파일 |
+| `intro.md` | API, 서버, CSV |
+| `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, NoSQL과 문서형 데이터베이스, 호스팅, 무료 티어, PostgreSQL, 프런트엔드와 백엔드, 상주 서버, PWA, 서버리스, 콜드스타트, 바이너리, SPA, 아키텍처, OAuth, JWT |
+| `part1/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md), 디렉터리와 프로젝트 루트, 스킬 |
+| `part1/database-basics.md` | 테이블·행·열, 정규화와 비정규화, 기본 키와 외래 키, SQL, 스키마, UUID, 제약, NULL, JSON, SQL 인젝션, 드라이버, 조인, 인증과 인가, 인덱스, 실행 계획 |
+| `part1/database.md` | 엔티티, 잠금, 뷰, 트랜잭션, 원자적, slug |
+| `part1/go-basics.md` | 모듈과 패키지, 임포트, 표준 라이브러리, 제로값, 예외, 다중 반환값과 에러 처리, 공개와 비공개 |
+| `part1/go.md` | 구조체, 생성자, 순수 함수, 에러 래핑과 센티널 에러, 포인터, 메서드와 리시버, 구조체 태그, 슬라이스와 맵, 직렬화와 역직렬화 |
+| `part1/go-testing.md` | 플래그, 테이블 주도 테스트, 포매터와 정적 분석, 품질 게이트, 셸과 셸 스크립트, 훅(Claude Code), 표준 입출력과 표준 에러, 종료 코드, 서브에이전트, 프런트매터 (세로 정렬은 상자 없이 본문 절로 다룬다) |
+| `part1/gin.md` | HTTP 요청과 응답, 인터페이스, 프로세스, 패닉, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 경로/쿼리 파라미터, 미들웨어, CORS, 팩토리 함수와 클로저, 의존성 주입, 모의 객체 |
+| `part1/html-css.md` | 화면 낭독기, HTML 태그와 요소, 시맨틱 마크업, class와 id, 요소의 가족 관계, 폼, CSS 변수(커스텀 프로퍼티), rem, 상태(state), CSS 선택자, 박스 모델, 플렉스박스와 그리드, 미디어 쿼리 |
+| `part1/go-templates.md` | 템플릿 엔진, 파싱, SVG와 인라인, 이스케이프와 XSS, embed(Go), PRG 패턴, 플래시 메시지 |
+| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), HTML 조각, hidden 필드, Web API(브라우저), data-* 속성, 이벤트 위임 |
+| `part1/local-dev.md` | 클론, localhost와 포트, 코드 편집기와 확장, 언어 서버, 디버거와 중단점 |
+| `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 저장소, 원격 저장소와 push·pull, 스테이징, diff, 기본 브랜치 |
+| `part2/github-actions.md` | 지속적 통합(CI), 워크플로·잡·스텝, YAML, 러너, 브랜치 보호 규칙, 저장소 시크릿 |
+| `part2/vercel.md` | 인스턴스, 컨테이너와 Dockerfile, 웹소켓, 엣지, HTTPS, CDN, 빌드와 배포, CRUD, 캐치올, 리라이트, 리전, 프리뷰 배포 |
+| `part2/supabase-auth.md` | 관리형 서비스, 프로바이더, 액세스 토큰과 리프레시 토큰, 리다이렉트와 콜백, 쿠키, PKCE, CSRF, 무상태, 클레임, 대칭 키와 비대칭 키, JWKS와 서명 검증, Client ID와 Client Secret |
+| `part2/supabase-db.md` | 환경 변수, 연결 문자열, GIN 인덱스, 커넥션 풀러, 프리페어드 스테이트먼트, 마이그레이션, 권고 잠금, 콜로케이션, RLS |
+| `part2/pwa.md` | 웹 앱 매니페스트, 서비스 워커, 캐시 전략, 개발자 도구 |
+| `part2/free-tier.md` | 한도와 스로틀링, 대역폭과 전송량, 핑과 헬스 체크, 백업과 덤프(pg_dump) |
+| `part2/whats-next.md` | E2E 테스트, 관측성 |
+| `appendix/setup.md` | 터미널, WSL, 패키지 매니저, sudo, PATH와 셸 설정 파일 |
 
 **동음이의어 주의.** 같은 말이 다른 뜻으로 쓰이는 곳은 그 자리에서 한 구절로 구분해 준다. 모르는 말은 독자가 멈추지만, 아는 줄 알았던 말은 조용히 오해로 굳는다.
 
@@ -103,6 +104,8 @@
 - **세션**: 네 가지 뜻으로 쓰인다. 2장은 Claude Code의 대화 단위, 12장은 카드 한 벌을 도는 한 번의 학습(`study_sessions`), 17장은 로그인 상태, 18장은 DB에 접속해 있는 연결 하나다. 12·17·18장에서 각각 다른 뜻임을 짚는다.
 - **컨텍스트**: 2장은 에이전트에게 건네는 대화 내용, 11장은 템플릿이 지금 보고 있는 데이터 한 덩어리다(11장에서 구분).
 - **커넥션 풀과 커넥션 풀러**: 이름이 한 글자 차이지만 다른 물건이다. 풀은 우리 서버가 자기 안에 쥐고 돌려쓰는 연결 묶음(pgxpool), 풀러는 DB 앞에 서서 중개하는 별도의 서버(Supavisor)다(18장 상자에서 구분).
+- **메서드**: 7장은 구조체에 딸린 함수(Go의 메서드), 9장은 HTTP 요청의 종류(GET, POST)다(7장 상자에서 구분).
+- **토큰**: 2장은 LLM이 글을 쪼개 세는 단위, 17장은 로그인 상태를 증명하는 문자열이다(17장 상자에서 구분).
 
 ## 화면 캡처
 
