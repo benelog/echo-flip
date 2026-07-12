@@ -75,19 +75,19 @@
 
 | 파일 | 소유 용어 |
 |---|---|
-| `intro.md` | API |
+| `intro.md` | API, 서버(클라이언트 포함) |
 | `part1/tech-choices.md` | 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, 호스팅, 무료 티어, PostgreSQL, 프런트엔드와 백엔드, PWA, 서버리스, 콜드스타트, 아키텍처, OAuth, JWT (도입 소속 장이라 예외적으로 16개) |
 | `part1/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md) |
-| `part1/database-basics.md` | 테이블·행·열, 기본 키와 외래 키, SQL, 제약, 조인, 인덱스 |
+| `part1/database-basics.md` | 테이블·행·열, 기본 키와 외래 키, SQL, 스키마, 제약, 조인, 인덱스, JSON (NULL은 상자 없이 제약 절 본문에서 도입한다) |
 | `part1/database.md` | 트랜잭션 |
 | `part1/go-basics.md` | 모듈과 패키지, 다중 반환값과 에러 처리 |
 | `part1/go.md` | 구조체, 순수 함수, 포인터 |
 | `part1/go-testing.md` | 테이블 주도 테스트, 포매터와 정적 분석, 품질 게이트, 훅(Claude Code), 종료 코드, 서브에이전트 (세로 정렬은 상자 없이 본문 절로 다룬다) |
-| `part1/gin.md` | HTTP 요청과 응답, 라우터와 라우팅, 엔드포인트, 핸들러, JSON과 바인딩, 미들웨어, CORS |
+| `part1/gin.md` | HTTP 요청과 응답, 인터페이스, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 미들웨어, CORS |
 | `part1/html-css.md` | HTML 태그와 요소, 시맨틱 마크업, CSS 선택자, 박스 모델, 플렉스박스와 그리드, CSS 변수(커스텀 프로퍼티), 미디어 쿼리 |
 | `part1/go-templates.md` | 템플릿 엔진, 이스케이프와 XSS, embed(Go) |
 | `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), 이벤트 위임, Web API(브라우저) |
-| `part1/local-dev.md` | 언어 서버(Language Server) |
+| `part1/local-dev.md` | localhost와 포트, 언어 서버(Language Server) |
 | `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 기본 브랜치 |
 | `part2/github-actions.md` | 지속적 통합(CI, Continuous Integration) |
 | `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN, 프리뷰 배포 |
@@ -95,7 +95,7 @@
 | `part2/supabase-db.md` | 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션, 마이그레이션, RLS, 환경 변수 |
 | `part2/pwa.md` | 서비스 워커(Service Worker), 웹 앱 매니페스트 |
 | `part2/free-tier.md` | 한도(Quota)와 스로틀링(Throttling) |
-| `appendix/setup.md` | 터미널, 패키지 매니저 |
+| `appendix/setup.md` | 터미널, 패키지 매니저, PATH와 셸 설정 파일 |
 
 **동음이의어 주의.** 8장의 훅은 Claude Code가 자동 실행하는 스크립트이고, React 같은 프런트엔드 프레임워크의 훅(상태 관리 함수)과는 다른 것이다(8장 상자에서 한 문장으로 짚는다).
 "세션"도 마찬가지다: 2장의 세션은 Claude Code의 대화 단위, 17장의 로그인 세션은 인증 상태다(17장 쿠키 상자에서 구분).
