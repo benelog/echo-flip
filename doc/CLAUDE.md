@@ -86,19 +86,23 @@
 | `part1/gin.md` | HTTP 요청과 응답, 인터페이스, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 미들웨어, CORS |
 | `part1/html-css.md` | HTML 태그와 요소, 시맨틱 마크업, CSS 선택자, 박스 모델, 플렉스박스와 그리드, CSS 변수(커스텀 프로퍼티), 미디어 쿼리 |
 | `part1/go-templates.md` | 템플릿 엔진, 이스케이프와 XSS, embed(Go) |
-| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), 이벤트 위임, Web API(브라우저) |
-| `part1/local-dev.md` | localhost와 포트, 언어 서버(Language Server) |
+| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), hidden 필드, 이벤트 위임, Web API(브라우저) |
+| `part1/local-dev.md` | localhost와 포트, 디버거와 중단점, 언어 서버(Language Server) |
 | `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 기본 브랜치 |
-| `part2/github-actions.md` | 지속적 통합(CI, Continuous Integration) |
-| `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN, 프리뷰 배포 |
-| `part2/supabase-auth.md` | 관리형 서비스, JWKS와 서명 검증, 무상태, 쿠키(Cookie), PKCE |
+| `part2/github-actions.md` | 지속적 통합(CI, Continuous Integration), 러너(Runner) |
+| `part2/vercel.md` | 빌드와 배포, 리라이트, 캐치올, 리전, CDN, HTTPS, 프리뷰 배포 |
+| `part2/supabase-auth.md` | 관리형 서비스, 리다이렉트와 콜백, JWKS와 서명 검증, 무상태, 쿠키(Cookie), PKCE |
 | `part2/supabase-db.md` | 커넥션 풀러, 프리페어드 스테이트먼트, 콜로케이션, 마이그레이션, RLS, 환경 변수 |
 | `part2/pwa.md` | 서비스 워커(Service Worker), 웹 앱 매니페스트 |
-| `part2/free-tier.md` | 한도(Quota)와 스로틀링(Throttling) |
+| `part2/free-tier.md` | 한도(Quota)와 스로틀링(Throttling), 대역폭과 전송량 |
 | `appendix/setup.md` | 터미널, 패키지 매니저, PATH와 셸 설정 파일 |
 
-**동음이의어 주의.** 8장의 훅은 Claude Code가 자동 실행하는 스크립트이고, React 같은 프런트엔드 프레임워크의 훅(상태 관리 함수)과는 다른 것이다(8장 상자에서 한 문장으로 짚는다).
-"세션"도 마찬가지다: 2장의 세션은 Claude Code의 대화 단위, 17장의 로그인 세션은 인증 상태다(17장 쿠키 상자에서 구분).
+**동음이의어 주의.** 같은 말이 다른 뜻으로 쓰이는 곳은 그 자리에서 한 구절로 구분해 준다. 모르는 말은 독자가 멈추지만, 아는 줄 알았던 말은 조용히 오해로 굳는다.
+
+- **훅**: 8장의 훅은 Claude Code가 자동 실행하는 스크립트이고, React 같은 프런트엔드 프레임워크의 훅(상태 관리 함수)과는 다른 것이다(8장 상자에서 한 문장으로 짚는다).
+- **세션**: 네 가지 뜻으로 쓰인다. 2장은 Claude Code의 대화 단위, 12장은 카드 한 벌을 도는 한 번의 학습(`study_sessions`), 17장은 로그인 상태, 18장은 DB에 접속해 있는 연결 하나다. 12·17·18장에서 각각 다른 뜻임을 짚는다.
+- **컨텍스트**: 2장은 에이전트에게 건네는 대화 내용, 11장은 템플릿이 지금 보고 있는 데이터 한 덩어리다(11장에서 구분).
+- **커넥션 풀과 커넥션 풀러**: 이름이 한 글자 차이지만 다른 물건이다. 풀은 우리 서버가 자기 안에 쥐고 돌려쓰는 연결 묶음(pgxpool), 풀러는 DB 앞에 서서 중개하는 별도의 서버(Supavisor)다(18장 상자에서 구분).
 
 ## 화면 캡처
 

@@ -74,8 +74,8 @@ func NewState() State {
 서류 양식의 빈칸들처럼 각 칸(필드)마다 이름과 담을 값의 종류가 정해져 있다.
 :::
 
-`NewState`는 생성자 관례를 보여 준다.
-Go에는 생성자 문법이 없고, `New`로 시작하는 일반 함수를 관례로 쓴다.
+`NewState`는 생성자(Constructor) 관례를 보여 준다.
+값을 처음 만들어 초기 상태로 채워 주는 함수를 다른 언어는 생성자라는 특별한 문법으로 두는데, Go에는 그런 문법이 없어 `New`로 시작하는 평범한 함수를 쓰기로 약속했다.
 여기서 주목할 것은 `State{EaseFactor: InitialEase}`가 `EaseFactor`만 지정한다는 점이다.
 6장에서 본 대로 초기화하지 않은 값은 타입별 제로값(Zero Value)을 가지므로, `IntervalDays`와 `Repetitions`는 자동으로 `0`이 된다.
 그리고 이것이 "아직 한 번도 복습하지 않은 카드"라는 의미와 정확히 일치한다.
@@ -170,19 +170,17 @@ func Parse(raw []byte) (Rule, error) {
 실패할 수 있는 함수는 마지막 반환값으로 `error` 타입을 돌려주고, 호출자는 그 값이 `nil`인지 즉시 검사한다.
 `if err := json.Unmarshal(raw, &r); err != nil { ... }`는 이 관례의 표준형으로, `if` 문 안에서 변수 선언과 조건 검사를 한 번에 한다.
 `fmt.Errorf`에 쓴 `%w`는 원인 에러를 감싸(wrap) 맥락을 덧붙이면서도 원인을 보존하는 새 에러를 만든다.
+원래 물건을 버리지 않고 상자에 넣은 뒤 "어디서 왜 왔는지"를 적은 송장을 겉에 붙이는 것과 같아서, 나중에 상자를 열면 원인이 그대로 나온다.
 
 미리 정의해 두고 재사용하는 센티널 에러(Sentinel Error) 패턴도 있다.
-internal/store/store.go에서 발췌했다.
+internal/store/store.go에서 발췌한 한 줄이다.
 
 ```go
 var ErrNotFound = errors.New("not found")
-
-type Store struct {
-	pool *pgxpool.Pool
-}
 ```
 
 `ErrNotFound`는 "요청한 행이 없다"를 뜻하는 패키지 공용 에러 값이다.
+미리 만들어 둔 이 값 하나를 여기저기서 돌려 쓰며 "없음"의 표지로 삼기 때문에, 자리를 지키고 선 보초에 빗대어 센티널(sentinel, 보초)이라 부른다.
 internal/store/decks.go에서는 DB 드라이버의 에러를 이 값으로 번역한다.
 
 ```go
@@ -275,11 +273,11 @@ type Deck struct {
 }
 ```
 
-`Description`이 `string`이 아니라 `*string`인 이유는 DB의 NULL을 표현하기 위해서다.
+`Description`이 `string`이 아니라 `*string`인 것은, 4장에서 본 NULL(값 자체가 없음)을 Go 쪽에서 어떻게 받을 것인가의 문제다.
 값 타입 `string`의 제로값은 빈 문자열이라 "설명이 빈 문자열"과 "설명이 없음"을 구별할 수 없다.
-포인터라면 `nil`이 "없음"을 뜻하고, JSON으로 직렬화하면 `null`이 된다.
-필드 뒤의 `` `json:"description"` ``은 구조체 태그(Struct Tag)로, JSON 직렬화 시 필드 이름을 지정하는 메타데이터다.
-이 태그는 이 장의 마지막 절에서 다시 만난다.
+포인터라면 `nil`이 "없음"을 뜻하고, JSON으로 옮길 때도 `null`이 된다.
+필드 뒤의 `` `json:"description"` ``은 구조체 태그(Struct Tag)다.
+이 칸을 JSON으로 주고받을 때는 `description`이라는 이름을 쓰라고 알려 주는 쪽지이고, 자세한 쓰임은 이 장 마지막의 JSON 절에서 본다.
 
 ## 슬라이스와 맵
 
@@ -312,7 +310,7 @@ func (s *Store) ListDecks(ctx context.Context, userID uuid.UUID) ([]Deck, error)
 `append`는 용량에 여유가 있으면 그 자리에 덧붙이지만, 배열이 가득 찼으면 더 큰 배열을 새로 마련해 기존 원소를 옮겨 담고 그 새 배열을 가리키는 슬라이스를 돌려준다.
 어느 쪽이 일어날지 호출하는 쪽에서는 알 수 없으므로, 반환값을 다시 받지 않으면 새 배열로 이사한 경우의 추가분을 잃어버린다.
 
-`defer rows.Close()`의 `defer`는 함수가 어떤 경로로 반환되든 마지막에 실행할 정리 작업을 예약하는 키워드로, 중간의 `return nil, err`에서도 커서가 확실히 닫힌다.
+`defer rows.Close()`의 `defer`는 함수가 어떤 경로로 반환되든 마지막에 실행할 정리 작업을 예약하는 키워드로, 중간의 `return nil, err`로 빠져나가도 DB에서 결과를 한 줄씩 꺼내 오는 통로(`rows`)가 확실히 닫힌다.
 
 맵은 키-값 저장소다.
 internal/store/cards.go에서 CSV 대량 등록 시 중복 카드를 걸러내는 데 쓴다.
@@ -416,7 +414,8 @@ CSV의 칸 구분자인 쉼표와 겹치지 않는 문자를 구분자로 골랐
 
 ## JSON 직렬화
 
-Echo Flip에서 프런트엔드와 백엔드가 데이터를 주고받을 때, 그리고 스마트 덱 규칙을 DB에 저장할 때의 공용 표기법은 JSON이다.
+4장에서 카드의 태그 목록을 한 칸에 담을 때 본 그 JSON이, 이번에는 통신 표기법으로 쓰인다.
+Echo Flip에서 프런트엔드와 백엔드가 데이터를 주고받을 때, 그리고 스마트 덱 규칙을 DB에 저장할 때의 공용 표기법이 JSON이다.
 구조체처럼 메모리 안에 있는 데이터 꾸러미를 전송하고 저장할 수 있는 한 줄의 글로 바꿔 적는 일을 직렬화(Serialization)라고 하고, 그 글을 다시 데이터로 되살리는 반대 방향을 역직렬화라고 한다.
 표준 라이브러리 `encoding/json`이 양방향을 모두 맡는다.
 
