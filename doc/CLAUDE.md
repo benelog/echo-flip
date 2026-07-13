@@ -92,7 +92,7 @@
 | `part2/github-actions.md` | 지속적 통합(CI), 워크플로·잡·스텝, YAML, 러너, 브랜치 보호 규칙, 저장소 시크릿 |
 | `part2/vercel.md` | 인스턴스, 컨테이너와 Dockerfile, 웹소켓, 엣지, HTTPS, CDN, 빌드와 배포, CRUD, 캐치올, 리라이트, 리전, 프리뷰 배포 |
 | `part2/supabase-auth.md` | 관리형 서비스, 프로바이더, 액세스 토큰과 리프레시 토큰, 리다이렉트와 콜백, 쿠키, PKCE, CSRF, 무상태, 클레임, 대칭 키와 비대칭 키, JWKS와 서명 검증, Client ID와 Client Secret |
-| `part2/supabase-db.md` | 환경 변수, 연결 문자열, GIN 인덱스, 커넥션 풀러, 프리페어드 스테이트먼트, 마이그레이션, 권고 잠금, 콜로케이션, RLS |
+| `part2/supabase-db.md` | 환경 변수, 연결 문자열, GIN 인덱스, 커넥션 풀러, 프리페어드 스테이트먼트, 마이그레이션, 권고 잠금, 확장 후 축소, 콜로케이션, RLS |
 | `part2/pwa.md` | 웹 앱 매니페스트, 서비스 워커, 캐시 전략, 개발자 도구 |
 | `part2/free-tier.md` | 한도와 스로틀링, 대역폭과 전송량, 핑과 헬스 체크, 백업과 덤프(pg_dump) |
 | `part2/whats-next.md` | E2E 테스트, 관측성 |
