@@ -792,26 +792,37 @@ direnv는 이 반복을 없애는 작은 도구다.
 셸 설정 파일은 터미널을 열 때마다 자동으로 실행되는 홈 폴더의 `~/.bashrc`(bash) 또는 `~/.zshrc`(zsh)이고, 지금 쓰는 셸은 `echo $SHELL`로 확인한다(부록 A의 "PATH와 셸 설정 파일" 상자).
 zsh를 쓴다면 위 한 줄의 `bash` 자리에 `zsh`를 넣는다.
 
-그다음 저장소 루트에 `.envrc`를 만들고 개발 프로젝트의 값을 채운다.
+그다음 저장소 루트에 `.envrc`를 만든다.
+값을 여기에 다시 적지는 않고, 앞에서 만든 `.env.dev`를 읽어 오게 한다.
+파일 전체가 한 줄이다.
 
 ```bash
-export DB_PW='<개발 프로젝트의 데이터베이스 비밀번호>'
-export DATABASE_URL="postgresql://postgres.<project-ref>:${DB_PW}@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
-export MIGRATE_DATABASE_URL="postgresql://postgres.<project-ref>:${DB_PW}@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
-export SUPABASE_URL='https://<project-ref>.supabase.co'
-export SUPABASE_ANON_KEY='<개발 프로젝트의 anon key>'
+dotenv .env.dev
 ```
 
-비밀번호를 `DB_PW`로 한 번만 적고 두 연결 문자열이 그것을 참조하는 구조를 눈여겨보자.
-비밀번호를 바꿀 일이 생겨도 고칠 곳이 한 군데다.
-포트가 6543과 5432로 나뉜 것은 이 장에서 본 대로 트랜잭션 풀러를 거치는 연결과 세션이 유지되는 연결의 차이다.
+`dotenv`는 direnv가 제공하는 명령으로, `이름=값` 형식의 파일을 읽어 그대로 export한다.
+값이 사는 곳을 `.env.dev` 하나로 못 박는 것이 요점이다.
+`run_dev.sh`는 direnv가 깔려 있지 않은 컴퓨터에서도 돌아야 하므로 그 파일을 직접 읽고, direnv는 같은 파일을 셸에 올려 준다.
+두 경로가 같은 파일 하나를 보므로 값이 어긋날 일이 없고, 비밀번호를 바꿔도 고칠 곳은 한 군데다.
 
 파일을 만들면 direnv는 `.envrc is blocked`라는 오류와 함께 일단 거부한다.
 낯선 저장소를 클론했을 때 그 안의 `.envrc`가 임의의 셸 명령을 실행할 수 있다는 것을 생각하면 당연한 경계다.
 내용을 눈으로 확인한 뒤 `direnv allow`로 승인한다.
-이제 저장소 디렉터리로 `cd` 하는 것만으로 다섯 개 변수가 셸에 올라오고, `go run ./cmd/server`도 `go run ./cmd/migrate`도 앞에 아무것도 붙이지 않고 실행된다.
+이제 저장소 디렉터리로 `cd` 하는 것만으로 네 변수가 셸에 올라오고, `go run ./cmd/migrate`처럼 앞에 아무것도 붙이지 않은 명령이 개발 DB를 향한다.
 디렉터리를 벗어나면 변수는 사라지므로, 다른 프로젝트의 `DATABASE_URL`과 뒤섞이는 사고도 막아 준다.
-direnv를 쓰지 않겠다면 `.env.local`을 셸에서 직접 `source`하거나 명령마다 변수를 앞에 붙이면 되고, 앱은 아무 차이도 알아채지 못한다.
+
+편리한 만큼 함정도 하나 생긴다.
+`DATABASE_URL`이 셸에 늘 올라와 있으면, 1부의 로컬 모드로 띄웠다고 생각한 서버가 실은 개발 DB에 붙는다.
+이 장 첫머리에서 본 대로 `DATABASE_URL`의 유무가 모드를 정하기 때문이다.
+그래서 `run_local.sh`는 이 변수를 지운 채로 서버를 띄운다.
+
+```bash
+exec env -u DATABASE_URL go run ./cmd/server
+```
+
+`env -u`는 지정한 환경 변수를 지운 채로 명령을 실행하는 옵션이다.
+로컬 모드는 언제나 SQLite로 뜨고 개발 DB에 붙는 것은 `run_dev.sh`로만 한다는 규칙을, 문서가 아니라 스크립트가 강제하게 만든 것이다.
+셸에 환경 변수를 상주시키는 도구를 쓸 때는, 그 변수가 의미를 갖는 다른 실행 경로가 없는지 함께 살펴야 한다.
 
 `.envrc`에 운영 프로젝트의 값은 두지 않는다.
 운영 값이 늘 셸에 올라와 있으면 개발 DB에 돌릴 마이그레이션을 운영에 돌리는 사고가 명령 한 줄 거리로 가까워지기 때문이다.
@@ -841,7 +852,7 @@ direnv를 쓰지 않겠다면 `.env.local`을 셸에서 직접 `source`하거나
 둘째, 유출이 의심되면 즉시 회전한다.
 Supabase 대시보드에서 DB 비밀번호를 재설정하면 기존 연결 문자열은 무효가 된다.
 셋째, 값이 사는 곳을 환경마다 하나로 정해 둔다.
-로컬은 `.env.dev`와 `.envrc`(둘 다 개발 프로젝트 값), 프리뷰와 프로덕션은 Vercel의 스코프별 환경 변수, 마이그레이션 워크플로는 GitHub 저장소 시크릿이 그곳이다.
+로컬은 `.env.dev` 하나(`.envrc`는 그 파일을 읽을 뿐 값을 갖지 않는다), 프리뷰와 프로덕션은 Vercel의 스코프별 환경 변수, 마이그레이션 워크플로는 GitHub 저장소 시크릿이 그곳이다.
 운영 프로젝트의 값이 사는 곳은 그중 뒤의 둘뿐이고, 값을 바꿀 때는 그 두 곳을 함께 고친다.
 
 ## 에이전트 활용 아이디어
