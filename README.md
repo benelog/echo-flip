@@ -22,15 +22,15 @@
 
 ## 환경
 
-local, preview, production 세 환경이 있다. 브랜치가 배포 환경을 정한다: `main` 푸시 → preview, `release` 푸시(= `./release.sh`의 main → release 병합) → production.
+local, dev, production 세 환경이 있다. 브랜치가 배포 환경을 정한다: `main` 푸시 → dev(Vercel Preview), `release` 푸시(= `./release.sh`의 main → release 병합) → production.
 
 | 환경 | URL | DB / 인증 | 배포 계기 |
 |---|---|---|---|
 | **local** | http://localhost:8080 | SQLite 파일(`local-db/flashcard.db`), 로그인 없음 | `./run_local.sh` |
-| **preview** (개발) | https://flashcard-git-main-sanghyuk-jungs-projects.vercel.app | 개발용 Supabase 프로젝트 | `main` 푸시 |
-| **production** (운영) | https://flashcard-delta.vercel.app | 운영용 Supabase 프로젝트 | `release` 푸시 |
+| **dev** (개발) | https://flashcard-dev.vercel.app | 개발용 Supabase 프로젝트 | `main` 푸시 |
+| **production** (운영) | https://flashcard.benelog.net | 운영용 Supabase 프로젝트 | `release` 푸시 |
 
-preview URL은 main 브랜치의 최신 배포를 가리키는 고정 별칭이다(배포마다 새로 생기는 고유 URL과 별개).
+dev URL은 main 브랜치의 최신 Preview 배포를 가리키는 고정 별칭이다(배포마다 새로 생기는 고유 URL과 별개).
 환경 변수는 Vercel의 Production/Preview 스코프에 따로 등록한다. 상세 배선은 [DEPLOY.md](./DEPLOY.md) 참고.
 
 ## 로컬 개발

@@ -114,7 +114,7 @@
 
 - 배치: `<div class="fc-shots">` + 마크다운 이미지 + `<p class="fc-caption">그림 N …</p>`. 휴대폰 화면 한 장짜리는 `fc-shots single`.
 - **여러 화면은 반드시 한 장으로 합성해 둔다.** 이 책은 다단 페이지 넘김 모드라 이미지를 flex로 나란히 놓으면 단 경계에서 잘린다.
-- 캡처 조건: 배포본(`https://flashcard-delta.vercel.app`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
+- 캡처 조건: 배포본(`https://flashcard.benelog.net`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.
 - 재촬영 절차는 `doc/scripts/capture-screenshots.mjs`로 자동화되어 있다(별도 프로필 Chrome에 수동 로그인 → CDP 연결 촬영 → ImageMagick 합성. 사용법은 스크립트 머리 주석).
 - 현재 실린 그림: 그림 1 덱 상세, 그림 2 학습 3단계, 그림 3 홈·복습 큐, 그림 4 통계·공유 (모두 intro).
