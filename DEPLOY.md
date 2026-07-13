@@ -118,7 +118,8 @@ GitHub Actions 러너는 IPv4라, Supabase의 IPv6 전용 direct 호스트(`db.<
 ## 문제 해결
 
 - **빌드가 `next build`를 실행하다 "Couldn't find any pages or app directory"로 실패**: 저장소가 Next.js였던 시절 import되어 Framework Preset에 Next.js가 남아 있는 경우. `vercel.json`의 `"framework": null`이 프리셋을 덮어쓰므로, 이 설정이 포함된 커밋을 다시 배포하면 된다.
-- **로그인 후 다시 로그인 페이지로**: Supabase URL Configuration의 Redirect URL에 배포 URL의 `/auth/callback`이 없는 경우.
+- **로그인 후 다시 로그인 페이지로**: Supabase URL Configuration의 Redirect URL에 배포 URL의 `/auth/callback`이 없는 경우. 또는 PKCE 쿠키(`fc_pkce`, 300초) 만료 — 로그인 화면에서 5분 이상 지체하면 실패합니다.
+- **로그인이 실패하고 Vercel Logs에 `net/http: invalid header field value`**: 환경 변수 값에 개행·제어 문자가 섞인 경우입니다(긴 키를 복사할 때 흔합니다). 대시보드에서 값을 한 줄로 다시 입력하세요. 실제 사고 기록은 [fix-auth.md](./fix-auth.md) 참고.
 - **서버가 500 "jwks unavailable"**: `SUPABASE_URL` 오타(JWKS URL은 여기서 유도). 구형 프로젝트(HS256)라면 대신 `SUPABASE_JWT_SECRET`(Settings → API → JWT Secret)을 설정해도 됩니다.
 - **첫 요청이 느림**: 서버리스 콜드스타트 + JWKS 첫 조회. 이후 요청은 빠릅니다.
 - **DB 연결 오류 "prepared statement"**: `DATABASE_URL`이 direct(5432)로 되어 있는 경우 transaction pooler(6543)로 교체.
