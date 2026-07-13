@@ -23,3 +23,5 @@ local-db/
 doc/node_modules/
 doc/.vitepress/dist/
 doc/.vitepress/cache/
+
+.idea/
