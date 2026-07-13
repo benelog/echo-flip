@@ -1,0 +1,44 @@
+name: DB migrate
+
+# 스키마 SQL이 바뀐 커밋이 푸시될 때만 돈다.
+#   main    → dev 환경 DB (= Vercel Preview 가 보는 개발용 Supabase 프로젝트)
+#   release → 운영 환경 DB
+# 저장소 Secrets 에 DEV_MIGRATE_DATABASE_URL / PROD_MIGRATE_DATABASE_URL 을 등록해 두어야 한다.
+# 두 값 모두 Session pooler 또는 direct connection(포트 5432) 문자열이어야 한다
+# (마이그레이션이 advisory lock 을 잡으므로 transaction pooler 6543 은 쓸 수 없다).
+on:
+  push:
+    branches: [main, release]
+    paths:
+      - 'internal/db/migrations/**'
+      - 'internal/db/migrate.go'
+      - 'cmd/migrate/**'
+      - '.github/workflows/migrate.yml'
+  workflow_dispatch:
+
+# 같은 DB에 두 마이그레이션이 겹쳐 도는 것을 막는다. 진행 중인 건 취소하지 않는다.
+concurrency:
+  group: migrate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: ${{ github.ref_name == 'release' && '운영' || 'dev' }} DB 마이그레이션
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: go run ./cmd/migrate
+        env:
+          MIGRATE_DATABASE_URL: ${{ github.ref_name == 'release' && secrets.PROD_MIGRATE_DATABASE_URL || secrets.DEV_MIGRATE_DATABASE_URL }}
+        run: |
+          if [ -z "$MIGRATE_DATABASE_URL" ]; then
+            echo "${{ github.ref_name }} 브랜치에 해당하는 마이그레이션 시크릿이 비어 있습니다."
+            echo "저장소 Settings → Secrets → Actions 에 DEV_MIGRATE_DATABASE_URL / PROD_MIGRATE_DATABASE_URL 을 등록하세요."
+            exit 1
+          fi
+          go run ./cmd/migrate

@@ -15,6 +15,8 @@
 
 ## 2. DB 마이그레이션
 
+첫 1회는 손으로, 이후에는 GitHub Actions가 자동으로 합니다.
+
 ```bash
 MIGRATE_DATABASE_URL='<direct 연결 문자열>' go run ./cmd/migrate
 ```
@@ -74,6 +76,19 @@ git remote add origin git@github.com:benelog/flashcard.git
 git push -u origin main
 git branch release && git push origin release   # 운영 배포용 브랜치 (main = 개발용)
 ```
+
+**마이그레이션 시크릿 등록** — Settings → Secrets and variables → Actions → New repository secret
+
+| 이름 | 값 |
+|---|---|
+| `DEV_MIGRATE_DATABASE_URL` | 개발 프로젝트의 **Session pooler / direct (5432)** 문자열 |
+| `PROD_MIGRATE_DATABASE_URL` | 운영 프로젝트의 **Session pooler / direct (5432)** 문자열 |
+
+이후 `internal/db/migrations/`가 바뀐 커밋을 푸시하면 `.github/workflows/migrate.yml`이
+자동으로 마이그레이션을 적용합니다 — main이면 개발 DB, release면 운영 DB.
+포트 6543(transaction pooler)은 advisory lock을 지원하지 않아 여기 쓰면 실패합니다.
+GitHub Actions 러너는 IPv4라, Supabase의 IPv6 전용 direct 호스트(`db.<ref>.supabase.co`) 대신
+**Session pooler 문자열**을 쓰는 편이 안전합니다.
 
 ## 6. Vercel ✋
 

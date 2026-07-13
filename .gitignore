@@ -5,6 +5,7 @@
 # env files (can opt-in for committing if needed)
 .env*
 !.env.local.example
+!.env.dev.example
 
 # direnv
 .envrc
