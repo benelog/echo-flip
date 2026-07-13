@@ -1,6 +1,6 @@
 # 15장 GitHub Actions: 원격 품질 게이트
 
-지금까지 Echo Flip의 품질 게이트는 두 곳에 있었다.
+지금까지 Flashcard의 품질 게이트는 두 곳에 있었다.
 8장의 훅이 에이전트가 파일을 쓸 때마다 `gofmt`와 `go vet`을 돌리고, 13장의 `전체 검증` 태스크가 사람이 커밋하기 전에 세 검사를 묶어 돌린다.
 
 둘 다 로컬의 게이트다.
@@ -72,7 +72,7 @@ Go도 없고 이 저장소의 코드도 없는 상태에서 시작해, 코드를
 
 여기서 알아 둘 성질은 잡끼리는 기본적으로 병렬로 돈다는 것이다.
 백엔드와 프런트엔드가 서로 다른 도구 체인으로 검증되는 저장소라면 잡을 둘로 나눠 전체 시간을 둘 중 느린 쪽으로 줄일 수 있다.
-Echo Flip은 화면까지 Go 서버가 렌더링하므로(11장) 검증이 전부 Go 도구 체인 하나 위에서 돌고, 잡도 하나면 충분하다.
+Flashcard는 화면까지 Go 서버가 렌더링하므로(11장) 검증이 전부 Go 도구 체인 하나 위에서 돌고, 잡도 하나면 충분하다.
 
 ## ci.yml 해부
 
@@ -123,7 +123,7 @@ jobs:
 
       - name: Vercel 호환 검사 (api/ 는 internal/ 을 import 할 수 없다)
         run: |
-          if grep -rq 'benelog/echo-flip/internal' api/; then
+          if grep -rq 'benelog/flashcard/internal' api/; then
             echo "api/ 가 internal/ 패키지를 import 합니다. pkg/ 로 옮기세요."
             exit 1
           fi
@@ -211,7 +211,7 @@ Go 버전을 워크플로에 적어 넣는 대신 `go.mod`에서 읽게 했다.
 ```yaml
 - name: Vercel 호환 검사 (api/ 는 internal/ 을 import 할 수 없다)
   run: |
-    if grep -rq 'benelog/echo-flip/internal' api/; then
+    if grep -rq 'benelog/flashcard/internal' api/; then
       echo "api/ 가 internal/ 패키지를 import 합니다. pkg/ 로 옮기세요."
       exit 1
     fi

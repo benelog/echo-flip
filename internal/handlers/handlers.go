@@ -12,9 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/smartrules"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/smartrules"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // Store is the persistence contract the handlers consume. *store.Store (pgx,

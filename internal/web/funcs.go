@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/benelog/echo-flip/internal/smartrules"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/smartrules"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 func isNotFound(err error) bool {

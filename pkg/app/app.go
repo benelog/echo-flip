@@ -14,12 +14,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/config"
-	"github.com/benelog/echo-flip/internal/db"
-	"github.com/benelog/echo-flip/internal/handlers"
-	"github.com/benelog/echo-flip/internal/store"
-	"github.com/benelog/echo-flip/internal/web"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/config"
+	"github.com/benelog/flashcard/internal/db"
+	"github.com/benelog/flashcard/internal/handlers"
+	"github.com/benelog/flashcard/internal/store"
+	"github.com/benelog/flashcard/internal/web"
 )
 
 var (

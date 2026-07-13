@@ -1,6 +1,6 @@
 {
-  "name": "Echo Flip — 암기 카드",
-  "short_name": "Echo Flip",
+  "name": "Flashcard — 암기 카드",
+  "short_name": "Flashcard",
   "description": "단어·문장·숙어·개념을 카드로 뒤집으며 외우는 학습 앱",
   "lang": "ko",
   "start_url": "/",

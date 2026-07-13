@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/smartrules"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/smartrules"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // 학습 세션의 진행 상태는 서버에 저장하지 않는다. 카드 ID 큐·라운드·점수를

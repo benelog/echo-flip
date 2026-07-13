@@ -66,7 +66,7 @@ func Load() (*Config, error) {
 	cfg.AuthMode = "local"
 	cfg.SQLitePath = env("SQLITE_PATH")
 	if cfg.SQLitePath == "" {
-		cfg.SQLitePath = "local-db/echo-flip.db"
+		cfg.SQLitePath = "local-db/flashcard.db"
 	}
 	return cfg, nil
 }

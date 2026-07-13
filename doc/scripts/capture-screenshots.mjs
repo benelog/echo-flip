@@ -3,7 +3,7 @@
 // 사용 절차:
 //   1. 별도 프로필 Chrome을 디버깅 포트와 함께 띄운다(기본 프로필은 Chrome 136+에서 포트가 막힌다):
 //        google-chrome --user-data-dir=/tmp/ef-capture-profile --remote-debugging-port=9222 \
-//          --no-first-run --no-default-browser-check https://echo-flip-delta.vercel.app/login
+//          --no-first-run --no-default-browser-check https://flashcard-delta.vercel.app/login
 //   2. 그 창에서 직접 로그인한다(스크립트가 로그인될 때까지 최대 60분 대기).
 //   3. doc/ 에서 실행: node scripts/capture-screenshots.mjs
 //      원본 7장이 OUT_DIR(기본 /tmp/ef-capture-raw)에 1290×2580으로 저장된다.
@@ -19,7 +19,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 
-const BASE = process.env.CAPTURE_BASE ?? 'https://echo-flip-delta.vercel.app';
+const BASE = process.env.CAPTURE_BASE ?? 'https://flashcard-delta.vercel.app';
 const OUT = process.env.OUT_DIR ?? '/tmp/ef-capture-raw';
 const DECK_SLUG = process.env.DECK_SLUG ?? '38nn'; // "TOEIC 필수 단어" 데모 덱
 

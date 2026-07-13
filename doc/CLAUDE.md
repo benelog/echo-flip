@@ -6,10 +6,10 @@
 ## 책 개요
 
 - 제목: **월 0원으로 운영하는 나만의 웹 앱** — 부제: AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다
-  - 제목·홍보 문구에 "Echo Flip"과 "풀스택"이라는 단어를 쓰지 않는다(독자가 Echo Flip을 모르고 '풀스택'은 진부하다).
+  - 제목·홍보 문구에 "Flashcard"와 "풀스택"이라는 단어를 쓰지 않는다(이 책은 특정 앱의 소개서가 아니고 '풀스택'은 진부하다).
 - 목적: 이 앱의 모든 코드를 해설하는 책이 아니다. 비슷한 앱을 직접 만들 수 있도록 언어·프레임워크·배포 인프라 지식을 이 앱의 실제 코드 예제로 전달한다.
 - 각 기술의 **선택 이유(트레이드오프)** 를 반드시 다룬다: 왜 Go인가, 왜 서버 렌더링·htmx인가, 왜 Vercel·Supabase인가.
-- Echo Flip은 "영어 암기 앱"이 아니라 **"암기 카드 앱"**으로 표현한다. 영어 단어·숙어·문장뿐 아니라 용어·개념 설명에도 쓸 수 있다는 것이 상세 설명이다. TTS·사전 자동 채우기 등은 부가 기능으로 소개한다.
+- Flashcard는 "영어 암기 앱"이 아니라 **"암기 카드 앱"**으로 표현한다. 영어 단어·숙어·문장뿐 아니라 용어·개념 설명에도 쓸 수 있다는 것이 상세 설명이다. TTS·사전 자동 채우기 등은 부가 기능으로 소개한다.
 
 ## 기술 구성
 
@@ -17,8 +17,8 @@
 - 로컬 확인: `cd doc && npm install && npm run dev` / 빌드 검증: `npm run build` (깨진 링크 포함 검증)
 - 테마: `.vitepress/theme/custom.css` — 본문 명조(Noto Serif KR)·제목 고딕, 행간 2.05·양쪽 정렬, 인쇄용 CSS 포함. 한글 폰트가 없는 CI 러너 대비로 웹폰트 폴백을 둔다.
 - 이북 뷰어 레이아웃: `.vitepress/theme/Layout.vue`(DefaultTheme 확장). 목차는 왼쪽 하나뿐(오른쪽 아웃라인 없음), 상단 바 "목차" 버튼으로 접기/펼치기, 본문은 회색 배경 위 페이지 카드, 상단 읽기 진행 바, 좌우 화살표와 ←/→ 키로 장 이동. 홈(`index.md`)은 `layout: page` 기반 책 표지 랜딩.
-- PDF: `npm run pdf`(`scripts/export-pdf.mjs`)가 표지·차례를 만들고 빌드 결과를 장 순서대로 인쇄해 `dist/echo-flip-book.pdf` 한 권으로 병합한다. CI(`book.yml`)가 매 배포마다 재생성한다.
-- 배포: GitHub Pages (https://benelog.github.io/echo-flip/). `.github/workflows/book.yml`이 `doc/**` 변경 push 시 자동 배포한다.
+- PDF: `npm run pdf`(`scripts/export-pdf.mjs`)가 표지·차례를 만들고 빌드 결과를 장 순서대로 인쇄해 `dist/flashcard-book.pdf` 한 권으로 병합한다. CI(`book.yml`)가 매 배포마다 재생성한다.
+- 배포: GitHub Pages (https://benelog.github.io/flashcard/). `.github/workflows/book.yml`이 `doc/**` 변경 push 시 자동 배포한다.
 - 인라인 코드의 `{{ }}`는 `config.ts`의 `markdown.config`가 `v-pre`를 붙여 Vue 보간을 막는다(Go 템플릿 표기 때문에 필수).
 
 ## 장 구성
@@ -29,7 +29,7 @@
 
 | 장 | 제목 | 파일 |
 |---|---|---|
-| 도입 | 무엇을 만드는가: Echo Flip의 기능 요구사항 | `intro.md` |
+| 도입 | 무엇을 만드는가: Flashcard의 기능 요구사항 | `intro.md` |
 | 1 | 기술 선택: 요구사항에서 아키텍처까지 | `part1/tech-choices.md` |
 | 2 | Claude Code: AI 에이전트와 개발하기 | `part1/claude-code.md` |
 | 3 | 에이전트에게 지시하기: Plan 모드 활용 | `part1/instructing.md` |
@@ -114,7 +114,7 @@
 
 - 배치: `<div class="ef-shots">` + 마크다운 이미지 + `<p class="ef-caption">그림 N …</p>`. 휴대폰 화면 한 장짜리는 `ef-shots single`.
 - **여러 화면은 반드시 한 장으로 합성해 둔다.** 이 책은 다단 페이지 넘김 모드라 이미지를 flex로 나란히 놓으면 단 경계에서 잘린다.
-- 캡처 조건: 배포본(`https://echo-flip-delta.vercel.app`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
+- 캡처 조건: 배포본(`https://flashcard-delta.vercel.app`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.
 - 재촬영 절차는 `doc/scripts/capture-screenshots.mjs`로 자동화되어 있다(별도 프로필 Chrome에 수동 로그인 → CDP 연결 촬영 → ImageMagick 합성. 사용법은 스크립트 머리 주석).
 - 현재 실린 그림: 그림 1 덱 상세, 그림 2 학습 3단계, 그림 3 홈·복습 큐, 그림 4 통계·공유 (모두 intro).

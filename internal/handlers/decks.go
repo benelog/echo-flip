@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
+	"github.com/benelog/flashcard/internal/auth"
 )
 
 func (h *Handlers) ListDecks(c *gin.Context) {

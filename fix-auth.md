@@ -13,12 +13,12 @@
 
 ## 증상
 
-- **preview**(`echo-flip-git-main-sanghyuk-jungs-projects.vercel.app`): 로그인 시도가 앱에 닿지 못함.
-- **production**(`echo-flip-delta.vercel.app`): 구글 계정 선택까지는 진행되나 "로그인에 실패했어요. 다시 시도해주세요." 플래시와 함께 로그인 화면으로 복귀. 한 차례는 성공이 보고되어 간헐적일 가능성 있음.
+- **preview**(`flashcard-git-main-sanghyuk-jungs-projects.vercel.app`): 로그인 시도가 앱에 닿지 못함.
+- **production**(`flashcard-delta.vercel.app`): 구글 계정 선택까지는 진행되나 "로그인에 실패했어요. 다시 시도해주세요." 플래시와 함께 로그인 화면으로 복귀. 한 차례는 성공이 보고되어 간헐적일 가능성 있음.
 
 ## 확정 원인 1: preview는 Vercel 배포 보호에 막혀 있다
 
-- 실측: `https://echo-flip-git-main-….vercel.app/auth/login/google` 요청이 앱이 아니라 `https://vercel.com/sso-api?...`로 리다이렉트된다. Vercel이 preview 배포에 기본으로 켜 두는 Deployment Protection(Vercel Authentication)이 모든 요청을 가로채는 것.
+- 실측: `https://flashcard-git-main-….vercel.app/auth/login/google` 요청이 앱이 아니라 `https://vercel.com/sso-api?...`로 리다이렉트된다. Vercel이 preview 배포에 기본으로 켜 두는 Deployment Protection(Vercel Authentication)이 모든 요청을 가로채는 것.
 - 영향: 프로젝트에 접근 권한이 있는 Vercel 계정으로 인증한 브라우저가 아니면 preview의 어떤 페이지도 열 수 없다. OAuth 콜백 왕복도 같은 벽에 막힌다.
 - **해결(대시보드)**: 프로젝트 Settings → Deployment Protection → Vercel Authentication을 **Disabled**로. Hobby 플랜에서 가능.
 
@@ -34,31 +34,31 @@ GitHub deployments 기록(Vercel이 남긴 것)이 설정값을 증언한다:
 | 11:11 | release | b5228a6 | **Preview** |
 
 - 의도한 정책(책 16장, README, DEPLOY.md, CLAUDE.md): main 푸시 → Preview(개발), release 푸시 → Production(운영).
-- 현재 동작: 정반대. **main에 푸시하면 곧장 운영 도메인(`echo-flip-delta.vercel.app`)에 운영 Supabase(Production 스코프 환경 변수)로 배포된다.** 개발/운영 분리가 성립하지 않는 상태다.
+- 현재 동작: 정반대. **main에 푸시하면 곧장 운영 도메인(`flashcard-delta.vercel.app`)에 운영 Supabase(Production 스코프 환경 변수)로 배포된다.** 개발/운영 분리가 성립하지 않는 상태다.
 - **해결(대시보드)**: 프로젝트 Settings → Environments → Production → Branch Tracking(구 UI는 Settings → Git → Production Branch)을 `release`로 변경.
 
 ## production 로그인: 검증 완료 구간 (전부 정상)
 
 | 구간 | 확인 방법 | 결과 |
 |---|---|---|
-| 앱 → GoTrue authorize | `/auth/login/google` 리다이렉트 추적 | 운영 프로젝트(`kncwqneczvkugkflqwpe`), PKCE 쿠키(`ef_pkce`·`ef_next`, Max-Age 300) 발급, `redirect_to=https://echo-flip-delta.vercel.app/auth/callback` 정상 |
+| 앱 → GoTrue authorize | `/auth/login/google` 리다이렉트 추적 | 운영 프로젝트(`kncwqneczvkugkflqwpe`), PKCE 쿠키(`fc_pkce`·`fc_next`, Max-Age 300) 발급, `redirect_to=https://flashcard-delta.vercel.app/auth/callback` 정상 |
 | GoTrue → 구글 | authorize 응답의 Location 파싱 | client_id 존재, `redirect_uri=https://kncwqneczvkugkflqwpe.supabase.co/auth/v1/callback` 정상 |
-| Site URL | GoTrue 콜백에 무효 state를 보내 폴백 관찰 | `https://echo-flip-delta.vercel.app/`로 정상 설정 |
+| Site URL | GoTrue 콜백에 무효 state를 보내 폴백 관찰 | `https://flashcard-delta.vercel.app/`로 정상 설정 |
 | 콜백 배관 | 가짜 code + 실제 쿠키로 `/auth/callback` 호출 | 플래시 설정 후 `/login` 303, 설계대로 동작 |
 | `SUPABASE_ANON_KEY` | Vercel Production 스코프 값(`sb_publishable_vZkn…`)으로 GoTrue 직접 호출 | `/auth/v1/settings` 200, 토큰 엔드포인트가 키를 수용(`flow_state_not_found`는 가짜 코드 탓) → **키는 운영 프로젝트에서 유효** |
 | GoTrue 설정 | `/auth/v1/settings` 본문 | `disable_signup: false`, google·github 프로바이더 활성 |
 
 ## 남은 용의자 (production)
 
-콜백 핸들러(`internal/web/authpages.go`의 `oauthCallback`)가 플래시를 띄우는 조건은 세 가지다: `code` 없음, `ef_pkce` 쿠키 없음, 토큰 교환 실패.
+콜백 핸들러(`internal/web/authpages.go`의 `oauthCallback`)가 플래시를 띄우는 조건은 세 가지다: `code` 없음, `fc_pkce` 쿠키 없음, 토큰 교환 실패.
 
 1. **Supabase에 등록된 Google Client Secret 불일치** (유력): GoTrue가 구글에서 받은 코드를 교환하지 못하면 우리 콜백에 `?error=server_error&error_description=Unable+to+exchange+external+code`를 붙여 보낸다. 앱이 `error` 파라미터를 검사하지 않고 버리므로 `code` 없음 분기로 빠져 같은 플래시가 뜬다.
-2. **PKCE 쿠키 만료**: `ef_pkce`는 300초짜리다. 구글 계정 선택 화면에서 5분 이상 지체하면 콜백 시점에 verifier가 없어 실패한다. 간헐적 성공/실패와 부합.
+2. **PKCE 쿠키 만료**: `fc_pkce`는 300초짜리다. 구글 계정 선택 화면에서 5분 이상 지체하면 콜백 시점에 verifier가 없어 실패한다. 간헐적 성공/실패와 부합.
 3. 코드 이중 소비(재시도 탭, 뒤로 가기 등): GoTrue 코드가 이미 소비돼 교환이 실패하는 경우.
 
 ## 다음 단계: 결정적 증거 확보
 
-실패를 재현한 직후 Chrome 방문 기록(Ctrl+H)에서 `callback`을 검색해 가장 최근 `echo-flip-delta.vercel.app/auth/callback?...` 항목의 전체 URL을 확인한다.
+실패를 재현한 직후 Chrome 방문 기록(Ctrl+H)에서 `callback`을 검색해 가장 최근 `flashcard-delta.vercel.app/auth/callback?...` 항목의 전체 URL을 확인한다.
 
 - `?error=...`가 붙어 있으면 → GoTrue 쪽 실패. `error_description`이 원인 문장이다. "Unable to exchange external code"면 Supabase 대시보드 → Authentication → Sign In / Providers → Google의 Client Secret을 재확인·재입력한다.
 - `?code=...`만 있으면 → 앱 쪽 실패(쿠키 소실 또는 교환 실패). 이 둘을 구분하려면 아래 진단 패치가 필요하다.
@@ -84,6 +84,6 @@ flow state가 소비되지 않고 살아 있다는 것은 **서버가 이 코드
 
 1. ~~(대시보드) Production Branch를 `release`로~~ → **완료·검증됨** (2026-07-11 12:46 재배포에서 main 푸시 → Preview, release 푸시 → Production으로 정렬 확인)
 2. ~~(대시보드) Deployment Protection의 Vercel Authentication 해제~~ → **완료·검증됨** (preview가 SSO 대신 앱의 `/login`으로 응답)
-3. (대시보드) preview의 Supabase 배선: **미완**. 재배포 후에도 preview가 운영 프로젝트(`kncwqneczvkugkflqwpe`)로 authorize를 보낸다. Preview 스코프에 개발용 프로젝트의 `SUPABASE_URL`·`SUPABASE_ANON_KEY`·`DATABASE_URL`이 등록되어 있지 않다는 뜻(개발용 프로젝트 미생성 가능성, DEPLOY.md 1단계-4). 임시로 preview 로그인을 살리려면 운영 프로젝트의 Redirect URL 허용 목록에 `https://echo-flip-git-main-….vercel.app/auth/callback`을 추가하는 방법도 있으나, 개발 트래픽이 운영 DB로 가는 상태는 그대로다.
+3. (대시보드) preview의 Supabase 배선: **미완**. 재배포 후에도 preview가 운영 프로젝트(`kncwqneczvkugkflqwpe`)로 authorize를 보낸다. Preview 스코프에 개발용 프로젝트의 `SUPABASE_URL`·`SUPABASE_ANON_KEY`·`DATABASE_URL`이 등록되어 있지 않다는 뜻(개발용 프로젝트 미생성 가능성, DEPLOY.md 1단계-4). 임시로 preview 로그인을 살리려면 운영 프로젝트의 Redirect URL 허용 목록에 `https://flashcard-git-main-….vercel.app/auth/callback`을 추가하는 방법도 있으나, 개발 트래픽이 운영 DB로 가는 상태는 그대로다.
 4. (증거) production 실패 재현 → 방문 기록의 콜백 URL 확보 → 원인 확정: **대기 중**
 5. (코드) 진단 패치 적용 후, 원인에 맞는 수정

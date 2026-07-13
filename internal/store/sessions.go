@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
-	"github.com/benelog/echo-flip/internal/srs"
+	"github.com/benelog/flashcard/internal/srs"
 )
 
 type Session struct {

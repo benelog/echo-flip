@@ -9,7 +9,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/benelog/echo-flip/pkg/app"
+	"github.com/benelog/flashcard/pkg/app"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

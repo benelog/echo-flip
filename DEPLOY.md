@@ -26,7 +26,7 @@ Supabase Table Editor에 `profiles, decks, cards, card_srs, study_sessions, revi
 ## 3. OAuth 앱 등록 ✋
 
 **Google** — https://console.cloud.google.com
-1. 프로젝트 생성 → APIs & Services → OAuth consent screen 설정 (External, 앱 이름 echo-flip)
+1. 프로젝트 생성 → APIs & Services → OAuth consent screen 설정 (External, 앱 이름 flashcard)
 2. Credentials → Create Credentials → OAuth client ID → Web application
 3. Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback`
 4. Client ID/Secret을 Supabase → Authentication → Sign In / Providers → Google에 입력하고 Enable
@@ -70,14 +70,14 @@ SUPABASE_URL='https://<ref>.supabase.co' SUPABASE_ANON_KEY='<anon key>' \
 ## 5. GitHub 저장소 ✋
 
 ```bash
-git remote add origin git@github.com:benelog/echo-flip.git
+git remote add origin git@github.com:benelog/flashcard.git
 git push -u origin main
 git branch release && git push origin release   # 운영 배포용 브랜치 (main = 개발용)
 ```
 
 ## 6. Vercel ✋
 
-1. https://vercel.com → Add New Project → echo-flip 저장소 import (Root Directory는 저장소 루트 그대로.
+1. https://vercel.com → Add New Project → flashcard 저장소 import (Root Directory는 저장소 루트 그대로.
    Framework Preset은 `vercel.json`의 `"framework": null`이 덮어쓰므로 무엇으로 감지되든 상관없음)
 2. Settings → Environments → Production의 Branch Tracking에서 **Production Branch**를 `main`에서 `release`로 변경
    (이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)

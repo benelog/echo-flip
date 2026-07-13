@@ -1,4 +1,4 @@
-module github.com/benelog/echo-flip
+module github.com/benelog/flashcard
 
 go 1.26.4
 

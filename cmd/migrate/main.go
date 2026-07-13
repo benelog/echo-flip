@@ -10,7 +10,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/benelog/echo-flip/internal/db"
+	"github.com/benelog/flashcard/internal/db"
 )
 
 func main() {

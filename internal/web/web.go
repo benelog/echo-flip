@@ -1,4 +1,4 @@
-// Package web renders the HTML pages of Echo Flip. It sits on the same
+// Package web renders the HTML pages of Flashcard. It sits on the same
 // handlers.Store the JSON API uses; templates live in templates/ and are
 // embedded into the binary, so one Go binary (or one Vercel function) serves
 // pages, fragments and static assets alike.
@@ -16,9 +16,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/config"
-	"github.com/benelog/echo-flip/internal/handlers"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/config"
+	"github.com/benelog/flashcard/internal/handlers"
 )
 
 //go:embed templates

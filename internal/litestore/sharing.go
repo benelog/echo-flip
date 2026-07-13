@@ -11,7 +11,7 @@ import (
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // ShareDeck enables sharing, keeping any existing slug so links stay stable.

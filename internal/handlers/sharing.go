@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
+	"github.com/benelog/flashcard/internal/auth"
 )
 
 var slugPattern = regexp.MustCompile(`^[A-Za-z0-9_-]{4,64}$`)

@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/srs"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/srs"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 func (s *Store) CreateSession(ctx context.Context, userID uuid.UUID, mode, direction string, deckID *uuid.UUID, rule json.RawMessage, totalCards int) (store.Session, error) {

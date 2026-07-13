@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 const cardSelect = `

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
+	"github.com/benelog/flashcard/internal/auth"
 )
 
 // loginPage shows the OAuth buttons. Signed-in visitors (and local mode,

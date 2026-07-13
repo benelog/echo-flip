@@ -1,4 +1,4 @@
-# Echo Flip 프로젝트 지침
+# Flashcard 프로젝트 지침
 
 ## 브랜치 정책 (GitLab flow 단순화)
 
@@ -14,7 +14,7 @@
 
 ## 실행
 
-- 로컬 모드: 환경 변수 없이 `go run ./cmd/server` (SQLite, local-db/echo-flip.db, 로그인 불필요) → http://localhost:8080
+- 로컬 모드: 환경 변수 없이 `go run ./cmd/server` (SQLite, local-db/flashcard.db, 로그인 불필요) → http://localhost:8080
 - 운영 구성(PostgreSQL/Supabase)은 `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`로 켠다. `.env.local.example` 참고.
 
 ## 검증

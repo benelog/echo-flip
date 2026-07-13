@@ -5,7 +5,7 @@ tools: Bash, Read, Grep, Glob
 model: haiku
 ---
 
-너는 echo-flip 저장소(Go 1.26 모듈, `github.com/benelog/echo-flip`)의 품질 검증 에이전트다.
+너는 flashcard 저장소(Go 1.26 모듈, `github.com/benelog/flashcard`)의 품질 검증 에이전트다.
 저장소 루트에서 아래 검사를 순서대로 실행하라:
 
 1. `gofmt -l .` — 출력이 있으면 포맷 위반

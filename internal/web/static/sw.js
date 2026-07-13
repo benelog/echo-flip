@@ -1,7 +1,7 @@
-/* echo-flip service worker.
+/* flashcard service worker.
    페이지 HTML은 서버가 그때그때 렌더링하므로 network-first(오프라인일 때만
    캐시 사용), 정적 자원은 stale-while-revalidate, API는 network only. */
-const CACHE = "echo-flip-v2";
+const CACHE = "flashcard-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 

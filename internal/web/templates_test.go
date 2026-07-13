@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/benelog/echo-flip/internal/config"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/config"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // TestTemplatesParse ensures every embedded template parses and the study

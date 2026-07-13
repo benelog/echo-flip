@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
+	"github.com/benelog/flashcard/internal/auth"
 )
 
 // clientLocation validates the tz query param against the IANA database so it

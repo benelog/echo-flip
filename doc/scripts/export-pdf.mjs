@@ -1,5 +1,5 @@
 // 빌드된 사이트(.vitepress/dist)를 로컬로 서빙하고, 표지·차례와 함께
-// 장 순서대로 인쇄해 한 권의 PDF(echo-flip-book.pdf)로 합친다.
+// 장 순서대로 인쇄해 한 권의 PDF(flashcard-book.pdf)로 합친다.
 // 북마크(PDF 아웃라인)와 연속 쪽 번호를 넣는다. 시스템 Chrome을 사용한다.
 // 사용: vitepress build 후 `npm run pdf`
 import { createServer } from 'node:http'
@@ -12,12 +12,12 @@ import { PDFDocument, PDFHexString, PDFName, PDFNumber, StandardFonts, rgb } fro
 
 const docRoot = fileURLToPath(new URL('..', import.meta.url))
 const dist = join(docRoot, '.vitepress/dist')
-const BASE = '/echo-flip/'
+const BASE = '/flashcard/'
 
 const TITLE = '월 0원으로 운영하는 나만의 웹 앱'
 const SUBTITLE = 'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다'
 const AUTHOR = '정상혁'
-const SITE = 'benelog.github.io/echo-flip'
+const SITE = 'benelog.github.io/flashcard'
 
 // 책 읽기 순서. part가 있는 항목 앞에는 차례에 부 제목을 넣는다.
 const chapters = [
@@ -282,6 +282,6 @@ const outlineItems = [
   book.catalog.set(PDFName.of('Outlines'), rootRef)
 }
 
-const out = join(dist, 'echo-flip-book.pdf')
+const out = join(dist, 'flashcard-book.pdf')
 await writeFile(out, await book.save())
 console.log(`PDF 생성 완료: ${out} (표지 ${coverPages} + 차례 ${tocPages} + 본문 ${contentTotal}쪽)`)

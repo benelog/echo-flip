@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // DailyStats groups reviews by local date in the given (pre-validated) IANA

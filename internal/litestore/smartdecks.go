@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 func (s *Store) ListSmartDecks(ctx context.Context, userID uuid.UUID) ([]store.SmartDeck, error) {

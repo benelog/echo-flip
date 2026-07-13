@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/smartrules"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/smartrules"
 )
 
 // Suggestions returns the home-screen tiles: canned smart rules that

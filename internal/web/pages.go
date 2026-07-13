@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/benelog/echo-flip/internal/auth"
-	"github.com/benelog/echo-flip/internal/smartrules"
-	"github.com/benelog/echo-flip/internal/store"
+	"github.com/benelog/flashcard/internal/auth"
+	"github.com/benelog/flashcard/internal/smartrules"
+	"github.com/benelog/flashcard/internal/store"
 )
 
 // profileSettings mirrors the JSON blob stored in profiles.settings.
@@ -89,7 +89,7 @@ func (w *Web) homePage(c *gin.Context) {
 		}
 	}
 
-	w.render(c, http.StatusOK, "home", "Echo Flip", gin.H{
+	w.render(c, http.StatusOK, "home", "Flashcard", gin.H{
 		"Due":         due,
 		"Streak":      summary.Streak,
 		"Decks":       decks,

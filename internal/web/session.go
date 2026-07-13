@@ -7,18 +7,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/auth"
+	"github.com/benelog/flashcard/internal/auth"
 )
 
 // Cookie names. Session tokens are HttpOnly: page scripts (and any injected
 // script) can never read them — the main security win over localStorage.
 const (
-	accessCookie  = "ef_access"
-	refreshCookie = "ef_refresh"
-	pkceCookie    = "ef_pkce"
-	nextCookie    = "ef_next"
-	flashCookie   = "ef_flash"
-	dirCookie     = "ef_direction"
+	accessCookie  = "fc_access"
+	refreshCookie = "fc_refresh"
+	pkceCookie    = "fc_pkce"
+	nextCookie    = "fc_next"
+	flashCookie   = "fc_flash"
+	dirCookie     = "fc_direction"
 	tzCookie      = "tz"
 )
 

@@ -5,7 +5,7 @@ export default defineConfig({
   title: '월 0원으로 운영하는 나만의 웹 앱',
   description:
     'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
-  base: '/echo-flip/',
+  base: '/flashcard/',
   srcExclude: ['CLAUDE.md'],
   cleanUrls: true,
   markdown: {
@@ -33,14 +33,14 @@ export default defineConfig({
     nav: [
       { text: '홈', link: '/' },
       { text: '읽기 시작', link: '/preface' },
-      { text: 'PDF 다운로드', link: 'https://benelog.github.io/echo-flip/echo-flip-book.pdf' },
+      { text: 'PDF 다운로드', link: 'https://benelog.github.io/flashcard/flashcard-book.pdf' },
     ],
     sidebar: [
       {
         text: '도입',
         items: [
           { text: '저자 서문', link: '/preface' },
-          { text: '무엇을 만드는가: Echo Flip의 기능 요구사항', link: '/intro' },
+          { text: '무엇을 만드는가: Flashcard의 기능 요구사항', link: '/intro' },
         ],
       },
       {
@@ -98,6 +98,6 @@ export default defineConfig({
         },
       },
     },
-    socialLinks: [{ icon: 'github', link: 'https://github.com/benelog/echo-flip' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/benelog/flashcard' }],
   },
 })

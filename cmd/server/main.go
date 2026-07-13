@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/benelog/echo-flip/internal/config"
-	"github.com/benelog/echo-flip/internal/litestore"
-	"github.com/benelog/echo-flip/pkg/app"
+	"github.com/benelog/flashcard/internal/config"
+	"github.com/benelog/flashcard/internal/litestore"
+	"github.com/benelog/flashcard/pkg/app"
 )
 
 func main() {
@@ -25,13 +25,13 @@ func main() {
 			log.Fatal(err)
 		}
 		engine = app.New(cfg, s)
-		log.Printf("echo-flip api listening on :%s (local mode, sqlite: %s)", cfg.Port, cfg.SQLitePath)
+		log.Printf("flashcard api listening on :%s (local mode, sqlite: %s)", cfg.Port, cfg.SQLitePath)
 	} else {
 		engine, err = app.Engine()
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("echo-flip api listening on :%s (postgres)", cfg.Port)
+		log.Printf("flashcard api listening on :%s (postgres)", cfg.Port)
 	}
 	if err := engine.Run(":" + cfg.Port); err != nil {
 		log.Fatal(err)
