@@ -56,13 +56,15 @@ Supabase Table Editor에 `profiles, decks, cards, card_srs, study_sessions, revi
 
 ## 4. 로컬에서 확인
 
-`.env.local.example`를 참고해 셸에 export 하고:
+`.env.dev.example`을 `.env.dev`로 복사해 **개발 프로젝트** 값을 채우고:
 
 ```bash
-DATABASE_URL='<pooler 6543>' \
-SUPABASE_URL='https://<ref>.supabase.co' SUPABASE_ANON_KEY='<anon key>' \
-  go run ./cmd/server
+./run_dev.sh          # 개발 DB + GitHub/Google 로그인으로 서버 실행
+./migrate_dev.sh      # (필요시) 개발 DB에 마이그레이션 적용
 ```
+
+direnv를 쓴다면 `.envrc`에 `dotenv .env.dev` 한 줄을 두고 `direnv allow` 하면 셸에도 같은 값이 올라온다.
+`run_local.sh`는 `DATABASE_URL`을 지우고 실행하므로, 그 상태에서도 로컬 모드는 SQLite로 뜬다.
 
 - http://localhost:8080 → Google/GitHub 로그인 왕복 확인
 - 덱 만들기 → 카드 추가("사전에서 채우기" 시험) → 학습(일부러 틀려서 재도전 라운드 확인)

@@ -2,9 +2,8 @@
 .DS_Store
 *.pem
 
-# env files (can opt-in for committing if needed)
+# env files (실제 값은 커밋하지 않는다. 예제 파일만 예외)
 .env*
-!.env.local.example
 !.env.dev.example
 
 # direnv

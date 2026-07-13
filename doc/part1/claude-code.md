@@ -196,10 +196,10 @@ Plan 모드를 켜면 에이전트는 파일을 수정하거나 상태를 바꾸
 ### Flashcard의 경우
 
 Flashcard 저장소의 루트에도 한 화면 분량의 `CLAUDE.md`가 있다.
-다음이 그 전문이다.
-맨 위의 브랜치 정책은 2부(14장)에서 다룰 운영 규칙이니 지금은 넘어가고, 나머지 세 절(구조·실행·검증)이 앞에서 정리한 원칙을 어떻게 따르는지 보자.
+다음은 각 절의 뼈대만 남긴 발췌다.
+맨 위의 브랜치 정책은 2부(14장)에서 다룰 운영 규칙이니 지금은 넘어가고, 나머지 네 절(구조·환경·스키마 관리·검증)이 앞에서 정리한 원칙을 어떻게 따르는지 보자.
 적혀 있는 내용을 지금 다 이해할 필요는 없다.
-이 파일이 한 화면을 넘지 않는다는 것, 그리고 항목이 구조·실행·검증 셋뿐이라는 것만 보면 되고, 안에 나오는 낯선 이름들은 4장 이후 각 장에서 하나씩 다룬다.
+이 파일이 한 화면을 넘지 않는다는 것, 그리고 항목이 구조·환경·스키마 관리·검증 넷뿐이라는 것만 보면 되고, 안에 나오는 낯선 이름들은 4장 이후 각 장에서 하나씩 다룬다.
 
 ```markdown
 # Flashcard 프로젝트 지침
@@ -216,10 +216,22 @@ Flashcard 저장소의 루트에도 한 화면 분량의 `CLAUDE.md`가 있다.
 - 브라우저 JS는 `internal/web/static/app.js` 하나뿐(TTS·클립보드·오프라인·서비스 워커). 프런트엔드 빌드 도구(npm 등)는 앱에 없다. `doc/`(책, VitePress)만 자체 package.json을 가진다.
 - JSON API(`/api/*`)는 `internal/handlers`에 그대로 있다. HTML과 API가 같은 Gin 엔진(`pkg/app`)에 물린다.
 
-## 실행
+## 환경
 
-- 로컬 모드: 환경 변수 없이 `go run ./cmd/server` (SQLite, local-db/flashcard.db, 로그인 불필요) → http://localhost:8080
-- 운영 구성(PostgreSQL/Supabase)은 `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`로 켠다. `.env.local.example` 참고.
+| 환경 | 배포 | DB | 로그인 |
+|---|---|---|---|
+| local | `./run_local.sh` | SQLite (`local-db/flashcard.db`) | 없음(고정 사용자) |
+| dev | main 푸시 → Vercel **Preview** | 개발용 Supabase 프로젝트 | GitHub/Google |
+| production | release 병합 → Vercel **Production** | 운영 Supabase 프로젝트 | GitHub/Google |
+
+- `./run_dev.sh`: local에서 **dev DB**에 붙어 서버를 띄운다. 값은 `.env.dev`에서 읽는다.
+- 개발 환경 값의 단일 출처는 `.env.dev` 하나다. **운영 값은 로컬에 두지 않는다.**
+
+## 스키마 관리
+
+- Postgres 스키마의 단일 소스는 `internal/db/migrations/*.up.sql`. 새 변경은 항상 새 번호의 up/down 쌍을 추가한다.
+- 적용은 `.github/workflows/migrate.yml`이 한다: main → dev DB, release → 운영 DB.
+- local에서 dev DB에 미리 적용해 보려면 `./migrate_dev.sh`. 운영 DB에는 수동으로 적용하지 않는다.
 
 ## 검증
 
