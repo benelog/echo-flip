@@ -17,6 +17,25 @@ export function saveList(key, list) {
   } catch {}
 }
 
+// 앱 이름이 바뀌면서 저장소 키 접두사도 ef- 에서 fc- 로 옮겼다.
+// 이미 책을 읽던 독자의 북마크·형광펜이 사라지지 않도록 옛 키를 한 번만 새 키로 옮긴다.
+const LEGACY_KEYS = [
+  ['ef-bookmarks', 'fc-bookmarks'],
+  ['ef-highlights', 'fc-highlights'],
+  ['ef-toc-hidden', 'fc-toc-hidden'],
+]
+
+export function migrateLegacyKeys() {
+  try {
+    for (const [oldKey, newKey] of LEGACY_KEYS) {
+      const v = localStorage.getItem(oldKey)
+      if (v === null) continue
+      if (localStorage.getItem(newKey) === null) localStorage.setItem(newKey, v)
+      localStorage.removeItem(oldKey)
+    }
+  } catch {}
+}
+
 // 본문 텍스트 노드를 문서 순서로 이어 붙인 전체 문자열과 노드별 시작 오프셋
 function collectText(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)

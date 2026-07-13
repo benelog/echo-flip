@@ -2,7 +2,7 @@
 import DefaultTheme from 'vitepress/theme'
 import { useData, useRoute, useRouter } from 'vitepress'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { blockAnchors, findRange, loadList, saveList, serializeRange } from './ebook'
+import { blockAnchors, findRange, loadList, migrateLegacyKeys, saveList, serializeRange } from './ebook'
 
 const { page } = useData()
 const route = useRoute()
@@ -17,14 +17,14 @@ function docRoot() {
 const tocHidden = ref(false)
 
 function applyTocState() {
-  document.documentElement.classList.toggle('ef-toc-hidden', tocHidden.value)
+  document.documentElement.classList.toggle('fc-toc-hidden', tocHidden.value)
 }
 
 function toggleToc() {
   tocHidden.value = !tocHidden.value
   applyTocState()
   try {
-    localStorage.setItem('ef-toc-hidden', tocHidden.value ? '1' : '')
+    localStorage.setItem('fc-toc-hidden', tocHidden.value ? '1' : '')
   } catch {}
   // 본문 폭이 바뀌므로 페이지를 다시 계산한다
   nextTick(() => setTimeout(setupPaged, 50))
@@ -102,24 +102,24 @@ function animateFlip(from, to) {
   }
   const shadeEl = (background) => {
     const s = document.createElement('div')
-    s.className = 'ef-flip-shade'
+    s.className = 'fc-flip-shade'
     s.style.background = background
     return s
   }
 
   const overlay = document.createElement('div')
-  overlay.className = 'ef-flip'
+  overlay.className = 'fc-flip'
   overlay.style.cssText =
     `left:${scroller.offsetLeft}px;top:${scroller.offsetTop}px;width:${W}px;height:${H}px;` +
     `perspective:${Math.max(1400, W * 1.6)}px;perspective-origin:${px}px 50%;`
 
   // 넘어가는 종이 — 책등 쪽 모서리를 축으로 회전
   const sheet = document.createElement('div')
-  sheet.className = 'ef-flip-sheet'
+  sheet.className = 'fc-flip-sheet'
   sheet.style.cssText = `left:${px}px;width:${w}px;`
 
   const front = document.createElement('div')
-  front.className = 'ef-flip-face'
+  front.className = 'fc-flip-face'
   front.appendChild(cloneAt(px, forward ? S : T))
   const frontShade = shadeEl(
     'linear-gradient(to right, rgba(0,0,0,0.32), rgba(0,0,0,0.05) 55%, transparent)',
@@ -127,7 +127,7 @@ function animateFlip(from, to) {
   front.appendChild(frontShade)
 
   const back = document.createElement('div')
-  back.className = 'ef-flip-face back'
+  back.className = 'fc-flip-face back'
   // 펼침 모드에서는 종이 뒷면이 반대쪽 페이지 내용, 한 페이지 모드에서는
   // 뒷면이 화면 밖으로 넘어가므로 빈 종이로 둔다.
   if (two) back.appendChild(cloneAt(px - w, forward ? T : S))
@@ -141,7 +141,7 @@ function animateFlip(from, to) {
   let cast = null
   if (two || !forward) {
     const cover = document.createElement('div')
-    cover.className = 'ef-flip-cover'
+    cover.className = 'fc-flip-cover'
     const cx = forward ? px - w : px
     cover.style.cssText = `left:${cx}px;width:${w}px;`
     cover.appendChild(cloneAt(cx, S))
@@ -195,9 +195,9 @@ function pageOfX(x) {
 
 function setupPaged() {
   pagedActive.value = isPagedViewport() && !isHome.value
-  document.documentElement.classList.toggle('ef-paged', pagedActive.value)
+  document.documentElement.classList.toggle('fc-paged', pagedActive.value)
   if (!pagedActive.value) {
-    document.documentElement.classList.remove('ef-two')
+    document.documentElement.classList.remove('fc-two')
     scroller = null
     cardRect.value = null
     isBookmarked.value = false
@@ -208,13 +208,13 @@ function setupPaged() {
   if (!scroller) return
   // 자리가 넉넉하면 두 페이지 펼침 (카드 폭이 커지므로 열 수 지정 전에 판단)
   const avail = document.querySelector('.VPDoc .container')?.clientWidth ?? 0
-  document.documentElement.classList.toggle('ef-two', avail >= 1020)
+  document.documentElement.classList.toggle('fc-two', avail >= 1020)
   cardRect.value = scroller.parentElement?.getBoundingClientRect() ?? null
   measure()
   updateBookmarkState()
   try {
-    if (sessionStorage.getItem('ef-open-last')) {
-      sessionStorage.removeItem('ef-open-last')
+    if (sessionStorage.getItem('fc-open-last')) {
+      sessionStorage.removeItem('fc-open-last')
       curPage.value = numPages.value - 1
       applyPage(false)
       return
@@ -229,7 +229,7 @@ function goChapter(dir) {
   // 이전 장으로 갈 때는 책처럼 그 장의 마지막 페이지에서 시작한다
   if (dir === 'prev') {
     try {
-      sessionStorage.setItem('ef-open-last', '1')
+      sessionStorage.setItem('fc-open-last', '1')
     } catch {}
   }
   link.click()
@@ -275,7 +275,7 @@ let wheelLockUntil = 0
 
 function onWheel(e) {
   if (!pagedActive.value || e.ctrlKey) return
-  if (e.target.closest('.VPNav, .VPSidebar, .VPLocalSearchBox, .ef-panel')) return
+  if (e.target.closest('.VPNav, .VPSidebar, .VPLocalSearchBox, .fc-panel')) return
   const now = e.timeStamp
   if (now < wheelLockUntil) return
   if (now - wheelAt > 300) wheelAcc = 0
@@ -331,7 +331,7 @@ const hasNext = computed(() => curPage.value < numPages.value - 1 || !!nextHref.
 // ── 북마크 ────────────────────────────────────────────────────
 // 현재 펼침면에서 시작하는 첫 블록 요소를 기준점으로 저장한다.
 // 창 크기가 바뀌어도 그 요소가 있는 페이지로 되돌아갈 수 있다.
-const BM_KEY = 'ef-bookmarks'
+const BM_KEY = 'fc-bookmarks'
 const bookmarks = ref([])
 const isBookmarked = ref(false)
 
@@ -433,7 +433,7 @@ function removeBookmark(id) {
 // ── 형광펜 ────────────────────────────────────────────────────
 // CSS Custom Highlight API로 칠한다. DOM을 바꾸지 않으므로 Vue가
 // 관리하는 본문과 충돌하지 않는다.
-const HL_KEY = 'ef-highlights'
+const HL_KEY = 'fc-highlights'
 const HL_COLORS = ['yellow', 'green', 'pink']
 const highlights = ref([])
 const selTool = ref(null) // { mode: 'new' | 'edit', x, y, id? }
@@ -446,7 +446,7 @@ function highlightSupported() {
 
 function paintHighlights() {
   if (!highlightSupported()) return
-  for (const c of HL_COLORS) CSS.highlights.delete(`ef-hl-${c}`)
+  for (const c of HL_COLORS) CSS.highlights.delete(`fc-hl-${c}`)
   liveRanges = []
   const root = docRoot()
   if (!root) return
@@ -459,12 +459,12 @@ function paintHighlights() {
     ;(byColor[rec.color] ??= []).push(range)
   }
   for (const [c, ranges] of Object.entries(byColor)) {
-    CSS.highlights.set(`ef-hl-${c}`, new Highlight(...ranges))
+    CSS.highlights.set(`fc-hl-${c}`, new Highlight(...ranges))
   }
 }
 
 function onSelectionEnd(e) {
-  if (e.target instanceof Element && e.target.closest('.ef-seltool')) return
+  if (e.target instanceof Element && e.target.closest('.fc-seltool')) return
   // click 이벤트가 지나간 뒤에 선택 상태를 읽는다
   setTimeout(() => {
     if (!highlightSupported()) return
@@ -531,7 +531,7 @@ function openItem(type, rec) {
     return
   }
   try {
-    sessionStorage.setItem('ef-pending', JSON.stringify({ type, id: rec.id }))
+    sessionStorage.setItem('fc-pending', JSON.stringify({ type, id: rec.id }))
   } catch {}
   router.go(rec.path)
 }
@@ -567,8 +567,8 @@ function jumpNow(type, rec) {
 function consumePending() {
   let raw = null
   try {
-    raw = sessionStorage.getItem('ef-pending')
-    if (raw) sessionStorage.removeItem('ef-pending')
+    raw = sessionStorage.getItem('fc-pending')
+    if (raw) sessionStorage.removeItem('fc-pending')
   } catch {}
   if (!raw) return
   try {
@@ -581,7 +581,7 @@ function consumePending() {
 // ── 전역 이벤트 ───────────────────────────────────────────────
 function onClick(e) {
   const t = e.target instanceof Element ? e.target : null
-  if (t && t.closest('.ef-seltool, .ef-panel, .ef-panel-btn, .ef-ribbon')) return
+  if (t && t.closest('.fc-seltool, .fc-panel, .fc-panel-btn, .fc-ribbon')) return
   if (selTool.value) selTool.value = null
   if (panelOpen.value) panelOpen.value = false
   // 형광펜을 클릭하면 색 바꾸기/삭제 팝업
@@ -657,8 +657,9 @@ function refresh() {
 }
 
 onMounted(() => {
+  migrateLegacyKeys()
   try {
-    tocHidden.value = localStorage.getItem('ef-toc-hidden') === '1'
+    tocHidden.value = localStorage.getItem('fc-toc-hidden') === '1'
   } catch {}
   bookmarks.value = loadList(BM_KEY)
   highlights.value = loadList(HL_KEY)
@@ -692,7 +693,7 @@ onUnmounted(() => {
   window.removeEventListener('touchend', onSelectionEnd)
   document.removeEventListener('click', onClick)
   flipCleanup?.()
-  document.documentElement.classList.remove('ef-paged', 'ef-two')
+  document.documentElement.classList.remove('fc-paged', 'fc-two')
 })
 
 watch(curPage, () => {
@@ -714,12 +715,12 @@ watch(
 </script>
 
 <template>
-  <div v-if="!isHome" class="ef-progress" :style="{ width: progress + '%' }" />
+  <div v-if="!isHome" class="fc-progress" :style="{ width: progress + '%' }" />
   <DefaultTheme.Layout>
     <template #nav-bar-content-before>
       <button
         v-if="!isHome"
-        class="ef-toc-toggle"
+        class="fc-toc-toggle"
         type="button"
         :title="tocHidden ? '목차 펼치기' : '목차 접기'"
         :aria-pressed="!tocHidden"
@@ -734,7 +735,7 @@ watch(
       </button>
       <button
         v-if="!isHome"
-        class="ef-toc-toggle ef-panel-btn"
+        class="fc-toc-toggle fc-panel-btn"
         type="button"
         title="북마크와 형광펜"
         :aria-expanded="panelOpen"
@@ -749,7 +750,7 @@ watch(
     <template #layout-bottom>
       <button
         v-if="!isHome && hasPrev"
-        class="ef-arrow prev"
+        class="fc-arrow prev"
         type="button"
         aria-label="이전 페이지"
         @click="turnPage(-1)"
@@ -760,7 +761,7 @@ watch(
       </button>
       <button
         v-if="!isHome && hasNext"
-        class="ef-arrow next"
+        class="fc-arrow next"
         type="button"
         aria-label="다음 페이지"
         @click="turnPage(1)"
@@ -769,12 +770,12 @@ watch(
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>
-      <div v-if="!isHome && pagedActive" class="ef-page-num">{{ pageLabel }}</div>
+      <div v-if="!isHome && pagedActive" class="fc-page-num">{{ pageLabel }}</div>
 
       <!-- 북마크 리본 — 페이지 카드 오른쪽 위 -->
       <button
         v-if="!isHome && pagedActive && cardRect"
-        class="ef-ribbon"
+        class="fc-ribbon"
         :class="{ active: isBookmarked }"
         type="button"
         :title="isBookmarked ? '북마크 해제' : '이 페이지 북마크'"
@@ -787,47 +788,47 @@ watch(
       </button>
 
       <!-- 형광펜 선택 도구 -->
-      <div v-if="selTool" class="ef-seltool" :style="{ left: selTool.x + 'px', top: selTool.y + 'px' }">
+      <div v-if="selTool" class="fc-seltool" :style="{ left: selTool.x + 'px', top: selTool.y + 'px' }">
         <button
           v-for="c in HL_COLORS"
           :key="c"
-          class="ef-hl-dot"
+          class="fc-hl-dot"
           :class="c"
           type="button"
           :title="selTool.mode === 'edit' ? '색 바꾸기' : '형광펜'"
           @click="onSelToolPick(c)"
         />
-        <button v-if="selTool.mode === 'edit'" class="ef-hl-del" type="button" @click="removeHighlight(selTool.id)">
+        <button v-if="selTool.mode === 'edit'" class="fc-hl-del" type="button" @click="removeHighlight(selTool.id)">
           삭제
         </button>
       </div>
 
       <!-- 북마크·형광펜 패널 -->
-      <div v-if="panelOpen && !isHome" class="ef-panel">
-        <div class="ef-panel-section">북마크</div>
-        <p v-if="!sortedBookmarks.length" class="ef-panel-empty">
+      <div v-if="panelOpen && !isHome" class="fc-panel">
+        <div class="fc-panel-section">북마크</div>
+        <p v-if="!sortedBookmarks.length" class="fc-panel-empty">
           페이지 오른쪽 위 리본을 누르면 이 자리에 저장됩니다.
         </p>
-        <ul v-else class="ef-panel-list">
+        <ul v-else class="fc-panel-list">
           <li v-for="b in sortedBookmarks" :key="b.id">
-            <button class="ef-panel-item" type="button" @click="openItem('bm', b)">
-              <span class="ef-panel-item-title">{{ b.title }}</span>
-              <span class="ef-panel-item-text">{{ b.anchor.text }}</span>
+            <button class="fc-panel-item" type="button" @click="openItem('bm', b)">
+              <span class="fc-panel-item-title">{{ b.title }}</span>
+              <span class="fc-panel-item-text">{{ b.anchor.text }}</span>
             </button>
-            <button class="ef-panel-x" type="button" aria-label="북마크 삭제" @click="removeBookmark(b.id)">×</button>
+            <button class="fc-panel-x" type="button" aria-label="북마크 삭제" @click="removeBookmark(b.id)">×</button>
           </li>
         </ul>
-        <div class="ef-panel-section">형광펜</div>
-        <p v-if="!sortedHighlights.length" class="ef-panel-empty">
+        <div class="fc-panel-section">형광펜</div>
+        <p v-if="!sortedHighlights.length" class="fc-panel-empty">
           본문을 드래그하면 형광펜을 칠할 수 있습니다.
         </p>
-        <ul v-else class="ef-panel-list">
+        <ul v-else class="fc-panel-list">
           <li v-for="h in sortedHighlights" :key="h.id">
-            <button class="ef-panel-item" type="button" @click="openItem('hl', h)">
-              <span class="ef-panel-item-title"><i class="ef-hl-dot small" :class="h.color" />{{ h.title }}</span>
-              <span class="ef-panel-item-text">{{ h.text.slice(0, 64) }}</span>
+            <button class="fc-panel-item" type="button" @click="openItem('hl', h)">
+              <span class="fc-panel-item-title"><i class="fc-hl-dot small" :class="h.color" />{{ h.title }}</span>
+              <span class="fc-panel-item-text">{{ h.text.slice(0, 64) }}</span>
             </button>
-            <button class="ef-panel-x" type="button" aria-label="형광펜 삭제" @click="removeHighlight(h.id)">×</button>
+            <button class="fc-panel-x" type="button" aria-label="형광펜 삭제" @click="removeHighlight(h.id)">×</button>
           </li>
         </ul>
       </div>

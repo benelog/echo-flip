@@ -112,7 +112,7 @@
 책 초반부의 요구사항과 UI 설명에는 실제 앱 화면을 싣는다.
 이미지는 `doc/public/screenshots/` 아래에 두고 `/screenshots/이름.png`로 참조한다(VitePress가 base를 붙여 준다).
 
-- 배치: `<div class="ef-shots">` + 마크다운 이미지 + `<p class="ef-caption">그림 N …</p>`. 휴대폰 화면 한 장짜리는 `ef-shots single`.
+- 배치: `<div class="fc-shots">` + 마크다운 이미지 + `<p class="fc-caption">그림 N …</p>`. 휴대폰 화면 한 장짜리는 `fc-shots single`.
 - **여러 화면은 반드시 한 장으로 합성해 둔다.** 이 책은 다단 페이지 넘김 모드라 이미지를 flex로 나란히 놓으면 단 경계에서 잘린다.
 - 캡처 조건: 배포본(`https://flashcard-delta.vercel.app`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.

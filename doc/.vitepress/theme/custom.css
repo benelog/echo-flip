@@ -4,7 +4,7 @@
    ────────────────────────────────────────────────────────────── */
 
 :root {
-  --ef-font-serif: 'Noto Serif KR', 'KoPubWorld Batang', 'Nanum Myeongjo',
+  --fc-font-serif: 'Noto Serif KR', 'KoPubWorld Batang', 'Nanum Myeongjo',
     Georgia, 'Times New Roman', serif;
   /* 제목·UI용 고딕. 웹폰트(Noto Sans KR)를 포함해 한글 폰트가 없는
      환경(PDF를 만드는 CI 등)에서도 한글이 깨지지 않는다. */
@@ -21,7 +21,7 @@
 .vp-doc blockquote,
 .vp-doc td,
 .vp-doc th {
-  font-family: var(--ef-font-serif);
+  font-family: var(--fc-font-serif);
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -130,18 +130,18 @@
    ────────────────────────────────────────────────────────────── */
 
 @media (min-width: 960px) {
-  html.ef-paged,
-  html.ef-paged body {
+  html.fc-paged,
+  html.fc-paged body {
     height: 100%;
     overflow: hidden;
   }
 
-  .ef-paged .VPDoc {
+  .fc-paged .VPDoc {
     padding: 20px 32px 40px !important;
   }
 
   /* 종이 페이지 카드 — 화면 높이에 맞춰 고정 */
-  .ef-paged .VPDoc .content {
+  .fc-paged .VPDoc .content {
     position: relative;
     height: calc(100vh - var(--vp-nav-height) - 60px);
     padding: 44px 60px 40px !important;
@@ -154,17 +154,17 @@
   }
 
   /* 두 페이지 펼침 — 폭이 넉넉하면 열 두 개가 펼친 책의 좌우 페이지 */
-  html.ef-two .VPDoc .content {
+  html.fc-two .VPDoc .content {
     max-width: 1360px !important;
   }
 
-  html.ef-two .VPDoc .content-container {
+  html.fc-two .VPDoc .content-container {
     column-count: 2;
     column-gap: 88px;
   }
 
   /* 책등(spine) — 두 페이지 사이 가운데 접힌 선 */
-  html.ef-two .VPDoc .content::after {
+  html.fc-two .VPDoc .content::after {
     content: '';
     position: absolute;
     top: 36px;
@@ -182,7 +182,7 @@
   }
 
   /* 다단 컨테이너 — 넘치는 내용이 오른쪽 열로 흐른다 */
-  .ef-paged .VPDoc .content-container {
+  .fc-paged .VPDoc .content-container {
     height: 100%;
     overflow: hidden;
     column-count: 1;
@@ -197,10 +197,10 @@
   }
 
   /* 열(페이지) 사이에서 요소가 자연스럽게 나뉘도록 */
-  .ef-paged .vp-doc h1,
-  .ef-paged .vp-doc h2,
-  .ef-paged .vp-doc h3,
-  .ef-paged .vp-doc h4 {
+  .fc-paged .vp-doc h1,
+  .fc-paged .vp-doc h2,
+  .fc-paged .vp-doc h3,
+  .fc-paged .vp-doc h4 {
     break-after: avoid;
     break-inside: avoid;
   }
@@ -208,30 +208,30 @@
   /* overflow가 있는 요소는 열 사이에서 분할되지 못하고 통째로 밀리거나
      페이지보다 길면 잘린다. 인쇄와 같은 방식으로 줄 안에서 개행시켜
      코드가 페이지에 걸쳐 자연스럽게 이어지게 한다. */
-  .ef-paged .vp-doc [class*='language-'] {
+  .fc-paged .vp-doc [class*='language-'] {
     overflow: visible;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
 
-  .ef-paged .vp-doc [class*='language-'] pre,
-  .ef-paged .vp-doc [class*='language-'] code {
+  .fc-paged .vp-doc [class*='language-'] pre,
+  .fc-paged .vp-doc [class*='language-'] code {
     overflow: visible;
     white-space: pre-wrap;
     word-break: break-all;
   }
 
-  .ef-paged .vp-doc img {
+  .fc-paged .vp-doc img {
     max-height: 60vh;
     break-inside: avoid;
   }
 
   /* 첫 페이지 상단이 들쭉날쭉하지 않게 */
-  .ef-paged .vp-doc > div > *:first-child {
+  .fc-paged .vp-doc > div > *:first-child {
     margin-top: 0;
   }
 
-  .ef-paged .prev-next {
+  .fc-paged .prev-next {
     margin-top: 40px;
   }
 }
@@ -242,13 +242,13 @@
    책등을 축으로 3D 회전시킨다. 요소는 애니메이션 동안만 존재한다.
    ────────────────────────────────────────────────────────────── */
 
-.ef-flip {
+.fc-flip {
   position: absolute;
   z-index: 6;
   pointer-events: none;
 }
 
-.ef-flip-sheet {
+.fc-flip-sheet {
   position: absolute;
   top: 0;
   height: 100%;
@@ -258,7 +258,7 @@
   will-change: transform;
 }
 
-.ef-flip-face {
+.fc-flip-face {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -267,11 +267,11 @@
   -webkit-backface-visibility: hidden;
 }
 
-.ef-flip-face.back {
+.fc-flip-face.back {
   transform: rotateY(180deg);
 }
 
-.ef-flip-cover {
+.fc-flip-cover {
   position: absolute;
   top: 0;
   height: 100%;
@@ -281,7 +281,7 @@
 }
 
 /* 종이 면의 음영과 바닥에 드리우는 그림자 — 투명도는 JS가 움직인다 */
-.ef-flip-shade {
+.fc-flip-shade {
   position: absolute;
   inset: 0;
   opacity: 0;
@@ -289,7 +289,7 @@
 }
 
 /* 페이지 번호 (n / 전체) — 카드 아래 가운데 */
-.ef-page-num {
+.fc-page-num {
   position: fixed;
   bottom: 10px;
   left: calc(50% + var(--vp-sidebar-width, 272px) / 2);
@@ -303,7 +303,7 @@
   pointer-events: none;
 }
 
-.ef-toc-hidden .ef-page-num {
+.fc-toc-hidden .fc-page-num {
   left: 50%;
 }
 
@@ -311,7 +311,7 @@
    북마크 리본 — 페이지 카드 위 모서리에 걸린 갈피끈
    ────────────────────────────────────────────────────────────── */
 
-.ef-ribbon {
+.fc-ribbon {
   position: fixed;
   z-index: 25;
   padding: 0;
@@ -323,12 +323,12 @@
   transition: color 0.2s, translate 0.2s;
 }
 
-.ef-ribbon:hover {
+.fc-ribbon:hover {
   color: var(--vp-c-brand-1);
   translate: 0 2px;
 }
 
-.ef-ribbon.active {
+.fc-ribbon.active {
   color: var(--vp-c-brand-1);
 }
 
@@ -337,7 +337,7 @@
    실제 칠은 CSS Custom Highlight API(::highlight)가 담당한다.
    ────────────────────────────────────────────────────────────── */
 
-.ef-seltool {
+.fc-seltool {
   position: fixed;
   z-index: 70;
   display: flex;
@@ -350,7 +350,7 @@
   box-shadow: var(--vp-shadow-3);
 }
 
-.ef-hl-dot {
+.fc-hl-dot {
   width: 22px;
   height: 22px;
   padding: 0;
@@ -360,23 +360,23 @@
   transition: transform 0.15s;
 }
 
-.ef-hl-dot:hover {
+.fc-hl-dot:hover {
   transform: scale(1.15);
 }
 
-.ef-hl-dot.yellow {
+.fc-hl-dot.yellow {
   background: #f6d32d;
 }
 
-.ef-hl-dot.green {
+.fc-hl-dot.green {
   background: #6ede8a;
 }
 
-.ef-hl-dot.pink {
+.fc-hl-dot.pink {
   background: #ff87ab;
 }
 
-.ef-hl-dot.small {
+.fc-hl-dot.small {
   display: inline-block;
   flex: none;
   width: 10px;
@@ -385,11 +385,11 @@
   cursor: default;
 }
 
-.ef-hl-dot.small:hover {
+.fc-hl-dot.small:hover {
   transform: none;
 }
 
-.ef-hl-del {
+.fc-hl-del {
   padding: 2px 4px;
   border: none;
   background: none;
@@ -398,31 +398,31 @@
   cursor: pointer;
 }
 
-.ef-hl-del:hover {
+.fc-hl-del:hover {
   color: var(--vp-c-danger-1);
 }
 
-::highlight(ef-hl-yellow) {
+::highlight(fc-hl-yellow) {
   background-color: rgba(246, 211, 45, 0.45);
 }
 
-::highlight(ef-hl-green) {
+::highlight(fc-hl-green) {
   background-color: rgba(110, 222, 138, 0.4);
 }
 
-::highlight(ef-hl-pink) {
+::highlight(fc-hl-pink) {
   background-color: rgba(255, 135, 171, 0.4);
 }
 
-.dark ::highlight(ef-hl-yellow) {
+.dark ::highlight(fc-hl-yellow) {
   background-color: rgba(246, 211, 45, 0.26);
 }
 
-.dark ::highlight(ef-hl-green) {
+.dark ::highlight(fc-hl-green) {
   background-color: rgba(110, 222, 138, 0.24);
 }
 
-.dark ::highlight(ef-hl-pink) {
+.dark ::highlight(fc-hl-pink) {
   background-color: rgba(255, 135, 171, 0.27);
 }
 
@@ -430,7 +430,7 @@
    북마크·형광펜 패널
    ────────────────────────────────────────────────────────────── */
 
-.ef-panel {
+.fc-panel {
   position: fixed;
   top: calc(var(--vp-nav-height) + 8px);
   right: 12px;
@@ -445,7 +445,7 @@
   box-shadow: var(--vp-shadow-3);
 }
 
-.ef-panel-section {
+.fc-panel-section {
   padding: 10px 16px 6px;
   font-size: 12px;
   font-weight: 700;
@@ -453,7 +453,7 @@
   color: var(--vp-c-text-3);
 }
 
-.ef-panel-empty {
+.fc-panel-empty {
   margin: 0;
   padding: 2px 16px 8px;
   font-size: 13px;
@@ -461,18 +461,18 @@
   color: var(--vp-c-text-2);
 }
 
-.ef-panel-list {
+.fc-panel-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.ef-panel-list li {
+.fc-panel-list li {
   display: flex;
   align-items: stretch;
 }
 
-.ef-panel-item {
+.fc-panel-item {
   display: flex;
   flex: 1;
   min-width: 0;
@@ -485,11 +485,11 @@
   cursor: pointer;
 }
 
-.ef-panel-item:hover {
+.fc-panel-item:hover {
   background: var(--vp-c-bg-soft);
 }
 
-.ef-panel-item-title {
+.fc-panel-item-title {
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -500,7 +500,7 @@
   text-overflow: ellipsis;
 }
 
-.ef-panel-item-text {
+.fc-panel-item-text {
   display: -webkit-box;
   overflow: hidden;
   -webkit-line-clamp: 2;
@@ -511,7 +511,7 @@
   word-break: keep-all;
 }
 
-.ef-panel-x {
+.fc-panel-x {
   flex: none;
   width: 32px;
   border: none;
@@ -521,12 +521,12 @@
   cursor: pointer;
 }
 
-.ef-panel-x:hover {
+.fc-panel-x:hover {
   color: var(--vp-c-danger-1);
 }
 
 /* 상단 바의 목차·책갈피 버튼 (목차는 데스크톱 전용) */
-.ef-toc-toggle {
+.fc-toc-toggle {
   display: none;
   align-items: center;
   gap: 6px;
@@ -538,43 +538,43 @@
   transition: color 0.25s;
 }
 
-.ef-toc-toggle:hover {
+.fc-toc-toggle:hover {
   color: var(--vp-c-text-1);
 }
 
-.ef-toc-toggle.ef-panel-btn {
+.fc-toc-toggle.fc-panel-btn {
   display: flex;
   padding: 0 10px;
 }
 
 @media (min-width: 960px) {
-  .ef-toc-toggle {
+  .fc-toc-toggle {
     display: flex;
   }
 }
 
 /* 목차를 접은 몰입 모드 */
-.ef-toc-hidden .VPSidebar {
+.fc-toc-hidden .VPSidebar {
   display: none !important;
 }
 
-.ef-toc-hidden .VPContent.has-sidebar {
+.fc-toc-hidden .VPContent.has-sidebar {
   padding-left: 0 !important;
 }
 
 @media (min-width: 960px) {
-  .ef-toc-hidden .VPNavBar .divider {
+  .fc-toc-hidden .VPNavBar .divider {
     padding-left: 0 !important;
   }
 
-  .ef-toc-hidden .VPNavBar.has-sidebar .title {
+  .fc-toc-hidden .VPNavBar.has-sidebar .title {
     background-color: transparent;
     border-bottom-color: transparent;
   }
 }
 
 /* 읽기 진행 바 */
-.ef-progress {
+.fc-progress {
   position: fixed;
   top: 0;
   left: 0;
@@ -600,7 +600,7 @@
 }
 
 /* 좌우 페이지 넘김 화살표 */
-.ef-arrow {
+.fc-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
@@ -620,25 +620,25 @@
   transition: color 0.25s, border-color 0.25s;
 }
 
-.ef-arrow:hover {
+.fc-arrow:hover {
   color: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-1);
 }
 
 @media (min-width: 960px) {
-  .ef-arrow {
+  .fc-arrow {
     display: flex;
   }
 
-  .ef-arrow.next {
+  .fc-arrow.next {
     right: 24px;
   }
 
-  .ef-arrow.prev {
+  .fc-arrow.prev {
     left: calc(var(--vp-sidebar-width, 272px) + 24px);
   }
 
-  .ef-toc-hidden .ef-arrow.prev {
+  .fc-toc-hidden .fc-arrow.prev {
     left: 24px;
   }
 }
@@ -647,7 +647,7 @@
    홈 — 책 표지
    ────────────────────────────────────────────────────────────── */
 
-.ef-home {
+.fc-home {
   min-height: calc(100vh - var(--vp-nav-height));
   display: flex;
   flex-direction: column;
@@ -661,13 +661,13 @@
     var(--vp-c-bg-alt);
 }
 
-.dark .ef-home {
+.dark .fc-home {
   background:
     radial-gradient(640px 460px at 50% 42%, rgba(142, 162, 216, 0.08), transparent 70%),
     var(--vp-c-bg-alt);
 }
 
-.ef-book {
+.fc-book {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -692,7 +692,7 @@
 }
 
 /* 표지 안쪽 액자선 — 고전 양장본의 이중 테두리 느낌 */
-.ef-book::after {
+.fc-book::after {
   content: '';
   position: absolute;
   inset: 11px;
@@ -701,14 +701,14 @@
   pointer-events: none;
 }
 
-.ef-book:hover {
+.fc-book:hover {
   translate: 0 -6px;
   box-shadow:
     inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
     0 28px 52px -12px rgba(22, 29, 54, 0.6);
 }
 
-.ef-book-rule {
+.fc-book-rule {
   width: 56px;
   height: 4px;
   border-radius: 2px;
@@ -717,7 +717,7 @@
 }
 
 /* 암기 카드 모티프 — 원문(A)과 뜻(가) 카드가 겹쳐 뒤집히는 순간 */
-.ef-book-cards {
+.fc-book-cards {
   position: absolute;
   top: 42px;
   right: 38px;
@@ -725,7 +725,7 @@
   height: 52px;
 }
 
-.ef-book-cards span {
+.fc-book-cards span {
   position: absolute;
   display: flex;
   align-items: center;
@@ -738,7 +738,7 @@
   font-weight: 700;
 }
 
-.ef-book-cards span:first-child {
+.fc-book-cards span:first-child {
   top: 0;
   right: 28px;
   border: 1.5px solid rgba(255, 255, 255, 0.38);
@@ -747,7 +747,7 @@
   transform: rotate(-8deg);
 }
 
-.ef-book-cards span:last-child {
+.fc-book-cards span:last-child {
   top: 14px;
   right: 0;
   background: #8ea2d8;
@@ -756,9 +756,9 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
 }
 
-.ef-book h1 {
+.fc-book h1 {
   margin: 0 0 18px;
-  font-family: var(--ef-font-serif);
+  font-family: var(--fc-font-serif);
   font-size: clamp(24px, 6vw, 30px);
   line-height: 1.5;
   font-weight: 700;
@@ -767,11 +767,11 @@
 }
 
 /* 제목의 "0원"만 금색으로 — 무료 운영이라는 주제를 표지에서 힘주어 말한다 */
-.ef-book h1 .ef-zero {
+.fc-book h1 .fc-zero {
   color: #f6c453;
 }
 
-.ef-book-subtitle {
+.fc-book-subtitle {
   margin: 0;
   font-size: 14px;
   line-height: 1.8;
@@ -780,7 +780,7 @@
 }
 
 /* 표지 홍보 문구 — 차별점(AI 에이전트·Go·무료 티어) 세 줄 */
-.ef-book-pitch {
+.fc-book-pitch {
   margin: 22px 0 0;
   padding: 0;
   list-style: none;
@@ -790,20 +790,20 @@
   word-break: keep-all;
 }
 
-.ef-book-pitch li::before {
+.fc-book-pitch li::before {
   content: '✓';
   margin-right: 8px;
   color: #f6c453;
   font-weight: 700;
 }
 
-.ef-book-author {
+.fc-book-author {
   margin: auto 0 0;
   font-size: 14px;
   font-weight: 500;
 }
 
-.ef-book-zero {
+.fc-book-zero {
   position: absolute;
   right: -14px;
   bottom: -34px;
@@ -815,7 +815,7 @@
   pointer-events: none;
 }
 
-.ef-home-desc {
+.fc-home-desc {
   max-width: 560px;
   margin: 0;
   text-align: center;
@@ -825,14 +825,14 @@
   word-break: keep-all;
 }
 
-.ef-home-actions {
+.fc-home-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.ef-btn {
+.fc-btn {
   display: inline-block;
   padding: 9px 22px;
   border-radius: 22px;
@@ -845,18 +845,18 @@
   transition: border-color 0.25s, color 0.25s, background-color 0.25s;
 }
 
-.ef-btn:hover {
+.fc-btn:hover {
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
 }
 
-.ef-btn.brand {
+.fc-btn.brand {
   background: var(--vp-c-brand-1);
   border-color: var(--vp-c-brand-1);
   color: #fff;
 }
 
-.ef-btn.brand:hover {
+.fc-btn.brand:hover {
   background: var(--vp-c-brand-2);
   color: #fff;
 }
@@ -866,20 +866,20 @@
    휴대폰 화면 비율이라 세로가 길다. 폭을 묶어 본문 흐름을 해치지 않게 한다.
    ────────────────────────────────────────────────────────────── */
 
-.vp-doc .ef-shots {
+.vp-doc .fc-shots {
   margin: 1.8em 0 0.6em;
   break-inside: avoid;
   page-break-inside: avoid;
 }
 
-.vp-doc .ef-shots p {
+.vp-doc .fc-shots p {
   margin: 0;
   text-align: center;
 }
 
 /* 여러 화면은 한 장으로 합성해 둔다. 다단(페이지 넘김) 모드에서 flex로 늘어놓으면
    이미지가 단 경계에서 잘리기 때문이다. */
-.vp-doc .ef-shots img {
+.vp-doc .fc-shots img {
   display: block;
   margin: 0 auto;
   max-width: 100%;
@@ -890,11 +890,11 @@
 }
 
 /* 휴대폰 화면 한 장짜리는 세로가 길어 폭을 더 좁힌다 */
-.vp-doc .ef-shots.single img {
+.vp-doc .fc-shots.single img {
   max-width: 260px;
 }
 
-.vp-doc .ef-caption {
+.vp-doc .fc-caption {
   text-align: center;
   font-family: var(--vp-font-family-base);
   font-size: 0.85rem;
@@ -1006,29 +1006,29 @@
     padding: 0 !important;
   }
 
-  .ef-progress,
-  .ef-toc-toggle,
-  .ef-arrow,
-  .ef-page-num,
-  .ef-ribbon,
-  .ef-seltool,
-  .ef-panel {
+  .fc-progress,
+  .fc-toc-toggle,
+  .fc-arrow,
+  .fc-page-num,
+  .fc-ribbon,
+  .fc-seltool,
+  .fc-panel {
     display: none !important;
   }
 
   /* 화면용 페이지 넘김 모드(다단·고정 높이)를 종이에서는 해제 */
-  html.ef-paged,
-  html.ef-paged body {
+  html.fc-paged,
+  html.fc-paged body {
     height: auto !important;
     overflow: visible !important;
   }
 
-  .ef-paged .VPDoc .content {
+  .fc-paged .VPDoc .content {
     height: auto !important;
     overflow: visible !important;
   }
 
-  .ef-paged .VPDoc .content-container {
+  .fc-paged .VPDoc .content-container {
     height: auto !important;
     overflow: visible !important;
     column-count: auto !important;
@@ -1054,12 +1054,12 @@
   }
 
   /* 그림은 쪽을 넘어 갈라지지 않게, 그림자는 걷어낸다 */
-  .vp-doc .ef-shots {
+  .vp-doc .fc-shots {
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  .vp-doc .ef-shots img {
+  .vp-doc .fc-shots img {
     box-shadow: none !important;
     border: 1px solid #999 !important;
   }
