@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <title>오프라인 — Flashcard</title>
+  <link rel="icon" href="/favicon.ico">
+  <!-- 스타일을 인라인으로 둔다: 이 페이지는 네트워크가 없을 때 뜨므로
+       app.css가 캐시에 없어도 제대로 보여야 한다. -->
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+      background: #fafafa; color: #1f2937;
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      text-align: center;
+    }
+    .card { max-width: 22rem; display: grid; gap: 1rem; justify-items: center; }
+    svg { width: 3rem; height: 3rem; stroke: #2563eb; fill: none; stroke-width: 1.5; stroke-linecap: round; }
+    h1 { margin: 0; font-size: 1.25rem; }
+    p { margin: 0; font-size: .875rem; line-height: 1.6; color: #6b7280; }
+    button {
+      margin-top: .5rem; padding: .625rem 1.25rem;
+      border: 0; border-radius: .5rem; cursor: pointer;
+      background: #2563eb; color: #fff; font: inherit; font-size: .875rem; font-weight: 500;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #111827; color: #f3f4f6; }
+      p { color: #9ca3af; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 3l18 18"/>
+      <path d="M5 12.5a7 7 0 0 1 4-2.3"/>
+      <path d="M2 8.8a12 12 0 0 1 4.5-2.6"/>
+      <path d="M19 12.5a7 7 0 0 0-5.6-2.4"/>
+      <path d="M22 8.8a12 12 0 0 0-8.9-3.6"/>
+      <line x1="12" y1="19" x2="12" y2="19.01"/>
+    </svg>
+    <h1>오프라인이에요</h1>
+    <p>인터넷에 연결되어 있지 않아 이 화면을 불러올 수 없어요. 이미 열어 본 페이지는 연결 없이도 볼 수 있어요.</p>
+    <button onclick="location.reload()">다시 시도</button>
+  </div>
+  <script>
+    // 연결이 돌아오면 원래 가려던 페이지를 자동으로 다시 연다.
+    addEventListener("online", () => location.reload());
+  </script>
+</body>
+</html>

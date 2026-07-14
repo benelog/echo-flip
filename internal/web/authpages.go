@@ -91,7 +91,9 @@ func (w *Web) logout(c *gin.Context) {
 		}
 	}
 	w.clearAuthCookies(c)
-	c.Redirect(http.StatusSeeOther, "/login")
+	// signed_out은 app.js에 대한 신호다: 서비스 워커가 오프라인용으로 캐시해 둔
+	// 이 사용자의 페이지 HTML을 지우게 한다.
+	c.Redirect(http.StatusSeeOther, "/login?signed_out=1")
 }
 
 // origin rebuilds the request's external base URL, proxy-aware.

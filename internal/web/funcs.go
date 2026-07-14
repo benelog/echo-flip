@@ -19,6 +19,7 @@ func isNotFound(err error) bool {
 
 var funcMap = template.FuncMap{
 	"icon":      icon,
+	"asset":     asset,
 	"hasPrefix": strings.HasPrefix,
 	"deref":     deref,
 	"pct":       pct,

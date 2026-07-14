@@ -9,9 +9,9 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/static/app.css">
-  <script src="/static/htmx.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <link rel="stylesheet" href="{{asset "/static/app.css"}}">
+  <script src="{{asset "/static/htmx.min.js"}}" defer></script>
+  <script src="{{asset "/static/app.js"}}" defer></script>
 </head>
 <body>
 {{if eq .Path "/login"}}

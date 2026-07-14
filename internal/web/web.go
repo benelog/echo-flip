@@ -5,12 +5,15 @@
 package web
 
 import (
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"html/template"
 	"io/fs"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +31,26 @@ var templateFS embed.FS
 var staticFS embed.FS
 
 var nilUUID = uuid.Nil
+
+// assetVersion fingerprints the embedded CSS/JS. The templates hang it off
+// every asset URL as ?v=…, so a deploy changes the URL itself: the service
+// worker (which serves static files stale-while-revalidate) can never pair a
+// new page with last version's stylesheet. Filenames stay stable, which keeps
+// them readable in the repo and in devtools.
+var assetVersion = sync.OnceValue(func() string {
+	h := sha256.New()
+	for _, name := range []string{"static/app.css", "static/app.js", "static/htmx.min.js"} {
+		b, err := staticFS.ReadFile(name)
+		if err != nil {
+			panic(err)
+		}
+		h.Write(b)
+	}
+	return hex.EncodeToString(h.Sum(nil))[:12]
+})
+
+// asset is the template func: {{asset "/static/app.css"}}.
+func asset(path string) string { return path + "?v=" + assetVersion() }
 
 type Web struct {
 	store handlers.Store
@@ -190,8 +213,9 @@ func (w *Web) Register(r *gin.Engine) {
 	})
 }
 
-// registerStatic serves the embedded assets. Everything is fingerprint-free,
-// so cache briefly; the service worker adds stale-while-revalidate on top.
+// registerStatic serves the embedded assets. Filenames carry no hash, so a URL
+// is only immutable when the template stamped ?v=<assetVersion> on it; bare
+// URLs get a short TTL. The service worker adds stale-while-revalidate on top.
 func (w *Web) registerStatic(r *gin.Engine) {
 	static, err := fs.Sub(staticFS, "static")
 	if err != nil {
@@ -206,7 +230,11 @@ func (w *Web) registerStatic(r *gin.Engine) {
 		}
 	}
 	r.GET("/static/*filepath", func(c *gin.Context) {
-		c.Header("Cache-Control", "public, max-age=3600")
+		if c.Query("v") == assetVersion() {
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			c.Header("Cache-Control", "public, max-age=3600")
+		}
 		c.Request.URL.Path = "/" + strings.TrimPrefix(c.Param("filepath"), "/")
 		server.ServeHTTP(c.Writer, c.Request)
 	})
@@ -219,6 +247,9 @@ func (w *Web) registerStatic(r *gin.Engine) {
 	r.GET("/sw.js", cached("/sw.js"))
 	r.GET("/manifest.webmanifest", cached("/manifest.webmanifest"))
 	r.GET("/favicon.ico", cached("/favicon.ico"))
+	// The offline fallback the service worker precaches and serves when a page
+	// is requested with no network and no cached copy.
+	r.GET("/offline.html", cached("/offline.html"))
 }
 
 // clientTZ returns the visitor's IANA timezone, reported by app.js in a

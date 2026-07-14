@@ -34,6 +34,13 @@ DB는 환경마다 완전히 분리되어 있다.
 - 마이그레이션과 Vercel 배포는 서로를 기다리지 않는다. 컬럼 삭제·이름 변경은 배포 순서에 상관없이 안전하도록 세 단계(추가 → 코드 전환 → 제거)로 나눈다.
 - SQLite(`internal/litestore/schema.sql`)는 위 마이그레이션을 손으로 옮긴 포팅본이다. Postgres 마이그레이션을 추가하면 **같은 커밋에서 이 파일도 함께 고쳐야** 두 환경이 어긋나지 않는다.
 
+## PWA와 캐시
+
+- `internal/web/static/sw.js`의 캐시 저장소는 두 개다. `flashcard-pages-*`는 사용자별로 렌더링된 HTML(서버가 `no-store`를 붙이지만 Cache Storage에는 통하지 않는다), `flashcard-static-*`는 사용자와 무관한 자원이다. 개인 화면은 `PAGES`에만 담고, 로그아웃(`/login?signed_out=1` → `app.js`)에서 그 상자만 지운다.
+- `/api/` 응답과 GET이 아닌 요청은 캐시하지 않는다(network only).
+- 캐시 전략을 바꾸면 두 캐시 이름의 버전(`-v3`)을 함께 올린다. 올리지 않으면 옛 정책으로 채워진 항목이 사용자 기기에 남는다.
+- 정적 자원은 파일명에 해시가 없다. 템플릿에서 반드시 `{{asset "/static/…"}}`로 참조해 `?v=<내용 해시>`가 붙게 한다(`internal/web/web.go`의 `assetVersion`). 새 자산 파일을 추가하면 해시 대상 목록에도 넣는다.
+
 ## 검증
 
 - `go build ./... && go vet ./... && go test ./...` (gofmt는 훅이 자동 적용)

@@ -13,6 +13,25 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
+// 로그아웃: 서비스 워커가 오프라인용으로 갖고 있던 사용자별 페이지 HTML을 지운다.
+// 서버는 이 페이지들에 no-store를 붙이지만 캐시 저장소는 그와 무관하게 남는다.
+// 서버가 /login?signed_out=1 로 보내 준 것이 신호다(sw.js의 PAGES 캐시 접두사).
+if (new URLSearchParams(location.search).has("signed_out")) {
+  if ("caches" in window) {
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((k) => k.startsWith("flashcard-pages"))
+            .map((k) => caches.delete(k)),
+        ),
+      )
+      .catch(() => {});
+  }
+  history.replaceState(null, "", location.pathname); // 주소창에서 흔적을 지운다
+}
+
 // 오프라인 배너.
 const banner = document.getElementById("offline-banner");
 if (banner) {
