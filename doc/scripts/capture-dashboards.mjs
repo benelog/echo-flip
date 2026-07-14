@@ -32,22 +32,30 @@ const GOOGLE_CLIENT =
   '596602515668-6lq1oqvn79knor4tbe3v5i631j8908st.apps.googleusercontent.com';
 const VERCEL_PROJECT = process.env.VERCEL_PROJECT ?? 'sanghyuk-jungs-projects/flashcard';
 
+// Supabase·Google 대시보드에 뜨는 상태 배너나 홍보 팝업은 촬영 전에 숨긴다(dismiss).
+// 텍스트로 요소를 찾아 그 위쪽의 fixed/sticky/absolute 조상을 display:none 한다.
+const SUPABASE_OVERLAYS = ['We are investigating', 'Unified Logs is here'];
+const GOOGLE_OVERLAYS = ['console.cloud.google.com'];
+
 const SHOTS = [
   {
     name: 'dash-providers',
     url: `https://supabase.com/dashboard/project/${SUPABASE_PROJECT}/auth/providers`,
-    // "Auth Providers" 목록이 보이도록 아래로 조금 스크롤한다.
-    scrollTo: 'Auth Providers',
+    // Google·GitHub이 Enabled로 보이도록 그 근처로 스크롤한다.
+    scrollTo: 'GitHub',
+    dismiss: SUPABASE_OVERLAYS,
   },
   {
     name: 'dash-google-client',
     url: `https://console.cloud.google.com/auth/clients/${GOOGLE_CLIENT}?project=${GOOGLE_PROJECT}`,
     scrollTo: '승인된 리디렉션 URI',
+    dismiss: GOOGLE_OVERLAYS,
   },
   {
     name: 'dash-url-config',
     url: `https://supabase.com/dashboard/project/${SUPABASE_PROJECT}/auth/url-configuration`,
     scrollTo: 'Redirect URLs',
+    dismiss: SUPABASE_OVERLAYS,
   },
   {
     name: 'dash-vercel-environments',
@@ -56,7 +64,8 @@ const SHOTS = [
   {
     name: 'dash-vercel-envvars',
     url: `https://vercel.com/${VERCEL_PROJECT}/settings/environments/production`,
-    scrollTo: 'Environment Variables',
+    // 환경 변수 목록(DATABASE_URL 등)이 화면에 오도록 그 행까지 스크롤한다.
+    scrollTo: 'DATABASE_URL',
   },
 ];
 
@@ -73,10 +82,34 @@ await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
 for (const s of SHOTS) {
   await page.goto(s.url, { waitUntil: 'networkidle2', timeout: 60000 }).catch(() => {});
   await new Promise((r) => setTimeout(r, 2500));
+  if (s.dismiss) {
+    await page
+      .evaluate((texts) => {
+        for (const t of texts) {
+          const leaf = [...document.querySelectorAll('body *')].find(
+            (n) => n.children.length === 0 && n.textContent?.trim().startsWith(t),
+          );
+          let el = leaf;
+          for (let i = 0; i < 10 && el && el !== document.body; i++) {
+            const pos = getComputedStyle(el).position;
+            const r = el.getBoundingClientRect();
+            const positioned = pos === 'fixed' || pos === 'sticky' || pos === 'absolute';
+            // 화면 위쪽에 붙은 전폭 배너(상태 알림 등)도 숨긴다.
+            const topBar = r.top <= 12 && r.width >= window.innerWidth * 0.9 && r.height <= 140;
+            if (positioned || topBar) {
+              el.style.display = 'none';
+              break;
+            }
+            el = el.parentElement;
+          }
+        }
+      }, s.dismiss)
+      .catch(() => {});
+  }
   if (s.scrollTo) {
     await page
       .evaluate((text) => {
-        const el = [...document.querySelectorAll('h1,h2,h3,h4,div,span')].find((n) =>
+        const el = [...document.querySelectorAll('h1,h2,h3,h4,div,span,code')].find((n) =>
           n.textContent?.trim().startsWith(text),
         );
         el?.scrollIntoView({ block: 'center' });
