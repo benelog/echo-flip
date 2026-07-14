@@ -655,164 +655,246 @@
   justify-content: center;
   gap: 28px;
   padding: 48px 24px 72px;
-  /* 표지 뒤로 은은한 광을 깔아 책이 조명 아래 놓인 느낌을 준다 */
-  background:
-    radial-gradient(640px 460px at 50% 42%, rgba(51, 67, 110, 0.09), transparent 70%),
-    var(--vp-c-bg-alt);
+  background: #edf0f2;
 }
 
 .dark .fc-home {
-  background:
-    radial-gradient(640px 460px at 50% 42%, rgba(142, 162, 216, 0.08), transparent 70%),
-    var(--vp-c-bg-alt);
+  background: #202226;
 }
 
 .fc-book {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(400px, 88vw);
-  aspect-ratio: 1 / 1.42;
-  padding: 44px 38px 36px;
+  width: min(420px, 88vw);
+  aspect-ratio: 7 / 10;
+  padding: 30px 32px 26px;
   box-sizing: border-box;
-  border-radius: 4px 14px 14px 4px;
-  /* 위: 모서리 광, 가운데: 점 패턴 질감, 아래: 기존 남색 그러데이션 */
-  background-image:
-    radial-gradient(circle at 82% 8%, rgba(142, 162, 216, 0.22), transparent 55%),
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
-  background-size: auto, 22px 22px, auto;
-  color: #fff;
+  border: 1px solid #1d232d;
+  border-radius: 2px 7px 7px 2px;
+  background: #f7f5ef;
+  color: #151a22;
   overflow: hidden;
   text-decoration: none !important;
   box-shadow:
-    inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
-    0 18px 40px -12px rgba(22, 29, 54, 0.55);
+    inset 7px 0 #e64c3c,
+    0 18px 36px -14px rgba(29, 35, 45, 0.42);
   transition: translate 0.25s, box-shadow 0.25s;
 }
 
-/* 표지 안쪽 액자선 — 고전 양장본의 이중 테두리 느낌 */
-.fc-book::after {
+/* 인쇄물의 재단 밖으로 이어지는 컬러 블록 */
+.fc-book::before {
   content: '';
   position: absolute;
-  inset: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 2px 10px 10px 2px;
+  top: 0;
+  right: 0;
+  width: 88px;
+  height: 14px;
+  background: #16a6a1;
   pointer-events: none;
 }
 
 .fc-book:hover {
   translate: 0 -6px;
   box-shadow:
-    inset 6px 0 12px -6px rgba(255, 255, 255, 0.25),
-    0 28px 52px -12px rgba(22, 29, 54, 0.6);
+    inset 7px 0 #e64c3c,
+    0 28px 48px -14px rgba(29, 35, 45, 0.5);
 }
 
-.fc-book-rule {
-  width: 56px;
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #f6c453, #8ea2d8);
-  margin-bottom: 30px;
-}
-
-/* 암기 카드 모티프 — 원문(A)과 뜻(가) 카드가 겹쳐 뒤집히는 순간 */
-.fc-book-cards {
-  position: absolute;
-  top: 42px;
-  right: 38px;
-  width: 78px;
-  height: 52px;
-}
-
-.fc-book-cards span {
-  position: absolute;
+/* IT 실용서에서 자주 쓰는 시리즈 라벨과 권호 */
+.fc-book-kicker {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 30px;
-  border-radius: 6px;
-  font-family: var(--vp-font-family-base);
-  font-size: 13px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 9px;
+  border-bottom: 2px solid #151a22;
+  font-size: 10px;
   font-weight: 700;
+  color: #38404c;
 }
 
-.fc-book-cards span:first-child {
-  top: 0;
-  right: 28px;
-  border: 1.5px solid rgba(255, 255, 255, 0.38);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.75);
-  transform: rotate(-8deg);
-}
-
-.fc-book-cards span:last-child {
-  top: 14px;
-  right: 0;
-  background: #8ea2d8;
-  color: #1d2747;
-  transform: rotate(7deg);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+.fc-book-kicker b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  background: #151a22;
+  color: #fff;
+  font-size: 11px;
 }
 
 .fc-book h1 {
-  margin: 0 0 18px;
-  font-family: var(--fc-font-serif);
-  font-size: clamp(24px, 6vw, 30px);
-  line-height: 1.5;
+  margin: 0;
+  font-family: var(--vp-font-family-base);
+  font-size: 34px;
+  line-height: 1.22;
   font-weight: 700;
-  color: #fff;
+  color: #151a22;
   word-break: keep-all;
 }
 
-/* 제목의 "0원"만 금색으로 — 무료 운영이라는 주제를 표지에서 힘주어 말한다 */
-.fc-book h1 .fc-zero {
-  color: #f6c453;
+.fc-book h1 > span {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.fc-book h1 strong {
+  display: inline-block;
+  padding: 0 7px 2px;
+  background: #f2cf35;
+  color: #151a22;
+  font-size: 38px;
+  line-height: 1;
 }
 
 .fc-book-subtitle {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.82);
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  font-weight: 600;
+  color: #4b5360;
   word-break: keep-all;
 }
 
-/* 표지 홍보 문구 — 차별점(AI 에이전트·Go·무료 티어) 세 줄 */
+/* 에이전트에서 웹까지 이어지는 기술 흐름을 작은 시스템 도식으로 표현한다 */
+.fc-book-diagram {
+  position: relative;
+  height: 116px;
+  margin: 14px -32px 0 20px;
+  flex: none;
+}
+
+.fc-diagram-browser {
+  position: absolute;
+  inset: 4px 50px 4px 0;
+  border: 2px solid #151a22;
+  background: #fff;
+  box-shadow: 7px 7px 0 #16a6a1;
+}
+
+.fc-diagram-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 19px;
+  padding: 0 7px;
+  border-bottom: 2px solid #151a22;
+  background: #e8eaeb;
+}
+
+.fc-diagram-bar i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #151a22;
+}
+
+.fc-diagram-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 13px 8px 6px;
+}
+
+.fc-diagram-flow span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 28px;
+  border: 2px solid #151a22;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.fc-diagram-flow .agent { background: #f2cf35; }
+.fc-diagram-flow .go { background: #7fd1ca; }
+.fc-diagram-flow .web { background: #f07c6d; }
+
+.fc-diagram-flow > i {
+  width: 11px;
+  height: 2px;
+  background: #151a22;
+}
+
+.fc-diagram-lines {
+  display: grid;
+  gap: 4px;
+  padding: 0 14px;
+}
+
+.fc-diagram-lines i {
+  height: 3px;
+  background: #d6d9dc;
+}
+
+.fc-diagram-lines i:nth-child(2) { width: 74%; }
+.fc-diagram-lines i:nth-child(3) { width: 88%; }
+
+.fc-diagram-card {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 39px;
+  border: 2px solid #151a22;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.fc-diagram-card.front {
+  top: 13px;
+  background: #f2cf35;
+  rotate: 7deg;
+}
+
+.fc-diagram-card.back {
+  top: 61px;
+  right: 25px;
+  background: #e64c3c;
+  color: #fff;
+  rotate: -7deg;
+}
+
 .fc-book-pitch {
-  margin: 22px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 12.5px;
-  line-height: 2;
-  color: rgba(255, 255, 255, 0.68);
+  font-size: 10.5px;
+  line-height: 1.65;
+  font-weight: 600;
+  color: #48505b;
   word-break: keep-all;
 }
 
 .fc-book-pitch li::before {
-  content: '✓';
-  margin-right: 8px;
-  color: #f6c453;
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 7px 1px 0;
+  background: #e64c3c;
+}
+
+.fc-book-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: auto 0 0;
+  padding-top: 10px;
+  border-top: 1px solid #aeb3b7;
+  font-size: 9px;
   font-weight: 700;
+  color: #5a616b;
 }
 
 .fc-book-author {
-  margin: auto 0 0;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.fc-book-zero {
-  position: absolute;
-  right: -14px;
-  bottom: -34px;
-  font-size: 190px;
-  font-weight: 700;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.05);
-  letter-spacing: -0.04em;
-  pointer-events: none;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #151a22;
 }
 
 .fc-home-desc {
@@ -835,7 +917,7 @@
 .fc-btn {
   display: inline-block;
   padding: 9px 22px;
-  border-radius: 22px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none !important;
@@ -859,6 +941,71 @@
 .fc-btn.brand:hover {
   background: var(--vp-c-brand-2);
   color: #fff;
+}
+
+@media (max-width: 480px) {
+  .fc-home {
+    justify-content: flex-start;
+    padding: 28px 16px 56px;
+  }
+
+  .fc-book {
+    padding: 25px 27px 22px;
+  }
+
+  .fc-book h1 {
+    font-size: 29px;
+  }
+
+  .fc-book h1 strong {
+    font-size: 33px;
+  }
+
+  .fc-book-subtitle {
+    margin-top: 9px;
+    font-size: 11.5px;
+  }
+
+  .fc-book-diagram {
+    height: 100px;
+    margin: 10px -27px 0 14px;
+  }
+
+  .fc-diagram-browser {
+    inset: 2px 46px 2px 0;
+  }
+
+  .fc-diagram-flow {
+    gap: 4px;
+    padding-top: 10px;
+  }
+
+  .fc-diagram-flow span {
+    width: 36px;
+    height: 25px;
+  }
+
+  .fc-diagram-flow > i {
+    width: 7px;
+  }
+
+  .fc-diagram-card {
+    width: 49px;
+    height: 34px;
+  }
+
+  .fc-diagram-card.back {
+    top: 55px;
+  }
+
+  .fc-book-pitch {
+    margin-top: 9px;
+    font-size: 9px;
+  }
+
+  .fc-book-footer {
+    padding-top: 7px;
+  }
 }
 
 /* ──────────────────────────────────────────────────────────────

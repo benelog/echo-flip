@@ -60,48 +60,61 @@ function coverHtml() {
     html, body { margin: 0; padding: 0; }
     .cover {
       position: relative; box-sizing: border-box; width: 210mm; height: 296mm;
-      padding: 34mm 26mm 26mm; overflow: hidden;
-      /* 위: 모서리 광, 가운데: 점 패턴 질감, 아래: 남색 그러데이션 (웹 표지와 동일) */
-      background-image:
-        radial-gradient(circle at 82% 8%, rgba(142,162,216,.22), transparent 55%),
-        radial-gradient(rgba(255,255,255,.05) 0.35mm, transparent 0.35mm),
-        linear-gradient(160deg, #33436e 0%, #232f52 55%, #161d36 100%);
-      background-size: auto, 6mm 6mm, auto;
-      color: #fff; font-family: 'Noto Serif KR', serif;
+      padding: 20mm 19mm 17mm 24mm; overflow: hidden;
+      background: #f7f5ef; color: #151a22; font-family: 'Noto Sans KR', sans-serif;
       display: flex; flex-direction: column;
     }
-    .frame { position: absolute; inset: 7mm; border: 0.3mm solid rgba(255,255,255,.13); border-radius: 1mm 3mm 3mm 1mm; }
-    .rule { width: 34mm; height: 1.2mm; border-radius: 0.6mm; background: linear-gradient(90deg, #f6c453, #8ea2d8); margin-bottom: 14mm; }
-    h1 { font-size: 34pt; line-height: 1.45; font-weight: 700; margin: 0 0 10mm; word-break: keep-all; }
-    h1 .gold { color: #f6c453; }
-    .cards { position: absolute; top: 29mm; right: 24mm; width: 42mm; height: 28mm; font-family: 'Noto Sans KR', sans-serif; }
-    .cards span { position: absolute; display: flex; align-items: center; justify-content: center; width: 24mm; height: 16mm; border-radius: 1.6mm; font-size: 12pt; font-weight: 700; }
-    .cards .front { top: 0; right: 15mm; border: 0.4mm solid rgba(255,255,255,.38); background: rgba(255,255,255,.04); color: rgba(255,255,255,.75); transform: rotate(-8deg); }
-    .cards .back { top: 8mm; right: 0; background: #8ea2d8; color: #1d2747; transform: rotate(7deg); }
-    .subtitle { font-family: 'Noto Sans KR', sans-serif; font-size: 13.5pt; font-weight: 400; color: rgba(255,255,255,.82); margin: 0; line-height: 1.8; word-break: keep-all; }
-    .pitch { margin: 12mm 0 0; padding: 0; list-style: none; font-family: 'Noto Sans KR', sans-serif; font-size: 10.5pt; line-height: 2.1; color: rgba(255,255,255,.68); word-break: keep-all; }
-    .pitch li::before { content: '✓'; margin-right: 2.5mm; color: #f6c453; font-weight: 700; }
-    .bottom { margin-top: auto; font-family: 'Noto Sans KR', sans-serif; }
-    .author { font-size: 13pt; font-weight: 500; margin: 0 0 2.5mm; }
-    .site { font-size: 9.5pt; color: rgba(255,255,255,.55); margin: 0; }
-    .zero { position: absolute; right: -6mm; bottom: -14mm; font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 340pt; line-height: 1; color: rgba(255,255,255,.05); letter-spacing: -0.04em; }
+    .spine { position: absolute; inset: 0 auto 0 0; width: 4mm; background: #e64c3c; }
+    .accent { position: absolute; top: 0; right: 0; width: 45mm; height: 7mm; background: #16a6a1; }
+    .kicker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9mm; padding-bottom: 4mm; border-bottom: 0.8mm solid #151a22; font-size: 9pt; font-weight: 700; color: #38404c; }
+    .kicker b { display: grid; place-items: center; width: 10mm; height: 10mm; background: #151a22; color: #fff; font-size: 9pt; }
+    h1 { font-size: 36pt; line-height: 1.2; font-weight: 700; margin: 0; word-break: keep-all; }
+    h1 .small { font-size: 20pt; font-weight: 600; }
+    h1 .zero { display: inline-block; padding: 0 3mm 1.5mm; background: #f2cf35; font-size: 41pt; line-height: 1; }
+    .subtitle { margin: 6mm 0 0; font-size: 14pt; font-weight: 600; color: #4b5360; line-height: 1.7; word-break: keep-all; }
+    .diagram { position: relative; flex: none; height: 72mm; margin: 8mm -19mm 0 9mm; }
+    .browser { position: absolute; inset: 2mm 26mm 2mm 0; border: 0.8mm solid #151a22; background: #fff; box-shadow: 4mm 4mm 0 #16a6a1; }
+    .bar { display: flex; align-items: center; gap: 1.8mm; box-sizing: border-box; height: 9mm; padding: 0 4mm; border-bottom: 0.8mm solid #151a22; background: #e8eaeb; }
+    .bar i { width: 2mm; height: 2mm; border-radius: 50%; background: #151a22; }
+    .flow { display: flex; align-items: center; justify-content: center; gap: 4mm; padding: 11mm 5mm 5mm; }
+    .flow span { display: grid; place-items: center; width: 24mm; height: 14mm; border: 0.8mm solid #151a22; font-size: 10pt; font-weight: 700; }
+    .flow .agent { background: #f2cf35; } .flow .go { background: #7fd1ca; } .flow .web { background: #f07c6d; }
+    .flow > i { width: 7mm; height: 0.8mm; background: #151a22; }
+    .lines { display: grid; gap: 2mm; padding: 0 9mm; }
+    .lines i { height: 1.2mm; background: #d6d9dc; }
+    .lines i:nth-child(2) { width: 74%; } .lines i:nth-child(3) { width: 88%; }
+    .card { position: absolute; right: 4mm; display: grid; place-items: center; width: 29mm; height: 20mm; border: 0.8mm solid #151a22; font-size: 18pt; font-weight: 700; }
+    .card.front { top: 8mm; background: #f2cf35; transform: rotate(7deg); }
+    .card.back { top: 39mm; right: 13mm; background: #e64c3c; color: #fff; transform: rotate(-7deg); }
+    .pitch { margin: 7mm 0 0; padding: 0; list-style: none; font-size: 10.5pt; line-height: 1.9; font-weight: 600; color: #48505b; word-break: keep-all; }
+    .pitch li::before { content: ''; display: inline-block; width: 2mm; height: 2mm; margin: 0 3mm 0.4mm 0; background: #e64c3c; }
+    .bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; padding-top: 5mm; border-top: 0.3mm solid #aeb3b7; }
+    .stack { font-size: 9pt; font-weight: 700; color: #5a616b; }
+    .author { font-size: 14pt; font-weight: 600; margin: 0 0 2mm; text-align: right; }
+    .site { font-size: 8.5pt; color: #777e86; margin: 0; text-align: right; }
   </style></head><body>
   <div class="cover">
-    <div class="frame"></div>
-    <div class="cards"><span class="front">A</span><span class="back">가</span></div>
-    <div class="rule"></div>
-    <h1>월 <span class="gold">0원</span>으로 운영하는<br>나만의 웹 앱</h1>
+    <div class="spine"></div><div class="accent"></div>
+    <div class="kicker"><span>AI와 함께 만드는 실전 개발서</span><b>01</b></div>
+    <h1><span class="small">월</span> <span class="zero">0원</span>으로<br>운영하는<br>나만의 웹 앱</h1>
     <p class="subtitle">${SUBTITLE}</p>
+    <div class="diagram">
+      <div class="browser">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="flow"><span class="agent">AI</span><i></i><span class="go">Go</span><i></i><span class="web">WEB</span></div>
+        <div class="lines"><i></i><i></i><i></i></div>
+      </div>
+      <div class="card front">A</div><div class="card back">가</div>
+    </div>
     <ul class="pitch">
       <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
       <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>
       <li>무료 티어에 유리하게 수십 MB 메모리만 사용하는 서버</li>
     </ul>
     <div class="bottom">
-      <p class="author">${AUTHOR} 지음</p>
-      <p class="site">${SITE}</p>
+      <span class="stack">GO · HTML · HTMX</span>
+      <div><p class="author">${AUTHOR} 지음</p><p class="site">${SITE}</p></div>
     </div>
-    <div class="zero">&#8361;0</div>
   </div></body></html>`
 }
 
