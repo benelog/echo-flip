@@ -49,10 +49,14 @@ htmx를 켜는 방법은 한 줄이다.
 다음은 모든 페이지의 공통 뼈대인 internal/web/templates/layout.html의 head 부분으로, 스타일시트와 함께 htmx와 app.js를 불러온다.
 
 ```html
-  <link rel="stylesheet" href="/static/app.css">
-  <script src="/static/htmx.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <link rel="stylesheet" href="{{asset "/static/app.css"}}">
+  <script src="{{asset "/static/htmx.min.js"}}" defer></script>
+  <script src="{{asset "/static/app.js"}}" defer></script>
 ```
+
+주소를 감싼 asset은 파일 내용의 해시를 주소 끝에 `?v=`로 붙여 주는 템플릿 함수다.
+브라우저와 서비스 워커가 낡은 사본을 새 화면에 물리지 않게 하려는 장치이고, 19장에서 다룬다.
+지금은 세 파일을 불러오는 줄이라고만 읽으면 된다.
 
 htmx.min.js는 50KB 남짓한 파일 하나다.
 남이 만든 파일을 외부 서버에서 내려받는 대신 저장소에 직접 복사해 두는 방식(벤더링, vendoring)을 택했고, 11장에서 본 embed로 Go 바이너리에 함께 넣었다.
@@ -448,7 +452,7 @@ func (w *Web) deleteDeck(c *gin.Context) {
 이 기능들은 사용자의 기기 안에서만 실행할 수 있으므로, 서버 렌더링 앱이라도 이 몫의 자바스크립트는 남는다.
 :::
 
-Flashcard에서 우리가 직접 쓴 자바스크립트 파일은 internal/web/static/app.js 하나이고, 전부 81줄이다.
+Flashcard에서 우리가 직접 쓴 자바스크립트 파일은 internal/web/static/app.js 하나이고, 전부 100줄이다.
 htmx.min.js는 남이 만든 완성품을 속성으로만 부리는 것이니 논외로 하면, 이 앱의 자바스크립트 전체를 한 절 안에서 훑을 수 있다.
 파일 머리의 주석이 이 절의 논지를 요약한다.
 
@@ -471,6 +475,8 @@ document.cookie =
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
+
+// ... 로그아웃 뒤 서비스 워커의 페이지 캐시를 비우는 덩어리는 19장에서 본다 ...
 
 // 오프라인 배너.
 const banner = document.getElementById("offline-banner");
@@ -593,8 +599,8 @@ htmx는 `hx-post`(어디로 보낼지), `hx-target`(어디에 끼울지), `hx-sw
 상태가 작고 민감하지 않으며 흐름이 짧을 때 성립하는 선택이고, 이어 하기가 중요하거나 상태를 신뢰해야 한다면 데이터베이스에 두는 편이 낫다.
 
 그리고 자바스크립트는 0줄이 되지 않았다.
-음성 합성, 클립보드, 오프라인 감지, 서비스 워커 등록, 시간대처럼 브라우저만 할 수 있는 일이 app.js 81줄로 남았고, 이벤트 위임과 data-* 속성 덕분에 이 코드는 htmx가 화면을 아무리 갈아 끼워도 손대지 않고 동작한다.
-반대로 키 입력 하나하나에 화면이 반응해야 하는 앱이라면, 이 81줄로는 부족해지고 React 같은 자바스크립트 프레임워크가 제값을 한다.
+음성 합성, 클립보드, 오프라인 감지, 서비스 워커 등록, 시간대처럼 브라우저만 할 수 있는 일이 app.js 100줄로 남았고, 이벤트 위임과 data-* 속성 덕분에 이 코드는 htmx가 화면을 아무리 갈아 끼워도 손대지 않고 동작한다.
+반대로 키 입력 하나하나에 화면이 반응해야 하는 앱이라면, 이 100줄로는 부족해지고 React 같은 자바스크립트 프레임워크가 제값을 한다.
 
 여기까지로 데이터베이스, Go와 Gin, 화면까지 앱 한 벌이 어떻게 생겼는지 읽을 수 있게 됐다.
 다음 13장에서는 지금까지 지면으로 읽어 온 이 앱을 독자의 컴퓨터에서 실제로 띄운다.

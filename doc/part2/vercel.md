@@ -376,13 +376,14 @@ rewrite는 리다이렉트와 달리 요청 URL을 바꾸지 않는다.
 개인 앱의 트래픽에서 함수 실행 몇 번은 무시할 수준이지만, 트래픽이 많은 서비스라면 정적 자산만이라도 CDN에 두는 쪽이 맞다.
 
 함수 실행이 잦아지는 비용은 캐시 헤더로 줄인다.
-아래 코드는 embed된 정적 자산을 라우트로 등록하면서, 응답마다 한 시간짜리 캐시 지시를 붙이는 부분이다.
+아래 코드는 embed된 정적 자산을 라우트로 등록하면서, 응답마다 캐시 지시를 붙이는 부분이다.
 
 `internal/web/web.go` (registerStatic 발췌):
 
 ```go
-// registerStatic serves the embedded assets. Everything is fingerprint-free,
-// so cache briefly; the service worker adds stale-while-revalidate on top.
+// registerStatic serves the embedded assets. Filenames carry no hash, so a URL
+// is only immutable when the template stamped ?v=<assetVersion> on it; bare
+// URLs get a short TTL. The service worker adds stale-while-revalidate on top.
 func (w *Web) registerStatic(r *gin.Engine) {
 	static, err := fs.Sub(staticFS, "static")
 	if err != nil {
@@ -391,7 +392,11 @@ func (w *Web) registerStatic(r *gin.Engine) {
 	server := http.FileServer(http.FS(static))
 	// ...
 	r.GET("/static/*filepath", func(c *gin.Context) {
-		c.Header("Cache-Control", "public, max-age=3600")
+		if c.Query("v") == assetVersion() {
+			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			c.Header("Cache-Control", "public, max-age=3600")
+		}
 		c.Request.URL.Path = "/" + strings.TrimPrefix(c.Param("filepath"), "/")
 		server.ServeHTTP(c.Writer, c.Request)
 	})
@@ -401,7 +406,13 @@ func (w *Web) registerStatic(r *gin.Engine) {
 
 `Cache-Control: public, max-age=3600`은 브라우저에게 이 응답을 한 시간 동안 다시 묻지 말고 재사용하라는 지시다.
 같은 사용자가 페이지를 오가는 동안 CSS와 자바스크립트 요청은 브라우저 캐시에서 해결되고, 함수까지 오는 정적 자산 요청은 사용자당 한 시간에 한 번꼴로 줄어든다.
-주석에 적힌 대로 파일 이름에 지문(fingerprint, 내용이 바뀔 때마다 이름에 붙는 해시)이 없어서 캐시를 하루 이상으로 길게 잡지는 않았고, 19장에서 볼 서비스 워커가 그 위에 한 겹의 캐시를 더 얹는다.
+
+한 시간과 1년 중 어느 쪽을 줄지는 지문(fingerprint, 내용이 바뀔 때마다 붙는 해시)이 있는지로 정한다.
+이 앱의 파일 이름은 `app.css`처럼 고정이라 이름만으로는 내용이 바뀌었는지 알 수 없다.
+그래서 템플릿이 자산 주소 끝에 내용 해시를 `?v=`로 붙여 주고, 그 지문이 맞는 요청에만 1년짜리 `immutable`을 준다.
+지문이 붙은 주소의 응답은 영원히 같은 내용이므로 다시 물을 이유가 없다.
+지문을 만드는 코드와, 이 장치가 없을 때 어떤 사고가 나는지는 19장에서 다룬다.
+19장에서 볼 서비스 워커는 이 위에 한 겹의 캐시를 더 얹는다.
 
 ## Vercel Go 함수의 제약과 대응
 

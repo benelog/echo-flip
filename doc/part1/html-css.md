@@ -34,9 +34,9 @@ HTML 문서에는 정해진 뼈대가 있다.
   <title>{{.Title}}</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <!-- ... 아이콘 링크 생략 ... -->
-  <link rel="stylesheet" href="/static/app.css">
-  <script src="/static/htmx.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <link rel="stylesheet" href="{{asset "/static/app.css"}}">
+  <script src="{{asset "/static/htmx.min.js"}}" defer></script>
+  <script src="{{asset "/static/app.js"}}" defer></script>
 </head>
 <body>
 <!-- ... 본문은 다음 절에서 ... -->

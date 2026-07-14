@@ -411,7 +411,7 @@ func (w *Web) registerStatic(r *gin.Engine) {
 	server := http.FileServer(http.FS(static))
 	// ...
 	r.GET("/static/*filepath", func(c *gin.Context) {
-		c.Header("Cache-Control", "public, max-age=3600")
+		// ... 캐시 헤더는 16장에서 본다 ...
 		c.Request.URL.Path = "/" + strings.TrimPrefix(c.Param("filepath"), "/")
 		server.ServeHTTP(c.Writer, c.Request)
 	})
