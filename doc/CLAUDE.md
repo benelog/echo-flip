@@ -52,6 +52,7 @@
 | 20 | 무료 티어 운영과 한도 관리 | `part2/free-tier.md` |
 | 21 | 다음 단계: 여기서 더 공부할 것들 | `part2/whats-next.md` |
 | 부록 A | 개발 도구 설치 | `appendix/setup.md` |
+| 부록 B | 배포 준비: 대시보드 설정 | `appendix/deploy.md` |
 
 기술 장에는 "에이전트 활용 아이디어" 절을 둔다.
 장을 늘리거나 줄이면 상호 참조·사이드바(`.vitepress/config.ts`)·PDF 차례(`scripts/export-pdf.mjs`)·`config.ts`의 description을 함께 맞춘다.
@@ -118,6 +119,16 @@
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.
 - 재촬영 절차는 `doc/scripts/capture-screenshots.mjs`로 자동화되어 있다(별도 프로필 Chrome에 수동 로그인 → CDP 연결 촬영 → ImageMagick 합성. 사용법은 스크립트 머리 주석).
 - 현재 실린 그림: 그림 1 덱 상세, 그림 2 학습 3단계, 그림 3 홈·복습 큐, 그림 4 통계·공유 (모두 intro).
+
+### 대시보드 캡처(부록 B)
+
+부록 B는 앱이 아니라 Supabase·Google·Vercel 대시보드 화면을 싣는다. 앱 캡처와 규칙이 조금 다르다.
+
+- 데스크톱 화면이라 가로가 넓다. `fc-shots single`(휴대폰용 좁은 폭)이 아니라 기본 `fc-shots`를 쓴다(폭이 본문 단을 그대로 채운다).
+- 저자 본인의 프로젝트 식별자(Supabase project ref, Google client ID, 조직·프로젝트 이름, Vercel slug)는 화면에 그대로 싣기로 했다. 공개 OAuth 흐름에 드러나는 값이라 비밀이 아니다. 단 연결 문자열·anon key·client secret이 보이는 화면은 찍지 않는다.
+- 재촬영 절차는 `doc/scripts/capture-dashboards.mjs`(세 대시보드에 로그인한 디버그 포트 Chrome에 CDP로 연결해 촬영). 사용법은 스크립트 머리 주석.
+- 그림 5~9: 그림 5 Google 클라이언트, 그림 6 Supabase 프로바이더, 그림 7 Supabase URL Configuration, 그림 8 Vercel Environments, 그림 9 Vercel 환경 변수.
+- `public/screenshots/dash-*.png`는 실제 캡처 전까지 "[캡처 예정]" 자리표시 이미지다. 실촬영본으로 교체하기 전에는 `doc/**`를 push하지 않는다(GitHub Pages로 바로 배포되기 때문).
 
 ## 문체 가이드
 
