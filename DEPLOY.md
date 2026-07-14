@@ -27,32 +27,47 @@ Supabase Table Editor에 `profiles, decks, cards, card_srs, study_sessions, revi
 
 ## 3. OAuth 앱 등록 ✋
 
+> 대시보드 메뉴 이름은 자주 바뀝니다. 책 부록 B("배포 준비: 대시보드 설정")에 화면 캡처와 함께 정리해 두었으니,
+> 아래 경로가 화면과 다르면 부록 B를 참고하세요. 여기서는 무엇을 어디에 등록하는지를 기준으로 적습니다.
+
+로그인은 세 관문을 지납니다. 세 곳의 설정이 모두 있어야 로그인이 완성됩니다(원리는 책 17장, 실제 장애 기록은 [fix-auth.md](./fix-auth.md)).
+① 앱 → Supabase가 프로바이더를 켜 두어야 하고, ② Supabase → OAuth 프로바이더가 Supabase 콜백을 승인해야 하며, ③ OAuth 프로바이더 → 앱이 Supabase의 Redirect URLs에 있어야 합니다.
+
 **Google** — https://console.cloud.google.com
-1. 프로젝트 생성 → APIs & Services → OAuth consent screen 설정 (External, 앱 이름 flashcard)
-2. Credentials → Create Credentials → OAuth client ID → Web application
-3. Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback`
-4. Client ID/Secret을 Supabase → Authentication → Sign In / Providers → Google에 입력하고 Enable
+
+옛 "APIs & Services → OAuth consent screen / Credentials" 메뉴는 이제 **Google 인증 플랫폼(Google Auth Platform)** 아래로 재편됐습니다(왼쪽 메뉴: 개요·브랜딩·대상·클라이언트).
+
+1. Google 인증 플랫폼 → **브랜딩(OAuth consent screen에 해당)**: User Type을 External, 앱 이름 지정
+2. Google 인증 플랫폼 → **클라이언트 → 클라이언트 만들기 → 애플리케이션 유형: 웹 애플리케이션**
+3. **승인된 리디렉션 URI(Authorized redirect URIs)**: `https://<project-ref>.supabase.co/auth/v1/callback`
+   (앱 주소가 아니라 **Supabase 주소**입니다. 앱의 `/auth/callback`은 Google이 아니라 Supabase가 호출하는 두 번째 홉이라 여기 넣지 않습니다.)
+4. Client ID/Secret을 Supabase → Authentication → **Sign In / Providers → Google**에 입력하고 Enable
+   (저장 반영에 몇 분 걸릴 수 있습니다.)
 
 **GitHub** — https://github.com/settings/developers
-1. New OAuth App, Authorization callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`
-2. Client ID/Secret을 Supabase → Providers → GitHub에 입력하고 Enable
+1. New OAuth App, **Authorization callback URL**: `https://<project-ref>.supabase.co/auth/v1/callback`
+2. Client ID/Secret을 Supabase → **Sign In / Providers → GitHub**에 입력하고 Enable
 
-**개발용 Supabase 프로젝트에도 같은 OAuth 앱 연결** — 앱을 새로 만들 필요는 없습니다.
-1. Google OAuth 클라이언트의 Authorized redirect URI와 GitHub OAuth App의 callback URL에
-   개발 프로젝트 주소 `https://<dev-project-ref>.supabase.co/auth/v1/callback`을 **추가**
-2. 같은 Client ID/Secret을 개발 프로젝트의 Providers에도 입력하고 Enable
+**개발용 Supabase 프로젝트는 OAuth 클라이언트를 분리하는 편을 권합니다.**
+한 클라이언트에 dev 콜백을 추가해 재사용해도 동작하지만(그 경우 Google 클라이언트의 승인된 리디렉션 URI와 GitHub OAuth App의 callback URL에
+`https://<dev-project-ref>.supabase.co/auth/v1/callback`을 **추가**), dev와 운영이 같은 client_id/secret을 공유하게 됩니다.
+프로젝트별로 클라이언트를 따로 만들면 dev용 값을 개발 Supabase 프로젝트의 Providers에만 넣어 두 환경이 완전히 분리됩니다.
 
-**Redirect URL 등록** — Supabase → Authentication → URL Configuration
+**Redirect URL 등록** — Supabase → Authentication → **URL Configuration**
+
+화면에는 **Site URL** 칸과 **Redirect URLs** 칸이 있습니다("Additional Redirect URLs"는 옛 이름입니다).
+Site URL은 "허용 목록에 맞는 게 없을 때의 기본 리다이렉트"이자 폴백입니다. Redirect URLs에 없는 주소로 돌아오면 GoTrue가 **에러 없이 Site URL로 대신 보냅니다**.
+그래서 이 값이 개발용 `localhost`로 남아 있으면, 배포에서 로그인한 사용자가 로그인 끝에 `localhost`로 튕깁니다(실제 사례는 fix-auth.md).
 
 운영 프로젝트:
-- Site URL: `https://<앱>.vercel.app` (배포 후 실제 URL로)
-- Additional Redirect URLs: `https://<앱>.vercel.app/auth/callback`
+- Site URL: `https://<앱>.vercel.app` (배포 후 실제 URL로. 커스텀 도메인이 있으면 그 주소로)
+- Redirect URLs: `https://<앱>.vercel.app/auth/callback`
 
 개발 프로젝트:
-- Site URL: `https://<앱>-git-main-<계정>.vercel.app` (main 브랜치 Preview의 **고정 alias**.
-  배포마다 바뀌는 고유 URL이 아니라 이 alias를 등록해야 합니다.)
-- Additional Redirect URLs: `https://<앱>-git-main-<계정>.vercel.app/auth/callback`,
-  `http://localhost:8080/auth/callback` (로컬에서 개발 DB에 붙을 때)
+- Site URL: `https://<앱>-git-main-<계정>.vercel.app` 또는 Preview의 고정 도메인(`flashcard-dev.vercel.app` 같은
+  대표 별칭). 배포마다 바뀌는 고유 URL이 아니라 고정 주소를 등록해야 합니다.
+- Redirect URLs: 위 고정 주소의 `/auth/callback`, 그리고 `http://localhost:8080/auth/callback` (로컬에서 개발 DB에 붙을 때)
+- 주의: 기존 항목을 편집할 때 값 중간에 새 URL을 붙여넣어 두 주소가 뭉개지지 않게 합니다. 한 항목에 하나의 완전한 URL만 넣습니다.
 
 ## 4. 로컬에서 확인
 
@@ -103,8 +118,9 @@ GitHub Actions 러너는 IPv4라, Supabase의 IPv6 전용 direct 호스트(`db.<
 
 1. https://vercel.com → Add New Project → flashcard 저장소 import (Root Directory는 저장소 루트 그대로.
    Framework Preset은 `vercel.json`의 `"framework": null`이 덮어쓰므로 무엇으로 감지되든 상관없음)
-2. Settings → Environments → Production의 Branch Tracking에서 **Production Branch**를 `main`에서 `release`로 변경
-   (이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)
+2. **Settings → Environments → Production**을 열고, Branch Tracking의 **Branch is** 값을 `main`에서 `release`로 변경
+   (Environments 목록 화면에서 Production·Preview·Development 세 환경의 브랜치와 도메인을 한눈에 확인할 수 있습니다.
+   이후 release 푸시/병합 = 운영 배포, main 푸시 = Preview 배포 = 개발 확인용 고유 URL)
 3. Environment Variables 등록 — 스코프를 나눠 **Production에는 운영 Supabase 프로젝트 값, Preview에는 개발 프로젝트 값**을 넣습니다 (분리 이유는 책 18장):
    | 이름 | 값 |
    |---|---|
@@ -112,6 +128,7 @@ GitHub Actions 러너는 IPv4라, Supabase의 IPv6 전용 direct 호스트(`db.<
    | `SUPABASE_URL` | `https://<ref>.supabase.co` |
    | `SUPABASE_ANON_KEY` | anon key |
 4. 환경 변수는 **다음 배포부터** 적용됩니다. 값을 바꿨다면 main에 푸시하거나 대시보드에서 Redeploy 하세요.
+   환경 변수는 이 화면(각 환경 상세)의 **Environment Variables** 구역에서 스코프별로 넣거나, 왼쪽 메뉴 **Environment Variables**에서 한꺼번에 관리합니다.
 5. `git push origin release`(또는 main→release 병합)로 운영 배포 → 발급된 URL을 Supabase URL Configuration(3단계)에 반영
 6. 개발 환경 분리 확인: main Preview URL에서 로그인·덱 생성 후, 데이터가 **개발** 프로젝트 Table Editor에만 쌓이고 운영 프로젝트에는 없는지 확인
 
@@ -125,11 +142,13 @@ GitHub Actions 러너는 IPv4라, Supabase의 IPv6 전용 direct 호스트(`db.<
 ## 문제 해결
 
 - **빌드가 `next build`를 실행하다 "Couldn't find any pages or app directory"로 실패**: 저장소가 Next.js였던 시절 import되어 Framework Preset에 Next.js가 남아 있는 경우. `vercel.json`의 `"framework": null`이 프리셋을 덮어쓰므로, 이 설정이 포함된 커밋을 다시 배포하면 된다.
-- **로그인 후 다시 로그인 페이지로**: Supabase URL Configuration의 Redirect URL에 배포 URL의 `/auth/callback`이 없는 경우. 또는 PKCE 쿠키(`fc_pkce`, 300초) 만료 — 로그인 화면에서 5분 이상 지체하면 실패합니다.
+- **로그인 후 다시 로그인 페이지로, 또는 로그인 끝에 `localhost`로 튕김**: Supabase URL Configuration의 Redirect URLs에 배포 URL의 `/auth/callback`이 없어 GoTrue가 Site URL로 폴백한 경우입니다. Redirect URLs와 Site URL을 함께 확인하세요. 또는 PKCE 쿠키(`fc_pkce`, 300초) 만료입니다(로그인 화면에서 5분 이상 지체하면 실패).
+- **`provider is not enabled`(400)로 로그인 실패**: 그 Supabase 프로젝트에서 해당 프로바이더가 꺼져 있습니다. Sign In / Providers에서 Enable하세요. 개발 프로젝트를 새로 만들면 프로바이더 설정이 프로젝트마다 따로라 흔히 빠집니다.
+- **Google/GitHub 화면에서 `redirect_uri_mismatch`**: OAuth 클라이언트에 그 Supabase 프로젝트의 콜백(`https://<project-ref>.supabase.co/auth/v1/callback`)이 등록되지 않았습니다. 앱 주소가 아니라 Supabase 주소를 등록해야 합니다.
 - **로그인이 실패하고 Vercel Logs에 `net/http: invalid header field value`**: 환경 변수 값에 개행·제어 문자가 섞인 경우입니다(긴 키를 복사할 때 흔합니다). 대시보드에서 값을 한 줄로 다시 입력하세요. 실제 사고 기록은 [fix-auth.md](./fix-auth.md) 참고.
 - **서버가 500 "jwks unavailable"**: `SUPABASE_URL` 오타(JWKS URL은 여기서 유도). 구형 프로젝트(HS256)라면 대신 `SUPABASE_JWT_SECRET`(Settings → API → JWT Secret)을 설정해도 됩니다.
 - **첫 요청이 느림**: 서버리스 콜드스타트 + JWKS 첫 조회. 이후 요청은 빠릅니다.
 - **DB 연결 오류 "prepared statement"**: `DATABASE_URL`이 direct(5432)로 되어 있는 경우 transaction pooler(6543)로 교체.
 - **오랜만에 Preview를 열었더니 DB 연결 실패**: Supabase 무료 프로젝트는 7일간 미사용 시 자동 정지됩니다.
   대시보드에서 개발 프로젝트를 Restore(unpause)하면 됩니다. 정지된 프로젝트는 무료 2개 한도에 포함되지 않습니다.
-- **Preview URL이 Vercel 로그인을 요구**: Settings → Deployment Protection에서 Preview 보호 설정을 확인하세요.
+- **Preview URL이 Vercel 로그인을 요구(로그인 시도가 `vercel.com/sso-api`로 가로채짐)**: Settings → **Deployment Protection → Vercel Authentication**의 **Require Log In**을 끄세요(Hobby 플랜에서 가능). 이게 켜져 있으면 OAuth 왕복이 앱에 닿기도 전에 막힙니다.
