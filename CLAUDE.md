@@ -23,8 +23,8 @@ DB는 환경마다 완전히 분리되어 있다.
 | production | release 병합 → Vercel **Production** | 운영 Supabase 프로젝트 | GitHub/Google |
 
 - `./run_dev.sh`: local에서 **dev DB**에 붙어 서버를 띄운다(GitHub/Google 로그인 포함). 값은 `.env.dev`에서 읽는다(`.env.dev.example` 참고).
-- 개발 환경 값의 단일 출처는 `.env.dev` 하나다. `.envrc`는 `dotenv .env.dev` 한 줄이라 direnv 사용자는 셸에도 같은 값이 올라온다. **운영 값은 로컬에 두지 않는다**(운영 반영은 release 병합 시 GitHub Actions가 한다).
-- 환경 구분은 `internal/config`가 `DATABASE_URL` 유무로 한다(있으면 postgres+supabase, 없으면 sqlite+local). 그래서 `run_local.sh`는 `env -u DATABASE_URL`로 실행한다. direnv로 dev 값이 셸에 올라와 있어도 로컬 모드가 SQLite로 뜨게 하기 위함이다.
+- 개발 환경 값의 단일 출처는 `.env.dev` 하나다. 이 파일을 읽는 곳은 `run_dev.sh`와 `migrate_dev.sh` 둘뿐이고, 값을 셸에 상주시키는 도구(direnv 등)는 쓰지 않는다. 일회성 명령에 값이 필요하면 그 셸에서 `set -a; source .env.dev; set +a`로 읽어 온다. **운영 값은 로컬에 두지 않는다**(운영 반영은 release 병합 시 GitHub Actions가 한다).
+- 환경 구분은 `internal/config`가 `DATABASE_URL` 유무로 한다(있으면 postgres+supabase, 없으면 sqlite+local). 그래서 `run_local.sh`는 `env -u DATABASE_URL`로 실행한다. 어떤 이유로든 dev 값이 셸에 올라와 있어도 로컬 모드가 SQLite로 뜨게 하기 위함이다.
 
 ## 스키마 관리
 

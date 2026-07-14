@@ -6,9 +6,6 @@
 .env*
 !.env.dev.example
 
-# direnv
-.envrc
-
 # go
 /bin/
 

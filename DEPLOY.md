@@ -63,8 +63,15 @@ Supabase Table Editor에 `profiles, decks, cards, card_srs, study_sessions, revi
 ./migrate_dev.sh      # (필요시) 개발 DB에 마이그레이션 적용
 ```
 
-direnv를 쓴다면 `.envrc`에 `dotenv .env.dev` 한 줄을 두고 `direnv allow` 하면 셸에도 같은 값이 올라온다.
-`run_local.sh`는 `DATABASE_URL`을 지우고 실행하므로, 그 상태에서도 로컬 모드는 SQLite로 뜬다.
+`.env.dev`를 읽는 곳은 이 두 스크립트뿐이다. 값을 셸에 상주시키는 도구(direnv 등)는 쓰지 않는다.
+`psql`처럼 일회성 명령에 값이 필요하면 그 셸에서 한 번만 읽어 온다:
+
+```bash
+set -a; source .env.dev; set +a
+psql "$MIGRATE_DATABASE_URL"
+```
+
+`run_local.sh`는 `DATABASE_URL`을 지우고(`env -u`) 실행하므로, 그 상태에서도 로컬 모드는 SQLite로 뜬다.
 
 - http://localhost:8080 → Google/GitHub 로그인 왕복 확인
 - 덱 만들기 → 카드 추가("사전에서 채우기" 시험) → 학습(일부러 틀려서 재도전 라운드 확인)
