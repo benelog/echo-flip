@@ -258,7 +258,14 @@ func (s *Store) CardsByRule(ctx context.Context, userID uuid.UUID, rule smartrul
 		return []Card{}, nil
 	}
 
-	rows, err = s.pool.Query(ctx, cardSelect+` where user_id = $1 and id = any($2)`, userID, ids)
+	// Pass ids as text and cast to uuid[]: the pool runs the simple protocol
+	// (Supabase's transaction pooler), where pgx has no text encoder for a
+	// []uuid.UUID slice against an unknown parameter type. []string does.
+	strIDs := make([]string, len(ids))
+	for i, id := range ids {
+		strIDs[i] = id.String()
+	}
+	rows, err = s.pool.Query(ctx, cardSelect+` where user_id = $1 and id = any($2::uuid[])`, userID, strIDs)
 	if err != nil {
 		return nil, err
 	}
