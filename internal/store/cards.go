@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/benelog/flashcard/internal/smartrules"
 )
@@ -258,14 +259,15 @@ func (s *Store) CardsByRule(ctx context.Context, userID uuid.UUID, rule smartrul
 		return []Card{}, nil
 	}
 
-	// Pass ids as text and cast to uuid[]: the pool runs the simple protocol
-	// (Supabase's transaction pooler), where pgx has no text encoder for a
-	// []uuid.UUID slice against an unknown parameter type. []string does.
-	strIDs := make([]string, len(ids))
+	// Pass ids as pgtype.UUID: the pool runs the simple protocol (Supabase's
+	// transaction pooler), where pgx has no text encoder for a []uuid.UUID
+	// slice against an unknown parameter type. pgtype.UUID is pgx's native
+	// uuid type, so it encodes itself and no ::uuid[] cast is needed.
+	pgIDs := make([]pgtype.UUID, len(ids))
 	for i, id := range ids {
-		strIDs[i] = id.String()
+		pgIDs[i] = pgtype.UUID{Bytes: id, Valid: true}
 	}
-	rows, err = s.pool.Query(ctx, cardSelect+` where user_id = $1 and id = any($2::uuid[])`, userID, strIDs)
+	rows, err = s.pool.Query(ctx, cardSelect+` where user_id = $1 and id = any($2)`, userID, pgIDs)
 	if err != nil {
 		return nil, err
 	}
