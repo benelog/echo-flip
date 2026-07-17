@@ -677,27 +677,15 @@
   overflow: hidden;
   text-decoration: none !important;
   box-shadow:
-    inset 7px 0 #e64c3c,
+    inset 7px 0 #16a6a1,
     0 18px 36px -14px rgba(29, 35, 45, 0.42);
   transition: translate 0.25s, box-shadow 0.25s;
-}
-
-/* 인쇄물의 재단 밖으로 이어지는 컬러 블록 */
-.fc-book::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 88px;
-  height: 14px;
-  background: #16a6a1;
-  pointer-events: none;
 }
 
 .fc-book:hover {
   translate: 0 -6px;
   box-shadow:
-    inset 7px 0 #e64c3c,
+    inset 7px 0 #16a6a1,
     0 28px 48px -14px rgba(29, 35, 45, 0.5);
 }
 
@@ -750,112 +738,51 @@
 
 .fc-book-subtitle {
   margin: 12px 0 0;
-  font-size: 13px;
-  line-height: 1.65;
+  font-family: var(--fc-font-serif);
+  font-size: 13.5px;
+  line-height: 1.7;
   font-weight: 600;
-  color: #4b5360;
+  color: #454d58;
   word-break: keep-all;
 }
 
-/* 에이전트에서 웹까지 이어지는 기술 흐름을 작은 시스템 도식으로 표현한다 */
+/* 앱을 이루는 세 층(화면·서버·데이터)을 정돈된 계층 도식으로 표현한다 */
 .fc-book-diagram {
-  position: relative;
-  height: 116px;
-  margin: 14px -32px 0 20px;
+  margin: 18px 6px 0 0;
   flex: none;
 }
 
-.fc-diagram-browser {
-  position: absolute;
-  inset: 4px 50px 4px 0;
+.fc-layer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 14px;
   border: 2px solid #151a22;
   background: #fff;
-  box-shadow: 7px 7px 0 #16a6a1;
+  box-shadow: 5px 5px 0 #d8e9e7;
 }
 
-.fc-diagram-bar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 19px;
-  padding: 0 7px;
-  border-bottom: 2px solid #151a22;
-  background: #e8eaeb;
+.fc-layer-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #151a22;
 }
 
-.fc-diagram-bar i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #151a22;
-}
-
-.fc-diagram-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 13px 8px 6px;
-}
-
-.fc-diagram-flow span {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 28px;
-  border: 2px solid #151a22;
+.fc-layer-tech {
   font-size: 10px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0e7d78;
 }
 
-.fc-diagram-flow .agent { background: #f2cf35; }
-.fc-diagram-flow .go { background: #7fd1ca; }
-.fc-diagram-flow .web { background: #f07c6d; }
-
-.fc-diagram-flow > i {
-  width: 11px;
-  height: 2px;
+.fc-layer-link {
+  display: block;
+  width: 2px;
+  height: 9px;
+  margin: 0 auto;
   background: #151a22;
-}
-
-.fc-diagram-lines {
-  display: grid;
-  gap: 4px;
-  padding: 0 14px;
-}
-
-.fc-diagram-lines i {
-  height: 3px;
-  background: #d6d9dc;
-}
-
-.fc-diagram-lines i:nth-child(2) { width: 74%; }
-.fc-diagram-lines i:nth-child(3) { width: 88%; }
-
-.fc-diagram-card {
-  position: absolute;
-  right: 8px;
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 39px;
-  border: 2px solid #151a22;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.fc-diagram-card.front {
-  top: 13px;
-  background: #f2cf35;
-  rotate: 7deg;
-}
-
-.fc-diagram-card.back {
-  top: 61px;
-  right: 25px;
-  background: #e64c3c;
-  color: #fff;
-  rotate: -7deg;
 }
 
 .fc-book-pitch {
@@ -875,13 +802,13 @@
   width: 5px;
   height: 5px;
   margin: 0 7px 1px 0;
-  background: #e64c3c;
+  background: #16a6a1;
 }
 
 .fc-book-footer {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: auto 0 0;
   padding-top: 10px;
   border-top: 1px solid #aeb3b7;
@@ -967,35 +894,17 @@
   }
 
   .fc-book-diagram {
-    height: 100px;
-    margin: 10px -27px 0 14px;
+    margin: 13px 5px 0 0;
   }
 
-  .fc-diagram-browser {
-    inset: 2px 46px 2px 0;
+  .fc-layer {
+    height: 26px;
+    padding: 0 11px;
+    box-shadow: 4px 4px 0 #d8e9e7;
   }
 
-  .fc-diagram-flow {
-    gap: 4px;
-    padding-top: 10px;
-  }
-
-  .fc-diagram-flow span {
-    width: 36px;
-    height: 25px;
-  }
-
-  .fc-diagram-flow > i {
-    width: 7px;
-  }
-
-  .fc-diagram-card {
-    width: 49px;
-    height: 34px;
-  }
-
-  .fc-diagram-card.back {
-    top: 55px;
+  .fc-layer-link {
+    height: 7px;
   }
 
   .fc-book-pitch {

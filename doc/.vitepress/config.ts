@@ -2,9 +2,9 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   lang: 'ko-KR',
-  title: '월 0원으로 운영하는 나만의 웹 앱',
+  title: '이해하며 만드는 나만의 웹 앱',
   description:
-    'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
+    'AI에게 지시해 쉬운 프로그래밍 언어로 만들고, 개념을 익혀 오래 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
   base: '/flashcard/',
   srcExclude: ['CLAUDE.md'],
   cleanUrls: true,

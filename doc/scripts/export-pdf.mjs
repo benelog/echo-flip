@@ -14,8 +14,8 @@ const docRoot = fileURLToPath(new URL('..', import.meta.url))
 const dist = join(docRoot, '.vitepress/dist')
 const BASE = '/flashcard/'
 
-const TITLE = '월 0원으로 운영하는 나만의 웹 앱'
-const SUBTITLE = 'AI에게 지시해 Go로 만들고, 무료 한도 안에서 운영한다'
+const TITLE = '이해하며 만드는 나만의 웹 앱'
+const SUBTITLE = 'AI에게 지시해 쉬운 프로그래밍 언어로 만들고, 개념을 익혀 오래 운영한다'
 const AUTHOR = '정상혁'
 const SITE = 'benelog.github.io/flashcard'
 
@@ -64,55 +64,41 @@ function coverHtml() {
       background: #f7f5ef; color: #151a22; font-family: 'Noto Sans KR', sans-serif;
       display: flex; flex-direction: column;
     }
-    .spine { position: absolute; inset: 0 auto 0 0; width: 4mm; background: #e64c3c; }
-    .accent { position: absolute; top: 0; right: 0; width: 45mm; height: 7mm; background: #16a6a1; }
+    .spine { position: absolute; inset: 0 auto 0 0; width: 4mm; background: #16a6a1; }
     .kicker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9mm; padding-bottom: 4mm; border-bottom: 0.8mm solid #151a22; font-size: 9pt; font-weight: 700; color: #38404c; }
     .kicker b { display: grid; place-items: center; width: 10mm; height: 10mm; background: #151a22; color: #fff; font-size: 9pt; }
     h1 { font-size: 36pt; line-height: 1.2; font-weight: 700; margin: 0; word-break: keep-all; }
-    h1 .small { font-size: 20pt; font-weight: 600; }
-    h1 .zero { display: inline-block; padding: 0 3mm 1.5mm; background: #f2cf35; font-size: 41pt; line-height: 1; }
-    .subtitle { margin: 6mm 0 0; font-size: 14pt; font-weight: 600; color: #4b5360; line-height: 1.7; word-break: keep-all; }
-    .diagram { position: relative; flex: none; height: 72mm; margin: 8mm -19mm 0 9mm; }
-    .browser { position: absolute; inset: 2mm 26mm 2mm 0; border: 0.8mm solid #151a22; background: #fff; box-shadow: 4mm 4mm 0 #16a6a1; }
-    .bar { display: flex; align-items: center; gap: 1.8mm; box-sizing: border-box; height: 9mm; padding: 0 4mm; border-bottom: 0.8mm solid #151a22; background: #e8eaeb; }
-    .bar i { width: 2mm; height: 2mm; border-radius: 50%; background: #151a22; }
-    .flow { display: flex; align-items: center; justify-content: center; gap: 4mm; padding: 11mm 5mm 5mm; }
-    .flow span { display: grid; place-items: center; width: 24mm; height: 14mm; border: 0.8mm solid #151a22; font-size: 10pt; font-weight: 700; }
-    .flow .agent { background: #f2cf35; } .flow .go { background: #7fd1ca; } .flow .web { background: #f07c6d; }
-    .flow > i { width: 7mm; height: 0.8mm; background: #151a22; }
-    .lines { display: grid; gap: 2mm; padding: 0 9mm; }
-    .lines i { height: 1.2mm; background: #d6d9dc; }
-    .lines i:nth-child(2) { width: 74%; } .lines i:nth-child(3) { width: 88%; }
-    .card { position: absolute; right: 4mm; display: grid; place-items: center; width: 29mm; height: 20mm; border: 0.8mm solid #151a22; font-size: 18pt; font-weight: 700; }
-    .card.front { top: 8mm; background: #f2cf35; transform: rotate(7deg); }
-    .card.back { top: 39mm; right: 13mm; background: #e64c3c; color: #fff; transform: rotate(-7deg); }
-    .pitch { margin: 7mm 0 0; padding: 0; list-style: none; font-size: 10.5pt; line-height: 1.9; font-weight: 600; color: #48505b; word-break: keep-all; }
-    .pitch li::before { content: ''; display: inline-block; width: 2mm; height: 2mm; margin: 0 3mm 0.4mm 0; background: #e64c3c; }
-    .bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; padding-top: 5mm; border-top: 0.3mm solid #aeb3b7; }
-    .stack { font-size: 9pt; font-weight: 700; color: #5a616b; }
+    h1 .hl { display: inline-block; padding: 0 3mm 1.5mm; background: #f2cf35; font-size: 41pt; line-height: 1; }
+    .subtitle { margin: 7mm 0 0; font-family: 'Noto Serif KR', serif; font-size: 14pt; font-weight: 600; color: #454d58; line-height: 1.75; word-break: keep-all; }
+    .diagram { flex: none; width: 128mm; margin: 12mm 0 0; }
+    .layer { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; height: 15mm; padding: 0 7mm; border: 0.7mm solid #151a22; background: #fff; box-shadow: 2.5mm 2.5mm 0 #d8e9e7; }
+    .layer .name { font-size: 12pt; font-weight: 700; }
+    .layer .tech { font-size: 10pt; font-weight: 700; letter-spacing: 0.3mm; color: #0e7d78; }
+    .link { width: 0.7mm; height: 5mm; margin: 0 auto; background: #151a22; }
+    .pitch { margin: 9mm 0 0; padding: 0; list-style: none; font-size: 10.5pt; line-height: 1.9; font-weight: 600; color: #48505b; word-break: keep-all; }
+    .pitch li::before { content: ''; display: inline-block; width: 2mm; height: 2mm; margin: 0 3mm 0.4mm 0; background: #16a6a1; }
+    .bottom { display: flex; align-items: flex-end; justify-content: flex-end; margin-top: auto; padding-top: 5mm; border-top: 0.3mm solid #aeb3b7; }
     .author { font-size: 14pt; font-weight: 600; margin: 0 0 2mm; text-align: right; }
     .site { font-size: 8.5pt; color: #777e86; margin: 0; text-align: right; }
   </style></head><body>
   <div class="cover">
-    <div class="spine"></div><div class="accent"></div>
+    <div class="spine"></div>
     <div class="kicker"><span>AI와 함께 만드는 실전 개발서</span><b>01</b></div>
-    <h1><span class="small">월</span> <span class="zero">0원</span>으로<br>운영하는<br>나만의 웹 앱</h1>
+    <h1><span class="hl">이해</span>하며<br>만드는<br>나만의 웹 앱</h1>
     <p class="subtitle">${SUBTITLE}</p>
     <div class="diagram">
-      <div class="browser">
-        <div class="bar"><i></i><i></i><i></i></div>
-        <div class="flow"><span class="agent">AI</span><i></i><span class="go">Go</span><i></i><span class="web">WEB</span></div>
-        <div class="lines"><i></i><i></i><i></i></div>
-      </div>
-      <div class="card front">A</div><div class="card back">가</div>
+      <div class="layer"><span class="name">화면</span><span class="tech">HTML · CSS</span></div>
+      <div class="link"></div>
+      <div class="layer"><span class="name">서버</span><span class="tech">Go</span></div>
+      <div class="link"></div>
+      <div class="layer"><span class="name">데이터</span><span class="tech">SQL</span></div>
     </div>
     <ul class="pitch">
       <li>코드는 AI 에이전트가 쓰고, 판단은 사람이 한다</li>
-      <li>Go 하나로 화면부터 API까지, 배울 것이 적은 스택</li>
+      <li>이해할 언어는 최소화(HTML/CSS, Go, SQL)</li>
       <li>무료 티어에 유리하게 수십 MB 메모리만 사용하는 서버</li>
     </ul>
     <div class="bottom">
-      <span class="stack">GO · HTML · HTMX</span>
       <div><p class="author">${AUTHOR} 지음</p><p class="site">${SITE}</p></div>
     </div>
   </div></body></html>`
