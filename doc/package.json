@@ -7,7 +7,8 @@
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview",
-    "pdf": "node scripts/export-pdf.mjs"
+    "pdf": "node scripts/export-pdf.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "devDependencies": {
     "pdf-lib": "^1.17.1",

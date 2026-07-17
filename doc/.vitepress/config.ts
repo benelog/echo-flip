@@ -1,10 +1,14 @@
 import { defineConfig } from 'vitepress'
 
+const TITLE = '이해하며 만드는 나만의 웹 앱'
+const DESCRIPTION =
+  'AI에게 지시해 쉬운 프로그래밍 언어로 만들고, 개념을 익혀 오래 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.'
+const SITE = 'https://benelog.github.io/flashcard/'
+
 export default defineConfig({
   lang: 'ko-KR',
-  title: '이해하며 만드는 나만의 웹 앱',
-  description:
-    'AI에게 지시해 쉬운 프로그래밍 언어로 만들고, 개념을 익혀 오래 운영한다. 작은 웹 앱의 실제 코드로 Go, Gin, PostgreSQL과 HTML·htmx를 익히고 Vercel·Supabase 무료 티어로 서버 비용 없이 운영하는 과정을 배운다.',
+  title: TITLE,
+  description: DESCRIPTION,
   base: '/flashcard/',
   srcExclude: ['CLAUDE.md'],
   cleanUrls: true,
@@ -19,6 +23,15 @@ export default defineConfig({
     },
   },
   head: [
+    // 페이스북 등 SNS 공유 미리보기(Open Graph). og-image.png는 scripts/og-image.mjs가 표지에서 만든다.
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: TITLE }],
+    ['meta', { property: 'og:description', content: DESCRIPTION }],
+    ['meta', { property: 'og:image', content: `${SITE}og-image.png` }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:locale', content: 'ko_KR' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     [
