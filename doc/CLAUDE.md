@@ -53,7 +53,7 @@
 | 20 | 무료 티어 운영과 한도 관리 | `part2/free-tier.md` |
 | 21 | 다음 단계: 여기서 더 공부할 것들 | `part2/whats-next.md` |
 | 부록 A | 개발 도구 설치 | `appendix/setup.md` |
-| 부록 B | 배포 준비: Supabase·Google·Vercel 대시보드 설정 | `appendix/deploy.md` |
+| 부록 B | 배포 준비: Supabase·Google·GitHub·Vercel 설정 | `appendix/deploy.md` |
 
 기술 장에는 "에이전트 활용 아이디어" 절을 둔다.
 장을 늘리거나 줄이면 상호 참조·사이드바(`.vitepress/config.ts`)·PDF 차례(`scripts/export-pdf.mjs`)·`config.ts`의 description을 함께 맞춘다.

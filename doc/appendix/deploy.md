@@ -1,4 +1,4 @@
-# 부록 B 배포 준비: Supabase·Google·Vercel 대시보드 설정
+# 부록 B 배포 준비: Supabase·Google·GitHub·Vercel 설정
 
 이 책의 배포는 세 곳의 웹 대시보드를 오간다.
 데이터베이스와 로그인을 맡는 Supabase, 소셜 로그인을 내주는 Google과 GitHub, 그리고 앱을 실제로 띄우는 Vercel이다.
