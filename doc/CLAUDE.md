@@ -1,7 +1,7 @@
 # 책 집필 지침
 
-`doc/` 아래 원고(intro.md, part1/, part2/, appendix/)를 쓰거나 고칠 때 지키는 규칙이다.
-이 파일은 사이트 빌드에서 제외된다(`.vitepress/config.ts`의 `srcExclude`).
+`doc/` 아래 원고(intro.adoc, part1/, part2/, appendix/)를 쓰거나 고칠 때 지키는 규칙이다.
+이 파일은 사이트 빌드에 포함되지 않는다(`book.config.mjs`의 toc에 오른 원고만 빌드된다).
 
 ## 책 개요
 
@@ -14,13 +14,15 @@
 
 ## 기술 구성
 
-- SSG: **VitePress**. 소스는 `doc/`에 있고 독립 `package.json`을 가진다(앱에는 npm이 없다).
-- 로컬 확인: `cd doc && npm install && npm run dev` / 빌드 검증: `npm run build` (깨진 링크 포함 검증)
-- 테마: `.vitepress/theme/custom.css` — 본문 명조(Noto Serif KR)·제목 고딕, 행간 2.05·양쪽 정렬, 인쇄용 CSS 포함. 한글 폰트가 없는 CI 러너 대비로 웹폰트 폴백을 둔다.
-- 이북 뷰어 레이아웃: `.vitepress/theme/Layout.vue`(DefaultTheme 확장). 목차는 왼쪽 하나뿐(오른쪽 아웃라인 없음), 상단 바 "목차" 버튼으로 접기/펼치기, 본문은 회색 배경 위 페이지 카드, 상단 읽기 진행 바, 좌우 화살표와 ←/→ 키로 장 이동. 홈(`index.md`)은 `layout: page` 기반 책 표지 랜딩.
-- PDF: `npm run pdf`(`scripts/export-pdf.mjs`)가 표지·차례를 만들고 빌드 결과를 장 순서대로 인쇄해 `dist/flashcard-book.pdf` 한 권으로 병합한다. CI(`book.yml`)가 매 배포마다 재생성한다.
-- 배포: GitHub Pages (https://benelog.github.io/flashcard/). `.github/workflows/book.yml`이 `doc/**` 변경 push 시 자동 배포한다.
-- 인라인 코드의 `{{ }}`는 `config.ts`의 `markdown.config`가 `v-pre`를 붙여 Vue 보간을 막는다(Go 템플릿 표기 때문에 필수).
+- 원고는 **AsciiDoc**(.adoc)이고, 빌드 엔진은 저장소 루트의 **`book-template/`**(다른 책에도 재사용할 수 있는 npm 패키지, 추후 별도 저장소로 분리 예정)다. `book build`가 원고를 downdoc으로 마크다운으로 변환해 `.generated/`(gitignore)에 만들고 **VitePress**가 사이트로 빌드한다.
+- `doc/`은 독립 `package.json`으로 `file:../book-template`을 의존한다(앱에는 npm이 없다). npm scripts(dev/build/pdf/og)는 모두 `book` CLI를 부른다.
+- **책의 단일 설정 소스는 `doc/book.config.mjs`다.** 제목·설명·저자·배포 주소·표지 문구·장 목차(toc)가 여기 있고, 사이트 사이드바·nav·OG 메타·홈 표지·PDF 표지·차례·아웃라인이 전부 여기서 파생된다.
+- 로컬 확인: `cd book-template && npm install`(최초 한 번) 후 `cd doc && npm install && npm run dev` / 빌드 검증: `npm run build` (깨진 링크 포함 검증)
+- 테마: `book-template/theme/custom.css` — 본문 명조(Noto Serif KR)·제목 고딕, 행간 2.05·양쪽 정렬, 인쇄용 CSS 포함. 한글 폰트가 없는 CI 러너 대비로 웹폰트 폴백을 둔다.
+- 이북 뷰어 레이아웃: `book-template/theme/Layout.vue`(DefaultTheme 확장). 목차는 왼쪽 하나뿐(오른쪽 아웃라인 없음), 상단 바 "목차" 버튼으로 접기/펼치기, 본문은 회색 배경 위 페이지 카드, 상단 읽기 진행 바, 좌우 화살표와 ←/→ 키로 장 이동. 홈(책 표지 랜딩)은 `book.config.mjs`의 cover 데이터에서 생성된다(홈 원고 파일은 없다).
+- PDF: `npm run pdf`(`book-template/lib/pdf.mjs`)가 표지·차례를 만들고 빌드 결과를 장 순서대로 인쇄해 `flashcard-book.pdf` 한 권으로 병합한다. CI(`book.yml`)가 매 배포마다 재생성한다.
+- 배포: GitHub Pages (https://benelog.github.io/flashcard/). `.github/workflows/book.yml`이 `doc/**`·`book-template/**` 변경 push 시 자동 배포한다.
+- 인라인 코드의 `{{ }}`는 엔진이 `v-pre`를 붙여 Vue 보간을 막는다(Go 템플릿 표기 때문에 필수). AsciiDoc 원고에서도 일반 백틱 안에 그대로 쓴다.
 
 ## 장 구성
 
@@ -30,33 +32,47 @@
 
 | 장 | 제목 | 파일 |
 |---|---|---|
-| 도입 | 무엇을 만드는가: Flashcard의 기능 요구사항 | `intro.md` |
-| 1 | 기술 선택: 요구사항에서 아키텍처까지 | `part1/tech-choices.md` |
-| 2 | Claude Code: AI 에이전트와 개발하기 | `part1/claude-code.md` |
-| 3 | 에이전트에게 지시하기: Plan 모드 활용 | `part1/instructing.md` |
-| 4 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `part1/database-basics.md` |
-| 5 | 데이터베이스 설계: 요구사항에서 테이블로 | `part1/database.md` |
-| 6 | Go 기초: 모듈, 변수, 함수 | `part1/go-basics.md` |
-| 7 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `part1/go.md` |
-| 8 | Go 테스트와 품질 게이트: 도구, 훅, 서브에이전트 | `part1/go-testing.md` |
-| 9 | Gin으로 만드는 HTTP API | `part1/gin.md` |
-| 10 | HTML과 CSS: 화면을 이루는 문서와 스타일 | `part1/html-css.md` |
-| 11 | html/template으로 만드는 화면 | `part1/go-templates.md` |
-| 12 | htmx: 자바스크립트 없이 만드는 동적 화면 | `part1/htmx.md` |
-| 13 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `part1/local-dev.md` |
-| 14 | Git: 개념과 브랜치 정책 | `part2/git.md` |
-| 15 | GitHub Actions: 원격 품질 게이트 | `part2/github-actions.md` |
-| 16 | Vercel: 한 플랫폼에 모두 배포하기 | `part2/vercel.md` |
-| 17 | Supabase 인증: OAuth와 JWKS 검증 | `part2/supabase-auth.md` |
-| 18 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `part2/supabase-db.md` |
-| 19 | PWA: 설치되는 앱으로 만들기 | `part2/pwa.md` |
-| 20 | 무료 티어 운영과 한도 관리 | `part2/free-tier.md` |
-| 21 | 다음 단계: 여기서 더 공부할 것들 | `part2/whats-next.md` |
-| 부록 A | 개발 도구 설치 | `appendix/setup.md` |
-| 부록 B | 배포 준비: Supabase·Google·GitHub·Vercel 설정 | `appendix/deploy.md` |
+| 도입 | 무엇을 만드는가: Flashcard의 기능 요구사항 | `intro.adoc` |
+| 1 | 기술 선택: 요구사항에서 아키텍처까지 | `part1/tech-choices.adoc` |
+| 2 | Claude Code: AI 에이전트와 개발하기 | `part1/claude-code.adoc` |
+| 3 | 에이전트에게 지시하기: Plan 모드 활용 | `part1/instructing.adoc` |
+| 4 | 데이터베이스 기초: 테이블, SQL, 인덱스 | `part1/database-basics.adoc` |
+| 5 | 데이터베이스 설계: 요구사항에서 테이블로 | `part1/database.adoc` |
+| 6 | Go 기초: 모듈, 변수, 함수 | `part1/go-basics.adoc` |
+| 7 | Go 코드 읽기: 구조체, 포인터, 에러 처리 | `part1/go.adoc` |
+| 8 | Go 테스트와 품질 게이트: 도구, 훅, 서브에이전트 | `part1/go-testing.adoc` |
+| 9 | Gin으로 만드는 HTTP API | `part1/gin.adoc` |
+| 10 | HTML과 CSS: 화면을 이루는 문서와 스타일 | `part1/html-css.adoc` |
+| 11 | html/template으로 만드는 화면 | `part1/go-templates.adoc` |
+| 12 | htmx: 자바스크립트 없이 만드는 동적 화면 | `part1/htmx.adoc` |
+| 13 | 로컬 개발 환경: 내 컴퓨터에서 앱 완성하기 | `part1/local-dev.adoc` |
+| 14 | Git: 개념과 브랜치 정책 | `part2/git.adoc` |
+| 15 | GitHub Actions: 원격 품질 게이트 | `part2/github-actions.adoc` |
+| 16 | Vercel: 한 플랫폼에 모두 배포하기 | `part2/vercel.adoc` |
+| 17 | Supabase 인증: OAuth와 JWKS 검증 | `part2/supabase-auth.adoc` |
+| 18 | Supabase 데이터베이스: pgx 연결과 개발·운영 DB 분리 | `part2/supabase-db.adoc` |
+| 19 | PWA: 설치되는 앱으로 만들기 | `part2/pwa.adoc` |
+| 20 | 무료 티어 운영과 한도 관리 | `part2/free-tier.adoc` |
+| 21 | 다음 단계: 여기서 더 공부할 것들 | `part2/whats-next.adoc` |
+| 부록 A | 개발 도구 설치 | `appendix/setup.adoc` |
+| 부록 B | 배포 준비: Supabase·Google·GitHub·Vercel 설정 | `appendix/deploy.adoc` |
 
 기술 장에는 "에이전트 활용 아이디어" 절을 둔다.
-장을 늘리거나 줄이면 상호 참조·사이드바(`.vitepress/config.ts`)·PDF 차례(`scripts/export-pdf.mjs`)·`config.ts`의 description을 함께 맞춘다.
+장을 늘리거나 줄이면 상호 참조와 `book.config.mjs`의 toc·description을 함께 맞춘다(사이드바·PDF 차례·아웃라인은 toc에서 자동으로 파생된다).
+
+## AsciiDoc 표기 규약
+
+원고는 AsciiDoc으로 쓰되, downdoc 변환 파이프라인이 전제하는 아래 부분집합만 쓴다.
+
+- 파일 첫 줄은 `= 장 제목` 하나. 절은 `==`, 소절은 `===`.
+- 굵게는 `*별표 한 겹*`. 마크다운식 `**두 겹**`은 쓰지 않는다(빌드가 에러로 잡는다).
+- 목록은 `*`(비순서)와 `.`(순서). 중첩 목록은 쓰지 않는다.
+- 코드 블록은 `[source,언어]` + `----` 구분자. 코드 캡션은 블록 제목(`.제목`)이 아니라 코드 블록 앞 본문 문장으로 쓴다.
+- 표는 `|===`로 열고 닫는다. 헤더는 한 줄(`| 열1 | 열2`)로 쓰고 그 뒤에 빈 줄, 본문 행도 한 줄에 하나씩.
+- 외부 링크는 맨몸 URL 대신 `https://주소[표시 문구]` 매크로로 쓴다(맨몸 URL은 링크가 되지 않는다).
+- 백틱이 든 인라인 코드는 마크다운처럼 이중 백틱으로 감싼다: `` `json:"…"` ``(downdoc이 그대로 통과시킨다).
+- 인라인 코드의 중괄호(`{{.Title}}`, `{define "x"}`)는 일반 백틱에 그대로 쓴다. 따옴표·앰퍼샌드·코드 속 별표(`count(*)`)는 파이프라인이 자동 보호하므로 신경 쓰지 않아도 된다.
+- 금지: `+…+` 패스스루, 문서 속성 정의(`:이름:`), downdoc 내장 속성 참조(`{sp}` 등), 제어 문자. 위반은 `book build`가 파일:줄 번호와 함께 에러로 알려 준다.
 
 ## 독자 대상
 
@@ -68,8 +84,17 @@
 
 핵심 용어는 **용어 상자**로 설명한다.
 
-- 문법: VitePress 내장 `::: info` 컨테이너를 쓰고, 제목은 `[용어 풀이] 이름(영문)` 형식으로 시작한다.
-- 스타일: `custom.css`의 "용어 상자" 절에서 `.custom-block.info`를 사전 항목처럼 꾸민다(본문은 명조, 상자 안은 고딕). 인쇄·PDF에서는 배경 없이 테두리만 남는다.
+- 문법: 블록 제목을 단 NOTE admonition으로 쓴다. 제목은 `[용어 풀이] 이름(영문)` 형식이다. 빌드가 VitePress `::: info` 컨테이너로 바꾼다.
+
+  ```
+  .[용어 풀이] 이름(영문)
+  [NOTE]
+  ====
+  본문.
+  ====
+  ```
+
+- 스타일: `book-template/theme/custom.css`의 "용어 상자" 절에서 `.custom-block.info`를 사전 항목처럼 꾸민다(본문은 명조, 상자 안은 고딕). 인쇄·PDF에서는 배경 없이 테두리만 남는다.
 - 분량: 상자당 2~6문장. 한 줄 정의 + 일상적인 비유나 필요한 이유. 장당 개수 상한은 두지 않는다. 필요한 만큼 두되, 상자가 본문을 대신하지는 않게 한다.
 - 위치: 그 용어가 본문에 처음 등장하는 문단 바로 다음.
 - 대상: IT·개발 용어에만 쓴다. 학습 방법론이나 일반 개념(간격 반복, 트레이드오프 등)은 상자 대신 본문에서 풀어쓴다.
@@ -77,28 +102,28 @@
 
 | 파일 | 소유 용어 |
 |---|---|
-| `intro.md` | API, 서버, CSV |
-| `part1/tech-choices.md` | 기술 스택, 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, NoSQL과 문서형 데이터베이스, 호스팅, 무료 티어, PostgreSQL, 프런트엔드와 백엔드, 상주 서버, PWA, 서버리스, 콜드스타트, 바이너리, SPA, 아키텍처, OAuth, JWT |
-| `part1/claude-code.md` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md), 디렉터리와 프로젝트 루트, 스킬 |
-| `part1/database-basics.md` | 테이블·행·열, 정규화와 비정규화, 기본 키와 외래 키, SQL, 스키마, UUID, 제약, NULL, JSON, SQL 인젝션, 드라이버, 조인, 인증과 인가, 인덱스, 실행 계획 |
-| `part1/database.md` | 엔티티, 잠금, 뷰, 트랜잭션, 원자적, slug |
-| `part1/go-basics.md` | 모듈과 패키지, 임포트, 표준 라이브러리, 제로값, 예외, 다중 반환값과 에러 처리, 공개와 비공개 |
-| `part1/go.md` | 구조체, 생성자, 순수 함수, 에러 래핑과 센티널 에러, 포인터, 메서드와 리시버, 구조체 태그, 슬라이스와 맵, 직렬화와 역직렬화 |
-| `part1/go-testing.md` | 플래그, 테이블 주도 테스트, 경쟁 상태, 픽스처, 포매터와 정적 분석, 품질 게이트, 셸과 셸 스크립트, 훅(Claude Code), 표준 입출력과 표준 에러, 종료 코드, 서브에이전트, 프런트매터 (세로 정렬은 상자 없이 본문 절로 다룬다) |
-| `part1/gin.md` | HTTP 요청과 응답, 인터페이스, 프로세스, 패닉, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 경로/쿼리 파라미터, 미들웨어, CORS, 팩토리 함수와 클로저, 의존성 주입, 모의 객체 |
-| `part1/html-css.md` | 화면 낭독기, HTML 태그와 요소, 시맨틱 마크업, class와 id, 요소의 가족 관계, 폼, CSS 변수(커스텀 프로퍼티), rem, 상태(state), CSS 선택자, 박스 모델, 플렉스박스와 그리드, 미디어 쿼리 |
-| `part1/go-templates.md` | 템플릿 엔진, 파싱, SVG와 인라인, 이스케이프와 XSS, embed(Go), PRG 패턴, 플래시 메시지 |
-| `part1/htmx.md` | AJAX(비동기 요청), DOM(문서 객체 모델), HTML 조각, hidden 필드, Web API(브라우저), data-* 속성, 이벤트 위임 |
-| `part1/local-dev.md` | 클론, localhost와 포트, 코드 편집기와 확장, 언어 서버, 디버거와 중단점 |
-| `part2/git.md` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 저장소, 원격 저장소와 push·pull, 스테이징, diff, 기본 브랜치 |
-| `part2/github-actions.md` | 지속적 통합(CI), 워크플로·잡·스텝, YAML, 러너, 브랜치 보호 규칙, 저장소 시크릿 |
-| `part2/vercel.md` | 인스턴스, 컨테이너와 Dockerfile, 웹소켓, 엣지, HTTPS, CDN, 빌드와 배포, CRUD, 캐치올, 리라이트, 리전, 프리뷰 배포 |
-| `part2/supabase-auth.md` | 관리형 서비스, 프로바이더, 액세스 토큰과 리프레시 토큰, 리다이렉트와 콜백, 쿠키, PKCE, CSRF, 무상태, 클레임, 대칭 키와 비대칭 키, JWKS와 서명 검증, Client ID와 Client Secret |
-| `part2/supabase-db.md` | 환경 변수, 연결 문자열, GIN 인덱스, 커넥션 풀러, 프리페어드 스테이트먼트, 마이그레이션, 권고 잠금, 확장 후 축소, 콜로케이션, RLS |
-| `part2/pwa.md` | 웹 앱 매니페스트, 서비스 워커, 캐시 전략, Cache Storage, 개발자 도구 |
-| `part2/free-tier.md` | 한도와 스로틀링, 대역폭과 전송량, 핑과 헬스 체크, 백업과 덤프(pg_dump) |
-| `part2/whats-next.md` | E2E 테스트, 관측성 |
-| `appendix/setup.md` | 터미널, WSL, 패키지 매니저, sudo, PATH와 셸 설정 파일 |
+| `intro.adoc` | API, 서버, CSV |
+| `part1/tech-choices.adoc` | 기술 스택, 컴파일/인터프리터 언어, 런타임, 정적/동적 타입, 프레임워크와 라이브러리, 의존성, 관계형 데이터베이스, NoSQL과 문서형 데이터베이스, 호스팅, 무료 티어, PostgreSQL, 프런트엔드와 백엔드, 상주 서버, PWA, 서버리스, 콜드스타트, 바이너리, SPA, 아키텍처, OAuth, JWT |
+| `part1/claude-code.adoc` | LLM, AI 코딩 에이전트와 도구 호출 루프, 컨텍스트와 토큰, 세션, 프롬프트, 프로젝트 지침(CLAUDE.md), 디렉터리와 프로젝트 루트, 스킬 |
+| `part1/database-basics.adoc` | 테이블·행·열, 정규화와 비정규화, 기본 키와 외래 키, SQL, 스키마, UUID, 제약, NULL, JSON, SQL 인젝션, 드라이버, 조인, 인증과 인가, 인덱스, 실행 계획 |
+| `part1/database.adoc` | 엔티티, 잠금, 뷰, 트랜잭션, 원자적, slug |
+| `part1/go-basics.adoc` | 모듈과 패키지, 임포트, 표준 라이브러리, 제로값, 예외, 다중 반환값과 에러 처리, 공개와 비공개 |
+| `part1/go.adoc` | 구조체, 생성자, 순수 함수, 에러 래핑과 센티널 에러, 포인터, 메서드와 리시버, 구조체 태그, 슬라이스와 맵, 직렬화와 역직렬화 |
+| `part1/go-testing.adoc` | 플래그, 테이블 주도 테스트, 경쟁 상태, 픽스처, 포매터와 정적 분석, 품질 게이트, 셸과 셸 스크립트, 훅(Claude Code), 표준 입출력과 표준 에러, 종료 코드, 서브에이전트, 프런트매터 (세로 정렬은 상자 없이 본문 절로 다룬다) |
+| `part1/gin.adoc` | HTTP 요청과 응답, 인터페이스, 프로세스, 패닉, 라우터와 라우팅, 엔드포인트, 핸들러, 바인딩, 경로/쿼리 파라미터, 미들웨어, CORS, 팩토리 함수와 클로저, 의존성 주입, 모의 객체 |
+| `part1/html-css.adoc` | 화면 낭독기, HTML 태그와 요소, 시맨틱 마크업, class와 id, 요소의 가족 관계, 폼, CSS 변수(커스텀 프로퍼티), rem, 상태(state), CSS 선택자, 박스 모델, 플렉스박스와 그리드, 미디어 쿼리 |
+| `part1/go-templates.adoc` | 템플릿 엔진, 파싱, SVG와 인라인, 이스케이프와 XSS, embed(Go), PRG 패턴, 플래시 메시지 |
+| `part1/htmx.adoc` | AJAX(비동기 요청), DOM(문서 객체 모델), HTML 조각, hidden 필드, Web API(브라우저), data-* 속성, 이벤트 위임 |
+| `part1/local-dev.adoc` | 클론, localhost와 포트, 코드 편집기와 확장, 언어 서버, 디버거와 중단점 |
+| `part2/git.adoc` | 버전 관리, 커밋, 브랜치, 병합과 풀 리퀘스트, 저장소, 원격 저장소와 push·pull, 스테이징, diff, 기본 브랜치 |
+| `part2/github-actions.adoc` | 지속적 통합(CI), 워크플로·잡·스텝, YAML, 러너, 브랜치 보호 규칙, 저장소 시크릿 |
+| `part2/vercel.adoc` | 인스턴스, 컨테이너와 Dockerfile, 웹소켓, 엣지, HTTPS, CDN, 빌드와 배포, CRUD, 캐치올, 리라이트, 리전, 프리뷰 배포 |
+| `part2/supabase-auth.adoc` | 관리형 서비스, 프로바이더, 액세스 토큰과 리프레시 토큰, 리다이렉트와 콜백, 쿠키, PKCE, CSRF, 무상태, 클레임, 대칭 키와 비대칭 키, JWKS와 서명 검증, Client ID와 Client Secret |
+| `part2/supabase-db.adoc` | 환경 변수, 연결 문자열, GIN 인덱스, 커넥션 풀러, 프리페어드 스테이트먼트, 마이그레이션, 권고 잠금, 확장 후 축소, 콜로케이션, RLS |
+| `part2/pwa.adoc` | 웹 앱 매니페스트, 서비스 워커, 캐시 전략, Cache Storage, 개발자 도구 |
+| `part2/free-tier.adoc` | 한도와 스로틀링, 대역폭과 전송량, 핑과 헬스 체크, 백업과 덤프(pg_dump) |
+| `part2/whats-next.adoc` | E2E 테스트, 관측성 |
+| `appendix/setup.adoc` | 터미널, WSL, 패키지 매니저, sudo, PATH와 셸 설정 파일 |
 
 **동음이의어 주의.** 같은 말이 다른 뜻으로 쓰이는 곳은 그 자리에서 한 구절로 구분해 준다. 모르는 말은 독자가 멈추지만, 아는 줄 알았던 말은 조용히 오해로 굳는다.
 
@@ -115,7 +140,19 @@
 책 초반부의 요구사항과 UI 설명에는 실제 앱 화면을 싣는다.
 이미지는 `doc/public/screenshots/` 아래에 두고 `/screenshots/이름.png`로 참조한다(VitePress가 base를 붙여 준다).
 
-- 배치: `<div class="fc-shots">` + 마크다운 이미지 + `<p class="fc-caption">그림 N …</p>`. 휴대폰 화면 한 장짜리는 `fc-shots single`.
+- 배치: `++++` 패스스루 블록 안에 `<div class="fc-shots">` + 마크다운 이미지 문법 + `<p class="fc-caption">그림 N …</p>`를 그대로 담는다(빌드가 블록 내용을 그대로 통과시킨다). 휴대폰 화면 한 장짜리는 `fc-shots single`.
+
+  ```
+  ++++
+  <div class="fc-shots single">
+
+  ![대체 텍스트](/screenshots/이름.png)
+
+  </div>
+
+  <p class="fc-caption">그림 N 설명.</p>
+  ++++
+  ```
 - **여러 화면은 반드시 한 장으로 합성해 둔다.** 이 책은 다단 페이지 넘김 모드라 이미지를 flex로 나란히 놓으면 단 경계에서 잘린다.
 - 캡처 조건: 배포본(`https://flashcard.benelog.net`)을 puppeteer로 열어 430×860 뷰포트, 3배 배율로 찍는다. 헤더의 계정 이메일은 `you@example.com`으로 치환한다.
 - 캡처용 데모 덱은 "TOEIC 필수 단어"(카드 8장). 개인 학습 데이터가 책에 노출되지 않게 하기 위함이다.
@@ -130,7 +167,7 @@
 - 저자 본인의 프로젝트 식별자(Supabase project ref, Google client ID, 조직·프로젝트 이름, Vercel slug)는 화면에 그대로 싣기로 했다. 공개 OAuth 흐름에 드러나는 값이라 비밀이 아니다. 단 연결 문자열·anon key·client secret이 보이는 화면은 찍지 않는다.
 - 재촬영 절차는 `doc/scripts/capture-dashboards.mjs`(세 대시보드에 로그인한 디버그 포트 Chrome에 CDP로 연결해 촬영). 사용법은 스크립트 머리 주석.
 - 그림 5~9: 그림 5 Google 클라이언트, 그림 6 Supabase 프로바이더, 그림 7 Supabase URL Configuration, 그림 8 Vercel Environments, 그림 9 Vercel 환경 변수.
-- `public/screenshots/dash-*.png`는 실제 캡처 전까지 "[캡처 예정]" 자리표시 이미지다. 실촬영본으로 교체하기 전에는 `doc/**`를 push하지 않는다(GitHub Pages로 바로 배포되기 때문).
+- `public/screenshots/dash-*.png`는 실촬영본이다(2026-07 교체 완료). 대시보드 화면 구성이 바뀌면 `capture-dashboards.mjs`로 재촬영해 교체한다.
 
 ## 문체 가이드
 
@@ -163,7 +200,7 @@ AI가 쓴 글에서 흔한 표현 습관을 걷어 내는 것이 목적이다.
   - 삽입구는 괄호로 바꾼다: `관계형 스키마 — 외래 키, JOIN — 를` → `관계형 스키마(외래 키, JOIN)를`
   - 문장 연결은 두 문장으로 나눈다: `~와 비슷하다 — 지역 변수가 ~` → `~와 비슷하다. 지역 변수가 ~`
   - 용어 해설 목록은 콜론으로 바꾼다: `**용어** — 설명이다.` → `**용어**: 설명이다.`
-- 장·절 제목과 목차(`.vitepress/config.ts`의 사이드바)에서도 쓰지 않는다. "제목 — 부제"는 "제목: 부제"로 바꾼다.
+- 장·절 제목과 목차(`book.config.mjs`의 toc)에서도 쓰지 않는다. "제목 — 부제"는 "제목: 부제"로 바꾼다.
   - 제목에 이미 콜론이 있으면(예: `output: 'export'`) 콜론이 겹치지 않게 문구를 다듬는다.
 - 실제 설정 파일이나 출력을 인용한 문자열(예: go-quality 서브에이전트의 `PASS — ...`)과 코드 블록 안 내용은 원문 그대로 둔다.
 

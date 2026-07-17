@@ -4,15 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview",
-    "pdf": "node scripts/export-pdf.mjs",
-    "og": "node scripts/og-image.mjs"
+    "dev": "book dev",
+    "build": "book build",
+    "preview": "book preview",
+    "pdf": "book pdf",
+    "og": "book og"
   },
   "devDependencies": {
-    "pdf-lib": "^1.17.1",
-    "puppeteer-core": "^25.3.0",
-    "vitepress": "^1.6.3"
+    "book-template": "file:../book-template",
+    "puppeteer-core": "^25.3.0"
   }
 }

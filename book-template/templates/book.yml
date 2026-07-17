@@ -1,11 +1,14 @@
+# 새 책 저장소용 GitHub Pages 배포 워크플로 참고본.
+# <책 디렉터리>를 원고 디렉터리로, <엔진 디렉터리>를 book-template 위치로 바꿔 쓴다.
+# (엔진을 별도 저장소에서 npm으로 설치한다면 엔진 쪽 npm ci 스텝과 lockfile 항목을 지운다)
 name: Deploy book to GitHub Pages
 
 on:
   push:
     branches: [main]
     paths:
-      - 'doc/**'
-      - 'book-template/**'
+      - '<책 디렉터리>/**'
+      - '<엔진 디렉터리>/**'
       - '.github/workflows/book.yml'
   workflow_dispatch:
 
@@ -28,26 +31,27 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: |
-            book-template/package-lock.json
-            doc/package-lock.json
+            <엔진 디렉터리>/package-lock.json
+            <책 디렉터리>/package-lock.json
       - name: Install engine dependencies
         run: npm ci
-        working-directory: book-template
+        working-directory: <엔진 디렉터리>
       - name: Install book dependencies
         run: npm ci
-        working-directory: doc
+        working-directory: <책 디렉터리>
       - name: Build book (adoc → md → VitePress)
         run: npm run build
-        working-directory: doc
+        working-directory: <책 디렉터리>
+      # PDF에 한글이 들어가면 CI 러너에 한글 폰트가 필요하다
       - name: Install Korean fonts for PDF rendering
         run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
       - name: Export PDF
         run: npm run pdf
-        working-directory: doc
+        working-directory: <책 디렉터리>
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: doc/.vitepress/dist
+          path: <책 디렉터리>/.vitepress/dist
 
   deploy:
     needs: build

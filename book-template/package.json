@@ -1,0 +1,26 @@
+{
+  "name": "book-template",
+  "version": "0.1.0",
+  "description": "AsciiDoc 원고를 이북 뷰어 사이트와 PDF로 배포하는 책 템플릿 엔진",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "book": "./bin/book.mjs"
+  },
+  "exports": {
+    "./config": "./lib/config.mjs",
+    "./lib/*": "./lib/*",
+    "./theme": "./theme/index.js",
+    "./theme/*": "./theme/*"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "downdoc": "1.1.0-stable",
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^25.3.0",
+    "vitepress": "^1.6.3"
+  }
+}
