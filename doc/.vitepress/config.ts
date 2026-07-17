@@ -91,7 +91,7 @@ export default defineConfig({
         text: '부록',
         items: [
           { text: '부록 A 개발 도구 설치', link: '/appendix/setup' },
-          { text: '부록 B 배포 준비: 대시보드 설정', link: '/appendix/deploy' },
+          { text: '부록 B 배포 준비: Supabase·Google·Vercel 대시보드 설정', link: '/appendix/deploy' },
         ],
       },
     ],

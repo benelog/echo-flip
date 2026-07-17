@@ -27,7 +27,7 @@ Supabase Table Editor에 `profiles, decks, cards, card_srs, study_sessions, revi
 
 ## 3. OAuth 앱 등록 ✋
 
-> 대시보드 메뉴 이름은 자주 바뀝니다. 책 부록 B("배포 준비: 대시보드 설정")에 화면 캡처와 함께 정리해 두었으니,
+> 대시보드 메뉴 이름은 자주 바뀝니다. 책 부록 B("배포 준비: Supabase·Google·Vercel 대시보드 설정")에 화면 캡처와 함께 정리해 두었으니,
 > 아래 경로가 화면과 다르면 부록 B를 참고하세요. 여기서는 무엇을 어디에 등록하는지를 기준으로 적습니다.
 
 로그인은 세 관문을 지납니다. 세 곳의 설정이 모두 있어야 로그인이 완성됩니다(원리는 책 17장, 실제 장애 기록은 [fix-auth.md](./fix-auth.md)).

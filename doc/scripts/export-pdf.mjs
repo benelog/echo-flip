@@ -45,7 +45,7 @@ const chapters = [
   { route: 'part2/free-tier', title: '20장 무료 티어 운영과 한도 관리' },
   { route: 'part2/whats-next', title: '21장 다음 단계: 여기서 더 공부할 것들' },
   { route: 'appendix/setup', title: '부록 A 개발 도구 설치', part: '부록' },
-  { route: 'appendix/deploy', title: '부록 B 배포 준비: 대시보드 설정' },
+  { route: 'appendix/deploy', title: '부록 B 배포 준비: Supabase·Google·Vercel 대시보드 설정' },
 ]
 
 const FONT_LINKS = `
