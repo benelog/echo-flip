@@ -12,7 +12,7 @@
   {{if gt .Data.Due 0}}
   <a class="btn btn-big" href="/study?mode=due">{{icon "cap"}} 복습 시작</a>
   {{else}}
-  <p class="sub" style="margin-top:.75rem">오늘 복습은 끝! 새 카드를 추가해보세요.</p>
+  <p class="sub note">오늘 복습은 끝! 새 카드를 추가해보세요.</p>
   {{end}}
 </section>
 
@@ -21,9 +21,9 @@
   <h2>추천 복습</h2>
   {{range .Data.Suggestions}}
   <a class="tile tile-amber row" href="/study?mode=smart&rule={{.Rule}}">
-    <span style="color:var(--amber)">{{icon "sparkles"}}</span>
+    <span class="amber">{{icon "sparkles"}}</span>
     <span>
-      <span style="font-weight:500;display:block">{{.Title}}</span>
+      <span class="medium block">{{.Title}}</span>
       <span class="tiny muted">대상 카드 {{.Count}}장</span>
     </span>
   </a>
@@ -38,7 +38,7 @@
   </div>
   {{range .Data.Decks}}
   <a class="tile row-between" href="/decks/{{.Slug}}">
-    <span style="font-weight:500">{{.Name}}</span>
+    <span class="medium">{{.Name}}</span>
     <span class="small muted">{{.CardCount}}장</span>
   </a>
   {{else}}

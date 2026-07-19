@@ -6,25 +6,25 @@
 {{/* 새 덱 폼: summary를 누르면 열린다. 자바스크립트 없이 details만으로. */}}
 <details class="reveal">
   <summary class="tile-dashed">{{icon "plus"}} 새 덱 만들기</summary>
-  <form method="post" action="/decks" class="row" style="margin-top:.5rem">
+  <form method="post" action="/decks" class="row">
     <input name="name" placeholder="덱 이름 (예: 토익 필수 단어)" autofocus required>
-    <button class="btn btn-primary" style="flex-shrink:0">만들기</button>
+    <button class="btn btn-primary no-shrink">만들기</button>
   </form>
 </details>
 
 <a class="tile tile-blue row-between" href="/shared">
-  <span class="row" style="font-weight:500">{{icon "globe"}} 공유 덱 둘러보기</span>
+  <span class="row medium">{{icon "globe"}} 공유 덱 둘러보기</span>
   <span class="faint">{{icon "chev-right"}}</span>
 </a>
 
 <section class="stack">
   {{range .Data.Decks}}
-  <a class="tile" href="/decks/{{.Slug}}">
+  <a class="tile deck-card" href="/decks/{{.Slug}}">
     <div class="row-between">
-      <span style="font-weight:500">{{.Name}}</span>
+      <span class="medium">{{.Name}}</span>
       <span class="small muted">{{.CardCount}}장</span>
     </div>
-    {{if .Description}}<p class="small muted" style="margin:.25rem 0 0">{{deref .Description}}</p>{{end}}
+    {{if .Description}}<p class="small muted">{{deref .Description}}</p>{{end}}
   </a>
   {{else}}
   <p class="empty">아직 덱이 없어요. 첫 덱을 만들어보세요!</p>
@@ -36,10 +36,10 @@
   <h2>스마트 덱</h2>
   {{range .Data.SmartDecks}}
   <div class="tile tile-amber row">
-    <a class="row" style="flex:1;min-width:0" href="/study?mode=smart&rule={{ruleRaw .Rule}}&title={{.Name}}&saved=1">
-      <span style="color:var(--amber)">{{icon "sparkles"}}</span>
-      <span style="min-width:0">
-        <span class="truncate" style="font-weight:500;display:block">{{.Name}}</span>
+    <a class="row fill" href="/study?mode=smart&rule={{ruleRaw .Rule}}&title={{.Name}}&saved=1">
+      <span class="amber">{{icon "sparkles"}}</span>
+      <span class="shrink">
+        <span class="truncate medium block">{{.Name}}</span>
         <span class="tiny muted">{{ruleLabel .Rule}}</span>
       </span>
     </a>

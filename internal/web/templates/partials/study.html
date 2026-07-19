@@ -22,9 +22,9 @@
   </div>
 
 {{else if eq .Phase "finished"}}
-  <div class="stack-lg center" style="padding:4rem 0">
-    <div class="finish-icon" style="font-size:2.5rem">{{icon "party"}}</div>
-    <h2 style="font-size:1.25rem;color:inherit">학습 완료!</h2>
+  <div class="stack-lg center study-end done">
+    <div class="finish-icon">{{icon "party"}}</div>
+    <h2>학습 완료!</h2>
     <div class="stat-3">
       <div class="box"><div class="num">{{.State.FPTotal}}장</div><div class="label">카드</div></div>
       <div class="box"><div class="num">{{.Accuracy}}%</div><div class="label">1차 정답률</div></div>
@@ -34,9 +34,9 @@
   </div>
 
 {{else if eq .Phase "break"}}
-  <div class="stack-lg center" style="padding:4rem 0">
-    <div class="finish-icon" style="font-size:2.5rem">{{icon "rotate"}}</div>
-    <h2 style="font-size:1.125rem;color:inherit">틀린 카드 {{len .State.Missed}}장을 다시 풀어볼까요?</h2>
+  <div class="stack-lg center study-end">
+    <div class="finish-icon">{{icon "rotate"}}</div>
+    <h2>틀린 카드 {{len .State.Missed}}장을 다시 풀어볼까요?</h2>
     <p class="small muted">전부 맞힐 때까지 반복해요. 재도전 결과는 오답률에 반영되지 않아요.</p>
     <form hx-post="/study/next-round" hx-target="#study-body">
       {{template "study_state_fields" .}}
@@ -52,14 +52,14 @@
         {{template "study_state_fields" .}}
         <button class="btn btn-icon" aria-label="그만하기">{{icon "x"}}</button>
       </form>
-      <span style="font-weight:500;color:var(--fg)">{{.State.Title}}</span>
+      <span class="title">{{.State.Title}}</span>
       <span>{{if gt .State.Round 1}}{{.State.Round}}R · {{end}}{{add .Index 1}}/{{.State.RoundLen}}</span>
     </div>
 
     <div class="progress"><div style="width:{{.ProgressPct}}%"></div></div>
 
     {{with .Card}}
-    <div class="stack-lg" style="position:relative">
+    <div class="stack-lg study-card">
       {{/* 뒤집기 상태는 이 체크박스 하나. CSS 형제 선택자가 카드 회전과
            채점 버튼 표시를 모두 처리한다 — 자바스크립트가 필요 없다. */}}
       <input type="checkbox" id="reveal" class="reveal-toggle">
@@ -79,7 +79,7 @@
           </div>
           <div class="flip-face flip-back">
             <div class="row-between">
-              <span class="tiny" style="color:var(--primary)">정답</span>
+              <span class="tiny primary">정답</span>
               <button type="button" class="tts" data-tts="{{$.BackTTS}}" data-tts-rate="{{$.State.TtsRate}}" aria-label="영어 읽어주기">{{icon "volume"}}</button>
             </div>
             <div class="face-center">
@@ -105,4 +105,4 @@
 {{end}}
 {{end}}
 
-{{define "saved_badge"}}<span class="pill pill-muted" style="align-self:flex-end">{{icon "check"}} 스마트 덱으로 저장했어요</span>{{end}}
+{{define "saved_badge"}}<span class="pill pill-muted self-end">{{icon "check"}} 스마트 덱으로 저장했어요</span>{{end}}

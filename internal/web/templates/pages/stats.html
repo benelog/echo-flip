@@ -8,8 +8,8 @@
 </section>
 
 <section class="stack">
-  <h2>최근 30일 학습량 <span style="font-weight:400">(<span style="color:var(--primary)">정답</span> · <span style="color:var(--red)">오답</span>)</span></h2>
-  <div class="tile" style="padding:1rem">
+  <h2>최근 30일 학습량 <span class="normal">(<span class="primary">정답</span> · <span class="red">오답</span>)</span></h2>
+  <div class="tile tile-lg">
     <div class="chart">
       {{range .Data.Days}}
       <div class="day" title="{{.Title}}">
@@ -22,12 +22,12 @@
 </section>
 
 <section class="stack">
-  <h2>덱별 성취도 <span style="font-weight:400">(3주 이상 간격에 도달한 카드 비율)</span></h2>
+  <h2>덱별 성취도 <span class="normal">(3주 이상 간격에 도달한 카드 비율)</span></h2>
   {{range .Data.Summary.Decks}}
   {{$p := pct .MatureCards .TotalCards}}
   <div class="tile">
     <div class="row-between small">
-      <span style="font-weight:500">{{.Name}}</span>
+      <span class="medium">{{.Name}}</span>
       <span class="muted">{{.MatureCards}}/{{.TotalCards}}장 · {{$p}}%</span>
     </div>
     <div class="meter"><div style="width:{{$p}}%"></div></div>

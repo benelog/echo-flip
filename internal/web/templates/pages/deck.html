@@ -2,7 +2,7 @@
 {{$deck := .Data.Deck}}
 <header class="row">
   <a class="btn btn-icon" href="/decks" aria-label="뒤로">{{icon "chev-left"}}</a>
-  <h1 class="truncate" style="flex:1;font-size:1.125rem">{{$deck.Name}}</h1>
+  <h1 class="truncate title-sm fill">{{$deck.Name}}</h1>
   <button class="btn btn-icon" aria-label="덱 삭제"
     hx-post="/decks/{{$deck.Slug}}/delete"
     hx-confirm="'{{$deck.Name}}' 덱과 카드를 모두 삭제할까요?">{{icon "trash"}}</button>
@@ -14,7 +14,7 @@
 </a>
 {{end}}
 
-<div class="row" style="flex-wrap:wrap">
+<div class="row deck-actions">
   <a class="btn btn-outline" href="/decks/{{$deck.Slug}}/cards/new">{{icon "plus"}} 카드 추가</a>
   <a class="btn btn-outline" href="/decks/{{$deck.Slug}}/export">{{icon "download"}} CSV 내보내기</a>
   {{if $deck.ShareSlug}}
@@ -22,7 +22,7 @@
       {{icon "link"}} <span class="before">공유 링크 복사</span><span class="after">복사했어요!</span>
     </button>
     <form method="post" action="/decks/{{$deck.Slug}}/unshare">
-      <button class="btn btn-outline" style="color:var(--muted)">{{icon "link-off"}} 공유 해제</button>
+      <button class="btn btn-outline muted">{{icon "link-off"}} 공유 해제</button>
     </form>
   {{else}}
     <form method="post" action="/decks/{{$deck.Slug}}/share">
@@ -35,25 +35,25 @@
 <details class="reveal">
   <summary class="tile-dashed">{{icon "upload"}} CSV 파일 선택해서 가져오기</summary>
   <form method="post" action="/decks/{{$deck.Slug}}/import" enctype="multipart/form-data"
-        class="row" style="margin-top:.5rem">
+        class="row">
     <input type="file" name="file" accept=".csv,text/csv" required>
-    <button class="btn btn-primary" style="flex-shrink:0">가져오기</button>
+    <button class="btn btn-primary no-shrink">가져오기</button>
   </form>
-  <p class="tiny faint" style="margin:.375rem 0 0">text,meaning (또는 front,back) 헤더가 있는 CSV. 태그는 | 구분.</p>
+  <p class="tiny faint">text,meaning (또는 front,back) 헤더가 있는 CSV. 태그는 | 구분.</p>
 </details>
 
 {{if $deck.ShareSlug}}
 <p class="tiny faint">이 덱은 공유 중이에요. 링크가 있거나 공유 덱 목록을 보는 누구나 미리보고 자기 덱으로 가져갈 수 있어요.</p>
 {{end}}
 
-<ul class="stack" style="list-style:none;margin:0;padding:0">
+<ul class="stack">
   {{range .Data.Cards}}
-  <li class="tile row">
-    <div style="flex:1;min-width:0">
-      <p class="truncate" style="font-weight:500;margin:0">{{.Text}}</p>
-      <p class="truncate small muted" style="margin:0">{{.Meaning}}</p>
+  <li class="tile row card-row">
+    <div class="fill">
+      <p class="truncate name">{{.Text}}</p>
+      <p class="truncate small muted">{{.Meaning}}</p>
       {{if gt .Attempts 0}}
-      <p class="tiny faint" style="margin:.125rem 0 0">시도 {{.Attempts}}회 · 오답률 {{pct100 .ErrorRate}}%</p>
+      <p class="tiny faint stat">시도 {{.Attempts}}회 · 오답률 {{pct100 .ErrorRate}}%</p>
       {{end}}
     </div>
     <a class="btn btn-icon" href="/cards/{{.ID}}" aria-label="카드 수정">{{icon "pencil"}}</a>

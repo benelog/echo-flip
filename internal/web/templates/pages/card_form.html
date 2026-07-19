@@ -2,7 +2,7 @@
 {{$f := .Data}}
 <header class="row">
   <a class="btn btn-icon" href="{{$f.BackURL}}" aria-label="뒤로">{{icon "chev-left"}}</a>
-  <h1 style="font-size:1.125rem">{{if $f.Editing}}카드 수정{{else}}새 카드{{end}}</h1>
+  <h1 class="title-sm">{{if $f.Editing}}카드 수정{{else}}새 카드{{end}}</h1>
 </header>
 
 <form method="post" action="{{$f.Action}}" class="stack-lg">

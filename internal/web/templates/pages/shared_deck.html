@@ -2,31 +2,31 @@
 {{$deck := .Data.Deck}}
 <header class="row">
   <a class="btn btn-icon" href="/shared" aria-label="뒤로">{{icon "chev-left"}}</a>
-  <div style="min-width:0;flex:1">
-    <h1 class="truncate" style="font-size:1.125rem">{{$deck.Name}}</h1>
-    <p class="tiny muted" style="margin:0">{{if $deck.OwnerName}}{{deref $deck.OwnerName}}{{else}}익명{{end}} 님의 공유 덱 · {{$deck.CardCount}}장</p>
+  <div class="fill">
+    <h1 class="truncate title-sm">{{$deck.Name}}</h1>
+    <p class="tiny muted flat">{{if $deck.OwnerName}}{{deref $deck.OwnerName}}{{else}}익명{{end}} 님의 공유 덱 · {{$deck.CardCount}}장</p>
   </div>
 </header>
 
 {{if $deck.Description}}
-<p class="small" style="margin:0">{{deref $deck.Description}}</p>
+<p class="small flat">{{deref $deck.Description}}</p>
 {{end}}
 
 {{if .LoggedIn}}
 <form method="post" action="/shared/{{.Data.Slug}}/import" class="stack">
   <button class="btn btn-primary btn-big">{{icon "download"}} 내 덱으로 가져오기</button>
 </form>
-<p class="tiny faint center" style="margin-top:-.75rem">카드 전체가 내 계정으로 복사되고, 학습 기록은 새로 시작해요.</p>
+<p class="tiny faint center btn-caption">카드 전체가 내 계정으로 복사되고, 학습 기록은 새로 시작해요.</p>
 {{else}}
 <a class="btn btn-primary btn-big" href="/login?next=/shared/{{.Data.Slug}}">{{icon "login"}} 로그인하고 내 덱으로 가져오기</a>
-<p class="tiny faint center" style="margin-top:-.75rem">로그인하면 이 덱을 내 계정으로 복사해 학습할 수 있어요.</p>
+<p class="tiny faint center btn-caption">로그인하면 이 덱을 내 계정으로 복사해 학습할 수 있어요.</p>
 {{end}}
 
-<ul class="stack" style="list-style:none;margin:0;padding:0">
+<ul class="stack">
   {{range .Data.Cards}}
-  <li class="tile">
-    <p style="font-weight:500;margin:0">{{.Text}}</p>
-    <p class="small muted" style="margin:0">{{.Meaning}}</p>
+  <li class="tile card-row">
+    <p class="name">{{.Text}}</p>
+    <p class="small muted">{{.Meaning}}</p>
   </li>
   {{end}}
 </ul>

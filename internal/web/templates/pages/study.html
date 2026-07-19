@@ -1,6 +1,6 @@
 {{define "content"}}
 {{if .Data.SaveRule}}
-<form hx-post="/smart-decks" hx-swap="outerHTML" style="align-self:flex-end">
+<form hx-post="/smart-decks" hx-swap="outerHTML" class="self-end">
   <input type="hidden" name="rule" value="{{.Data.SaveRule}}">
   <button class="btn pill pill-streak">{{icon "bookmark"}} 이 조건을 스마트 덱으로 저장</button>
 </form>
