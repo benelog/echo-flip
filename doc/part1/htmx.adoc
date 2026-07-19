@@ -354,7 +354,7 @@ stateFromForm이 폼 값에서 studyState를 다시 조립하고, 큐의 첫 카
 
 [source,html]
 ----
-    <span class="row-between">원문 (영어 · 용어)
+    <span class="field-label row-between">원문 (영어 · 용어)
       <span class="row">
         <!-- ... 발음 듣기 버튼 ... -->
         <button type="button" class="btn pill pill-blue"
