@@ -12,6 +12,12 @@
 - 브라우저 JS는 `internal/web/static/app.js` 하나뿐(TTS·클립보드·오프라인·서비스 워커). 프런트엔드 빌드 도구(npm 등)는 앱에 없다. `doc/`(책 원고, AsciiDoc)와 `book-template/`(책 빌드 엔진, 재사용 가능한 npm 패키지)만 자체 package.json을 가진다.
 - JSON API(`/api/*`)는 `internal/handlers`에 그대로 있다. HTML과 API가 같은 Gin 엔진(`pkg/app`)에 물린다.
 
+## 스타일(CSS)
+
+- **자손 선택자 대신 클래스를 쓴다.** `.bottomnav a`처럼 태그에 기대면 템플릿에서 그 태그를 바꾸거나 래퍼를 하나 더 감쌀 때 스타일이 풀리는데, 컴파일 오류도 테스트 실패도 나지 않아 알아채기 어렵다. 요소마다 이름표를 달아 `.navlink`처럼 평평하게 고른다.
+- 예외는 **상태 선택자**다. `:checked ~`(카드 뒤집기), `:checked +`(알약 라디오), `details.reveal[open] > summary`, `[data-done] .copy-*`는 자바스크립트 없이 상태를 자식·형제에 전달하는 메커니즘 자체라 클래스로 대체할 수 없다. 이런 선택자를 새로 둘 때는 왜 평탄화하지 않는지 주석에 남긴다.
+- 템플릿에 인라인 `style` 속성을 두지 않는다. 서버가 계산한 값을 넣는 경우(`style="width:{{.ProgressPct}}%"`)만 예외다.
+
 ## 환경
 
 DB는 환경마다 완전히 분리되어 있다.
