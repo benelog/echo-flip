@@ -19,7 +19,7 @@
   <a class="btn btn-outline" href="/decks/{{$deck.Slug}}/export">{{icon "download"}} CSV 내보내기</a>
   {{if $deck.ShareSlug}}
     <button class="btn btn-outline btn-share-ok" data-copy="{{.Data.ShareURL}}">
-      {{icon "link"}} <span class="before">공유 링크 복사</span><span class="after">복사했어요!</span>
+      {{icon "link"}} <span class="copy-before">공유 링크 복사</span><span class="copy-after">복사했어요!</span>
     </button>
     <form method="post" action="/decks/{{$deck.Slug}}/unshare">
       <button class="btn btn-outline muted">{{icon "link-off"}} 공유 해제</button>
@@ -35,11 +35,11 @@
 <details class="reveal">
   <summary class="tile-dashed">{{icon "upload"}} CSV 파일 선택해서 가져오기</summary>
   <form method="post" action="/decks/{{$deck.Slug}}/import" enctype="multipart/form-data"
-        class="row">
+        class="row reveal-form">
     <input type="file" name="file" accept=".csv,text/csv" required>
     <button class="btn btn-primary no-shrink">가져오기</button>
   </form>
-  <p class="tiny faint">text,meaning (또는 front,back) 헤더가 있는 CSV. 태그는 | 구분.</p>
+  <p class="tiny faint reveal-note">text,meaning (또는 front,back) 헤더가 있는 CSV. 태그는 | 구분.</p>
 </details>
 
 {{if $deck.ShareSlug}}
@@ -48,12 +48,12 @@
 
 <ul class="stack">
   {{range .Data.Cards}}
-  <li class="tile row card-row">
+  <li class="tile row">
     <div class="fill">
-      <p class="truncate name">{{.Text}}</p>
-      <p class="truncate small muted">{{.Meaning}}</p>
+      <p class="truncate card-name">{{.Text}}</p>
+      <p class="truncate small muted card-meaning">{{.Meaning}}</p>
       {{if gt .Attempts 0}}
-      <p class="tiny faint stat">시도 {{.Attempts}}회 · 오답률 {{pct100 .ErrorRate}}%</p>
+      <p class="tiny faint card-stat">시도 {{.Attempts}}회 · 오답률 {{pct100 .ErrorRate}}%</p>
       {{end}}
     </div>
     <a class="btn btn-icon" href="/cards/{{.ID}}" aria-label="카드 수정">{{icon "pencil"}}</a>

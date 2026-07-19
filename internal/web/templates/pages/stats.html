@@ -2,9 +2,9 @@
 <h1>통계</h1>
 
 <section class="stat-3">
-  <div class="box"><div class="num">{{.Data.Summary.Streak}}일</div><div class="label">연속 학습</div></div>
-  <div class="box"><div class="num">{{.Data.Summary.TotalReviews}}회</div><div class="label">총 복습</div></div>
-  <div class="box"><div class="num">{{if lt .Data.Accuracy 0}}-{{else}}{{.Data.Accuracy}}%{{end}}</div><div class="label">전체 정답률</div></div>
+  <div class="stat-box"><div class="stat-num">{{.Data.Summary.Streak}}일</div><div class="stat-label">연속 학습</div></div>
+  <div class="stat-box"><div class="stat-num">{{.Data.Summary.TotalReviews}}회</div><div class="stat-label">총 복습</div></div>
+  <div class="stat-box"><div class="stat-num">{{if lt .Data.Accuracy 0}}-{{else}}{{.Data.Accuracy}}%{{end}}</div><div class="stat-label">전체 정답률</div></div>
 </section>
 
 <section class="stack">
@@ -12,9 +12,9 @@
   <div class="tile tile-lg">
     <div class="chart">
       {{range .Data.Days}}
-      <div class="day" title="{{.Title}}">
-        <div class="correct" style="height:{{.CorrectPct}}%"></div>
-        <div class="wrong" style="height:{{.WrongPct}}%"></div>
+      <div class="chart-day" title="{{.Title}}">
+        <div class="chart-correct" style="height:{{.CorrectPct}}%"></div>
+        <div class="chart-wrong" style="height:{{.WrongPct}}%"></div>
       </div>
       {{end}}
     </div>
@@ -30,7 +30,7 @@
       <span class="medium">{{.Name}}</span>
       <span class="muted">{{.MatureCards}}/{{.TotalCards}}장 · {{$p}}%</span>
     </div>
-    <div class="meter"><div style="width:{{$p}}%"></div></div>
+    <div class="meter"><div class="meter-bar" style="width:{{$p}}%"></div></div>
   </div>
   {{else}}
   <p class="empty">아직 데이터가 없어요.</p>

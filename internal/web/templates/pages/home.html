@@ -7,12 +7,12 @@
 </header>
 
 <section class="hero">
-  <p class="sub">오늘 복습할 카드</p>
-  <p class="count">{{.Data.Due}}장</p>
+  <p class="hero-sub">오늘 복습할 카드</p>
+  <p class="hero-count">{{.Data.Due}}장</p>
   {{if gt .Data.Due 0}}
-  <a class="btn btn-big" href="/study?mode=due">{{icon "cap"}} 복습 시작</a>
+  <a class="btn btn-big hero-btn" href="/study?mode=due">{{icon "cap"}} 복습 시작</a>
   {{else}}
-  <p class="sub note">오늘 복습은 끝! 새 카드를 추가해보세요.</p>
+  <p class="hero-sub hero-note">오늘 복습은 끝! 새 카드를 추가해보세요.</p>
   {{end}}
 </section>
 

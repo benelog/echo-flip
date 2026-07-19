@@ -1,13 +1,13 @@
 {{define "content"}}
 <div class="stack-lg direction">
-  <div class="head">
+  <div class="direction-head">
     {{icon "swap"}}
-    <h2>어느 방향으로 학습할까요?</h2>
+    <h2 class="direction-title">어느 방향으로 학습할까요?</h2>
   </div>
 
-  <a class="tile row-between" href="{{.Data.TextFirst}}">
+  <a class="tile direction-tile row-between" href="{{.Data.TextFirst}}">
     <span>
-      <span class="row">원문 → 뜻
+      <span class="row direction-tile-head">원문 → 뜻
         {{if eq .Data.Last "text_to_meaning"}}<span class="pill pill-blue">지난번</span>{{end}}
       </span>
       <span class="small muted">영어·용어를 보고 뜻을 떠올려요</span>
@@ -15,9 +15,9 @@
     <span class="faint">{{icon "arrow"}}</span>
   </a>
 
-  <a class="tile row-between" href="{{.Data.TextLast}}">
+  <a class="tile direction-tile row-between" href="{{.Data.TextLast}}">
     <span>
-      <span class="row">뜻 → 원문
+      <span class="row direction-tile-head">뜻 → 원문
         {{if eq .Data.Last "meaning_to_text"}}<span class="pill pill-blue">지난번</span>{{end}}
       </span>
       <span class="small muted">뜻·설명을 보고 영어·용어를 떠올려요</span>

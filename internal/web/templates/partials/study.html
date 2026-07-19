@@ -22,13 +22,13 @@
   </div>
 
 {{else if eq .Phase "finished"}}
-  <div class="stack-lg center study-end done">
+  <div class="stack-lg center study-end">
     <div class="finish-icon">{{icon "party"}}</div>
-    <h2>학습 완료!</h2>
+    <h2 class="study-end-title done">학습 완료!</h2>
     <div class="stat-3">
-      <div class="box"><div class="num">{{.State.FPTotal}}장</div><div class="label">카드</div></div>
-      <div class="box"><div class="num">{{.Accuracy}}%</div><div class="label">1차 정답률</div></div>
-      <div class="box"><div class="num">{{.State.Round}}</div><div class="label">라운드</div></div>
+      <div class="stat-box"><div class="stat-num">{{.State.FPTotal}}장</div><div class="stat-label">카드</div></div>
+      <div class="stat-box"><div class="stat-num">{{.Accuracy}}%</div><div class="stat-label">1차 정답률</div></div>
+      <div class="stat-box"><div class="stat-num">{{.State.Round}}</div><div class="stat-label">라운드</div></div>
     </div>
     <a class="btn btn-primary btn-big" href="{{.State.ReturnURL}}">완료</a>
   </div>
@@ -36,7 +36,7 @@
 {{else if eq .Phase "break"}}
   <div class="stack-lg center study-end">
     <div class="finish-icon">{{icon "rotate"}}</div>
-    <h2>틀린 카드 {{len .State.Missed}}장을 다시 풀어볼까요?</h2>
+    <h2 class="study-end-title">틀린 카드 {{len .State.Missed}}장을 다시 풀어볼까요?</h2>
     <p class="small muted">전부 맞힐 때까지 반복해요. 재도전 결과는 오답률에 반영되지 않아요.</p>
     <form hx-post="/study/next-round" hx-target="#study-body">
       {{template "study_state_fields" .}}
@@ -52,11 +52,11 @@
         {{template "study_state_fields" .}}
         <button class="btn btn-icon" aria-label="그만하기">{{icon "x"}}</button>
       </form>
-      <span class="title">{{.State.Title}}</span>
+      <span class="study-title">{{.State.Title}}</span>
       <span>{{if gt .State.Round 1}}{{.State.Round}}R · {{end}}{{add .Index 1}}/{{.State.RoundLen}}</span>
     </div>
 
-    <div class="progress"><div style="width:{{.ProgressPct}}%"></div></div>
+    <div class="progress"><div class="progress-bar" style="width:{{.ProgressPct}}%"></div></div>
 
     {{with .Card}}
     <div class="stack-lg study-card">

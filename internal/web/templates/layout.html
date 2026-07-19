@@ -25,13 +25,13 @@
         <span class="tiny muted">로컬 모드</span>
       {{else if .LoggedIn}}
         <div class="topbar-user">
-          <span class="email">{{.Email}}</span>
+          <span class="topbar-email">{{.Email}}</span>
           <form method="post" action="/logout">
-            <button class="btn btn-outline">{{icon "logout"}} 로그아웃</button>
+            <button class="btn btn-sm btn-outline">{{icon "logout"}} 로그아웃</button>
           </form>
         </div>
       {{else}}
-        <a class="btn btn-primary" href="/login">{{icon "login"}} 로그인</a>
+        <a class="btn btn-sm btn-primary" href="/login">{{icon "login"}} 로그인</a>
       {{end}}
     </header>
     <div id="offline-banner">오프라인 상태예요. 학습 기록이 저장되지 않습니다.</div>
@@ -40,18 +40,18 @@
     </main>
     {{if .LoggedIn}}
     <nav class="bottomnav">
-      <div>
-        <a href="/" {{if eq .Path "/"}}class="active"{{end}}>{{icon "home"}}홈</a>
-        <a href="/decks" {{if hasPrefix .Path "/decks"}}class="active"{{end}}>{{icon "layers"}}덱</a>
-        <a href="/stats" {{if hasPrefix .Path "/stats"}}class="active"{{end}}>{{icon "chart"}}통계</a>
-        <a href="/settings" {{if hasPrefix .Path "/settings"}}class="active"{{end}}>{{icon "settings"}}설정</a>
+      <div class="bottomnav-inner">
+        <a class="navlink{{if eq .Path "/"}} active{{end}}" href="/">{{icon "home"}}홈</a>
+        <a class="navlink{{if hasPrefix .Path "/decks"}} active{{end}}" href="/decks">{{icon "layers"}}덱</a>
+        <a class="navlink{{if hasPrefix .Path "/stats"}} active{{end}}" href="/stats">{{icon "chart"}}통계</a>
+        <a class="navlink{{if hasPrefix .Path "/settings"}} active{{end}}" href="/settings">{{icon "settings"}}설정</a>
       </div>
     </nav>
     {{end}}
   </div>
 {{end}}
 {{if .Flash}}
-  <div class="toast"><div class="{{.FlashKind}}">{{.Flash}}</div></div>
+  <div class="toast"><div class="toast-msg {{.FlashKind}}">{{.Flash}}</div></div>
 {{end}}
 </body>
 </html>{{end}}

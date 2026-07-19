@@ -7,14 +7,14 @@
 
 <form method="post" action="{{$f.Action}}" class="stack-lg">
   <div class="type-pills">
-    <label><input type="radio" name="card_type" value="word" {{if eq $f.CardType "word"}}checked{{end}}><span>단어</span></label>
-    <label><input type="radio" name="card_type" value="sentence" {{if eq $f.CardType "sentence"}}checked{{end}}><span>문장</span></label>
-    <label><input type="radio" name="card_type" value="idiom" {{if eq $f.CardType "idiom"}}checked{{end}}><span>숙어</span></label>
-    <label><input type="radio" name="card_type" value="concept" {{if eq $f.CardType "concept"}}checked{{end}}><span>개념</span></label>
+    <label><input class="pill-radio" type="radio" name="card_type" value="word" {{if eq $f.CardType "word"}}checked{{end}}><span class="pill-label">단어</span></label>
+    <label><input class="pill-radio" type="radio" name="card_type" value="sentence" {{if eq $f.CardType "sentence"}}checked{{end}}><span class="pill-label">문장</span></label>
+    <label><input class="pill-radio" type="radio" name="card_type" value="idiom" {{if eq $f.CardType "idiom"}}checked{{end}}><span class="pill-label">숙어</span></label>
+    <label><input class="pill-radio" type="radio" name="card_type" value="concept" {{if eq $f.CardType "concept"}}checked{{end}}><span class="pill-label">개념</span></label>
   </div>
 
   <label class="field">
-    <span class="row-between">원문 (영어 · 용어)
+    <span class="field-label row-between">원문 (영어 · 용어)
       <span class="row">
         <button type="button" class="tts" data-tts-from="f-text" aria-label="영어 읽어주기">{{icon "volume"}}</button>
         <button type="button" class="btn pill pill-blue"
@@ -27,27 +27,27 @@
   </label>
 
   <label class="field">
-    <span>뜻 (설명)</span>
+    <span class="field-label">뜻 (설명)</span>
     <textarea id="f-meaning" name="meaning" rows="3" placeholder="우연한 행운, 뜻밖의 발견">{{$f.Meaning}}</textarea>
   </label>
 
   <label class="field">
-    <span>발음 기호</span>
+    <span class="field-label">발음 기호</span>
     <input id="f-phonetic" name="phonetic" placeholder="/ˌserənˈdipəti/" value="{{$f.Phonetic}}">
   </label>
 
   <label class="field">
-    <span>예문</span>
+    <span class="field-label">예문</span>
     <textarea id="f-example" name="example" rows="2">{{$f.Example}}</textarea>
   </label>
 
   <label class="field">
-    <span>태그 (쉼표로 구분)</span>
+    <span class="field-label">태그 (쉼표로 구분)</span>
     <input name="tags" placeholder="토익, 동사" value="{{$f.Tags}}">
   </label>
 
   <label class="field">
-    <span>메모</span>
+    <span class="field-label">메모</span>
     <input name="notes" value="{{$f.Notes}}">
   </label>
 

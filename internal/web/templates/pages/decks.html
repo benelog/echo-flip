@@ -6,7 +6,7 @@
 {{/* 새 덱 폼: summary를 누르면 열린다. 자바스크립트 없이 details만으로. */}}
 <details class="reveal">
   <summary class="tile-dashed">{{icon "plus"}} 새 덱 만들기</summary>
-  <form method="post" action="/decks" class="row">
+  <form method="post" action="/decks" class="row reveal-form">
     <input name="name" placeholder="덱 이름 (예: 토익 필수 단어)" autofocus required>
     <button class="btn btn-primary no-shrink">만들기</button>
   </form>
@@ -19,12 +19,12 @@
 
 <section class="stack">
   {{range .Data.Decks}}
-  <a class="tile deck-card" href="/decks/{{.Slug}}">
+  <a class="tile" href="/decks/{{.Slug}}">
     <div class="row-between">
       <span class="medium">{{.Name}}</span>
       <span class="small muted">{{.CardCount}}장</span>
     </div>
-    {{if .Description}}<p class="small muted">{{deref .Description}}</p>{{end}}
+    {{if .Description}}<p class="small muted deck-card-desc">{{deref .Description}}</p>{{end}}
   </a>
   {{else}}
   <p class="empty">아직 덱이 없어요. 첫 덱을 만들어보세요!</p>
